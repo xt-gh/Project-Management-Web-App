@@ -15,16 +15,18 @@ class ItemCard(Row):
     def build(self):
         return Container(
             content=Row([
-                Text(self.task_name, color="black", size=16),
+                Text(self.task_name, color="black", size=24),
                 IconButton(
                     icon=icons.MORE_HORIZ_ROUNDED,
                     icon_color="black"
                 )
-            ]),
+            ], alignment=MainAxisAlignment.SPACE_BETWEEN),
             bgcolor="#BABDE2",
             border=border.all(2, "#374375"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
+            width=200,
+            height=80,
             on_click=lambda e: print("Clickable without Ink clicked!"),
             ink=True
         )

@@ -1,5 +1,5 @@
 from flet import *
-from .FormComponents import DropdownInput, TextFieldInput
+from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
 from .ItemCard import ItemCard
 
 class ItemForm(Column):
@@ -16,12 +16,12 @@ class ItemForm(Column):
 
     
     def build(self):
-        self.task_name = TextFieldInput()
+        self.task_name = TextFieldInput(is_required=True)
         self.task_description = TextFieldInput()
         self.priority = DropdownInput(self.priotities)
         self.story_points = DropdownInput(self.fibbonacci)
         # self.type = TextFieldInput()
-        self.tags = DropdownInput(self.tags)
+        self.tags = MultipleSelectInput(self.tags)
         self.stage = DropdownInput(self.stages)
         self.assignee = DropdownInput(self.users)
         
@@ -62,24 +62,29 @@ class ItemForm(Column):
                     self.assignee,
                 ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                 Row([
-                    ElevatedButton("Submit", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
+                    ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
                     ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
                 ], alignment=MainAxisAlignment.SPACE_BETWEEN),
             ]),
-            bgcolor="grey",
+            bgcolor="pink",
             width=self.page.width * 0.5,
             height=self.page.height * 0.85,
             padding=padding.all(15),
             border_radius=border_radius.all(10),
         )
     
+    def is_valid_form(self):
+        return self.task_name.value != ""
+    
     def handle_submit(self):
-        return ItemCard(
-            task_name=self.task_name.value,
-            task_description=self.task_description.value,
-            priority=self.priority.value,
-            story_points=self.story_points.value,
-            tags=self.tags.value,
-            stage=self.stage.value,
-            assignee=self.assignee.value
-        )
+        if self.is_valid_form():
+            print("Form is valid")
+            item = "new item"
+            self.data.append(item)
+            self.close_form()
+            self.page.update()
+        
+        else:
+            print("Form is invalid")
+            self.task_name.error_text = "Task name is required"
+            self.page.update()
