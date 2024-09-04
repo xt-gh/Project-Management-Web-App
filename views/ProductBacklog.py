@@ -1,11 +1,12 @@
 from flet import *
 from .components.ItemCard import ItemCard
 from .components.ItemForm import ItemForm
+from data.manage_data import Data
 
 class ProductBacklog(Column):
-    def __init__(self, data, page, update_active_view):
+    def __init__(self, page, update_active_view):
         super().__init__()
-        self.data = data
+        self.data = Data()
         self.page = page
         self.update_active_view = update_active_view
         print(page.height)
@@ -24,13 +25,14 @@ class ProductBacklog(Column):
             height=self.page.height * 0.7,
         )
 
-        for i in range(len(self.data)):
+        product_backlog_items = self.data.get_product_backlog_items()
+
+        for key in product_backlog_items.keys():
             board.controls.append(
                 Container(
-                    content=ItemCard(task_name=self.data[i]),
+                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                 )
-                
             )   
         
         return Container(
@@ -60,18 +62,22 @@ class ProductBacklog(Column):
         print("Add item clicked")
 
         self.item_form = AlertDialog(
-            content=ItemForm(self.data, self.page, self.close_form),
+            content=ItemForm(self.page, self.close_form),
             on_dismiss=lambda e: print("Item form dismissed!"),
             bgcolor="#CADEED",
+            clip_behavior=ClipBehavior.HARD_EDGE
         )
         
         self.page.open(self.item_form)
 
     def add_item(self, item):
         print(vars(item))
+    
+    def handle_detailed_view(self, e):
+        print("Detailed view clicked")
 
     def close_form(self):
         print("Closing form")
-        print(self.data)
+        print(self.data.get_product_backlog_items())
         self.page.close(self.item_form)
         self.update_active_view()

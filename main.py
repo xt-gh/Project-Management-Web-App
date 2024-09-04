@@ -7,17 +7,16 @@ from views.ProductBacklog import ProductBacklog
 from views.Sprint import Sprint
 from views.SprintBoard import SprintBoard
 
-source_data = Data()
 
 class App(Row):
     def __init__(self, page):
         super().__init__(page)
-        self.data = source_data.get_board_items()
+        self.data = Data()
         self.page = page
         self.sidebar = SideBar(self.data, page)
-        self.active_view = ProductBacklog(self.data, self.page, self.update_active_view)
+        self.active_view = ProductBacklog(self.page, self.update_active_view)
         self.routes = {
-            "/productbacklog": ProductBacklog(self.data, self.page, self.update_active_view),
+            "/productbacklog": ProductBacklog(self.page, self.update_active_view),
             "/sprintboard": SprintBoard(),
             "/sprint": Sprint(),
         }
@@ -37,7 +36,7 @@ class App(Row):
 
     def get_active_view(self, route):
         routes = {
-            "/productbacklog": ProductBacklog(self.data, self.page, self.update_active_view),
+            "/productbacklog": ProductBacklog(self.page, self.update_active_view),
             "/sprintboard": SprintBoard(),
             "/sprint": Sprint(),
         }
