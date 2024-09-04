@@ -10,7 +10,7 @@ from views.SprintBoard import SprintBoard
 
 class App(Row):
     def __init__(self, page):
-        super().__init__(page)
+        super().__init__()
         self.data = Data()
         self.page = page
         self.sidebar = SideBar(self.data, page)

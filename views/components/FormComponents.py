@@ -60,51 +60,52 @@ class TextFieldInput(TextField):
                 self.error_text = None
             self.update()
 
-class MultipleSelectInput(GridView):
-    def __init__(self, options, is_required=False):
+class MultipleSelectInput(Row):
+    def __init__(self, options, expand=1, is_required=False):
         super().__init__()
         self.options = options
         self.is_required = is_required
         self.selected_options = []
         self.controls = [self.build_popup_menu()]
+        self.disabled = False
+
+        self.wrap = True
+        self.tight = True
         
-        self.expand = 1
-        self.runs_count = 3
-        self.max_extent = 150
-        self.child_aspect_ratio = 4.5
+        self.expand = expand
     
-    def handle_add_tag(self, e):
-        print("Add tag clicked for item", e.control.text)
-        self.selected_options.append(e.control.text)
-        self.options.remove(e.control.text)
-        self.add_chip(e.control.text)
+    def handle_add_tag(self, tag):
+        print("Add tag clicked for item", tag)
+        self.selected_options.append(tag)
+        print("REMOVING TAG", tag)
+        self.options.remove(tag)
+        self.add_chip(tag)
         if self.options == []:
             self.controls.pop()
         else:
             self.controls[-1] = self.build_popup_menu()
-        self.update()
     
     def add_chip(self, tag):
         chip = Chip(label=Text(tag, color="black"),
-                    bgcolor=colors.GREEN_200,
-                    on_delete = self.handle_remove_tag,
-                    delete_icon_color="black",
-                    width=200
+                    color="green",
+                    border_side=BorderSide(color="black", width=1),
                     )
+        if not self.disabled:
+            chip.on_delete = lambda e: (self.handle_remove_tag(e.control.label.value), self.update())
+            chip.delete_icon_color = "black"
+
         self.controls.insert(-1, chip)
 
-    def handle_remove_tag(self, e):
-        print(vars(e.control))
-        print("Remove tag clicked for item", e.control.label.value)
-        self.selected_options.remove(e.control.label.value)
-        self.options.append(e.control.label.value)
-        self.remove_chip(e.control.label.value)
+    def handle_remove_tag(self, tag):
+        print("Remove tag clicked for item", tag)
+        self.selected_options.remove(tag)
+        self.options.append(tag)
+        self.remove_chip(tag)
         
         if len(self.options) == 1:
             self.controls.append(self.build_popup_menu())
         else:
             self.controls[-1] = self.build_popup_menu()
-        self.update()
 
     def remove_chip(self, tag):
         for control in self.controls:
@@ -116,7 +117,21 @@ class MultipleSelectInput(GridView):
     def build_popup_menu(self):
         return PopupMenuButton(
             items=[
-                PopupMenuItem(text=option, on_click=self.handle_add_tag) for option in self.options
+                PopupMenuItem(text=option, on_click=lambda e: (self.handle_add_tag(e.control.text), self.update())) for option in self.options
             ],
             icon=icons.ADD,
         )
+    
+    # @property
+    # def disabled(self):
+    #     return self._disabled
+    
+    # @disabled.setter
+    # def disabled(self, value):
+    #     self._disabled = value
+    #     if self._disabled:
+    #         self.controls.pop() # remove the popup menu
+
+    #         for control in self.controls:
+    #             if isinstance(control, Chip):
+    #                 control.on_delete = None
