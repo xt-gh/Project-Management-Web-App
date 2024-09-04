@@ -32,7 +32,7 @@ class Data():
             "task_name": "Task 4",
             "description": "Description 4",
             "priority": "Urgent",
-            "story_points": "4",
+            "story_points": "5",
             "tags": ["UI", "Testing"],
             "stage": "Implementation",
             "assignee": ["Jane Smith"]
@@ -41,7 +41,7 @@ class Data():
             "task_name": "Task 5",
             "description": "Description 5",
             "priority": "Low",
-            "story_points": "5",
+            "story_points": "8",
             "tags": ["UX"],
             "stage": "Planning",
             "assignee": ["John Doe"]
@@ -50,7 +50,7 @@ class Data():
             "task_name": "Task 6",
             "description": "Description 6",
             "priority": "Medium",
-            "story_points": "6",
+            "story_points": "13",
             "tags": ["Testing", "Framework"],
             "stage": "Development",
             "assignee": ["Jane Doe"]
@@ -59,7 +59,7 @@ class Data():
             "task_name": "Task 7",
             "description": "Description 7",
             "priority": "Important",
-            "story_points": "7",
+            "story_points": "20",
             "tags": ["Front-end", "Back-end", "API"],
             "stage": "Testing",
             "assignee": ["John Smith"]

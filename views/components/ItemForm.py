@@ -39,16 +39,14 @@ class ItemForm(Container):
             self.header = [Text("Add Item", color="black", size=24)]
 
         if self.mode == "view":
-            self.header.append(
-                Text("Editing Item", color="black", size=24)
-            )
-            self.header.append(
-                    IconButton(
-                        icon=icons.DELETE_FOREVER,
-                        icon_color="black",
-                        on_click=lambda e: print("Delete clicked"),
-                    )
+            self.header = [
+                Text("Editing Item", color="black", size=24),
+                IconButton(
+                    icon=icons.DELETE_FOREVER,
+                    icon_color="black",
+                    on_click=lambda e: print("Delete clicked"),
                 )
+            ]
 
             item = self.product_backlog_items.get_product_backlog_item(self.item_id)
 
@@ -107,88 +105,6 @@ class ItemForm(Container):
         self.height=self.page.height * 0.85
         self.padding=padding.all(15)
         self.border_radius=border_radius.all(10)
-
-    def build_view_item_form(self):
-        self.task_name = TextFieldInput(is_required=True)
-        self.task_description = TextFieldInput()
-        self.task_description.multiline = True
-        self.priority = DropdownInput(self.priotity_options)
-        self.story_points = DropdownInput(self.fibbonacci)
-        self.tags = MultipleSelectInput(self.tag_options)
-        self.stage = DropdownInput(self.stage_options)
-        self.assignee = MultipleSelectInput(self.users)
-
-        item = self.product_backlog_items.get_product_backlog_item(self.item_id)
-
-        self.task_name.value = item["task_name"]
-        self.task_description.value = item["description"]
-        self.priority.value = item["priority"]
-        self.story_points.value = item["story_points"]
-        self.stage.value = item["stage"]
-        
-        for tag in item["tags"]:
-            self.tags.add_chip(tag)
-
-        for user in item["assignee"]:
-            self.assignee.add_chip(user)
-
-
-        self.task_name.disabled = True
-        self.task_description.disabled = True
-        self.priority.disabled = True
-        self.story_points.disabled = True
-        self.tags.disabled = True
-        self.stage.disabled = True
-        self.assignee.disabled = True
-
-        self.content=Column([
-                Row([
-                    Text("Add Item", color="black", size=24),
-                    IconButton(
-                        icon=icons.DELETE_FOREVER,
-                        icon_color="black",
-                        on_click=lambda e: print("Delete clicked"),
-                    )
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Task Name: ", color="black", size=20, width=150),
-                    self.task_name,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Description: ", color="black", size=20, width=150),
-                    self.task_description,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Priority: ", color="black", size=20, width=150),
-                    self.priority,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Story Points: ", color="black", size=20, width=150),
-                    self.story_points,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Tags: ", color="black", size=20, width=150),
-                    self.tags,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Stage: ", color="black", size=20, width=150),
-                    self.stage,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                Row([
-                    Text("Assignee: ", color="black", size=20, width=150),
-                    self.assignee,
-                ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-            ],
-            on_scroll=lambda e: print("Scrolled"),
-            scroll=ScrollMode.AUTO,
-            )
-        
-        self.bgcolor="pink"
-        self.width=self.page.width * 0.5
-        self.height=self.page.height * 0.85
-        self.padding=padding.all(15)
-        self.border_radius=border_radius.all(10)
-        
     
     def is_valid_form(self):
         return self.task_name.value != ""
