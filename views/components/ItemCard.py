@@ -32,7 +32,7 @@ class ItemCard(Column):
             tags.content.controls.append(
                 Container(
                     content=Text(self.tags[i], color="black", size=12),
-                    bgcolor="#F1F1F1",
+                    bgcolor="#FFFFFF",
                     border_radius=border_radius.all(5),
                     padding=padding.only(3, 1, 3, 1),
                     margin=margin.all(2),
@@ -88,7 +88,7 @@ class ItemCard(Column):
                 details
             ]
             ),
-            bgcolor="#BABDE2",
+            bgcolor="#DDDDDD",
             border=border.all(2, "#374375"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
