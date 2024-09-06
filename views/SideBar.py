@@ -17,8 +17,8 @@ class SideBar(Column):
                             bgcolor="#6686BD",
                             padding=10,
                             border_radius=border_radius.all(10),
-                            width=200,
-                            height=self.page.height - 130,
+                            width=300,
+                            height=self.page.height - 144,
                             # expand=True,
                         )
 
@@ -27,13 +27,13 @@ class SideBar(Column):
         return (
             Container(
                 content=Column([
-                    Text("Project Title", color="black", size=32),
+                    Text("Project Title", color="black", size=45),
                     Text("Project Description/Details", color="black", size=16),
                     self.navigator,
                 ], alignment=MainAxisAlignment.START),
                 padding=padding.all(15),
                 margin=margin.all(0),
-                width=250,
+                width=300,
             )
         )
     
