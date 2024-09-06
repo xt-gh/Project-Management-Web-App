@@ -18,6 +18,7 @@ class SideBar(Column):
                             padding=10,
                             border_radius=border_radius.all(10),
                             width=200,
+                            height=self.page.height - 130,
                             # expand=True,
                         )
 
