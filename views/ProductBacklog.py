@@ -49,7 +49,7 @@ class ProductBacklog(Column):
                         )
                     ]),
             bgcolor="#CADEED",
-            width=self.page.width - 300,
+            width=1105,
             height=self.page.height - 30,
             padding=padding.all(20),
             border_radius=border_radius.all(10),
