@@ -49,8 +49,8 @@ class ProductBacklog(Column):
                         )
                     ]),
             bgcolor="#CADEED",
-            width=1105,
-            height=self.page.height - 30,
+            width=1115,
+            height=self.page.height - 20,
             padding=padding.all(20),
             border_radius=border_radius.all(10),
         )
