@@ -8,7 +8,7 @@ class SideBar(Column):
         self.navigator = Container(
                             content=Column(
                                 controls=[
-                                    Text("View", color="white", size=24),
+                                    Text("View", color="white", size=35),
                                     ElevatedButton("Product Backlog", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/productbacklog")),
                                     ElevatedButton("Sprintboard", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/sprintboard")),
                                     ElevatedButton("Collaborators", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/sprint")),
