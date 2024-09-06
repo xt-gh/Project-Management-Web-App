@@ -39,7 +39,7 @@ class ProductBacklog(Column):
         return Container(
             content=Column([
                         Row([
-                            Text("Product Backlog", color=colors.GREEN_800, size=24),
+                            Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN,
                         ),
@@ -51,7 +51,7 @@ class ProductBacklog(Column):
             bgcolor="#CADEED",
             width=self.page.width - 300,
             height=self.page.height - 30,
-            padding=padding.all(15),
+            padding=padding.all(20),
             border_radius=border_radius.all(10),
         )
 
