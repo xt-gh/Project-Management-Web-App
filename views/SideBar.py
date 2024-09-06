@@ -9,12 +9,12 @@ class SideBar(Column):
                             content=Column(
                                 controls=[
                                     Text("View", color="white", size=24),
-                                    ElevatedButton("Product Backlog", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.page.go("/productbacklog")),
-                                    ElevatedButton("Sprintboard", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.page.go("/sprintboard")),
-                                    ElevatedButton("Collaborators", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.page.go("/sprint")),
+                                    ElevatedButton("Product Backlog", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/productbacklog")),
+                                    ElevatedButton("Sprintboard", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/sprintboard")),
+                                    ElevatedButton("Collaborators", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/sprint")),
                                 ],
                             ),
-                            bgcolor="#7291C1",
+                            bgcolor="#6686BD",
                             padding=10,
                             border_radius=border_radius.all(10),
                             width=200,
