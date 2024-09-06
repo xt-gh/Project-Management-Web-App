@@ -6,7 +6,7 @@ class ItemCard(Column):
         super().__init__()
         self.item_id = item_id
         self.data = Data()
-        item =self.data.get_product_backlog_item(self.item_id) 
+        item = self.data.get_product_backlog_item(self.item_id) 
 
         self.task_name = item["task_name"]
         self.task_description = item["description"]
@@ -23,20 +23,22 @@ class ItemCard(Column):
 
         tags = Container(
             content=Row(
-                alignment=MainAxisAlignment.START, 
-                wrap=False), 
+                alignment=MainAxisAlignment.SPACE_BETWEEN, 
+                tight=True), 
             bgcolor="#CADEED", 
             alignment=alignment.center_left
         )
-        for tag in self.tags:
+        for i in range(0, min(len(self.tags), 4)):
             tags.content.controls.append(
                 Container(
-                    content=Text(tag, color="black", size=12),
+                    content=Text(self.tags[i], color="black", size=12),
                     bgcolor="#F1F1F1",
                     border_radius=border_radius.all(5),
-                    padding=padding.all(1),
+                    padding=padding.only(3, 1, 3, 1),
                     margin=margin.all(2),
                 )
+                if i < 3 else
+                Text(f"+{len(self.tags)-3}", color="black", size="12")
             )
         task_title = Container(
             content=Text(
@@ -90,7 +92,7 @@ class ItemCard(Column):
             border=border.all(2, "#374375"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
-            width=200,
+            width=250,
             on_click=lambda e: print("Clickable without Ink clicked!"),
             ink=True
         )

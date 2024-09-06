@@ -24,6 +24,8 @@ class App(Row):
         self.controls=[self.sidebar, self.active_view]
         self.vertical_alignment = CrossAxisAlignment.START
 
+        self.page.on_resized = lambda e: (print("Window resized"), self.update_active_view())
+
     def route_change(self, e: RouteChangeEvent):
         self.active_view = self.get_active_view(e.route)
         self.controls[-1] = self.active_view
@@ -32,6 +34,7 @@ class App(Row):
 
     def update_active_view(self):
         self.controls[-1] = self.get_active_view(self.page.route)
+        self.controls[0] = SideBar(self.data, self.page)
         self.page.update()
 
     def get_active_view(self, route):
