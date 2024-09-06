@@ -46,6 +46,7 @@ class ItemCard(Column):
                 color="black", 
                 size=20,
                 max_lines=2,
+                expand=1,
                 overflow=TextOverflow.ELLIPSIS
             )
         )
@@ -91,7 +92,8 @@ class ItemCard(Column):
             border=border.all(1.5, "#6686BD"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
-            width=250,
+            margin=margin.all(5),
+            # width=250,
             on_click=lambda e: print("Clickable without Ink clicked!"),
             ink=True
         )
