@@ -47,8 +47,7 @@ class ItemCard(Column):
                 size=20,
                 max_lines=2,
                 overflow=TextOverflow.ELLIPSIS
-            ),
-            bgcolor="#CADEED",
+            )
         )
             
         details = Row([
@@ -69,14 +68,14 @@ class ItemCard(Column):
         if self.story_points:
             details.controls[0].controls.insert(
                 0,
-                Container(Text(f"  Story Points: {self.story_points} ", color="black", size=12), bgcolor="#CADEED"),
+                Container(Text(f"Story Points: {self.story_points} ", color="black", size=12)),
             )
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
 
         if self.priority:
             details.controls[0].controls.insert(
                 0,
-                Container(Text(f"Priority: {self.priority} ", color="black", size=12), bgcolor="#CADEED"),
+                Container(Text(f"Priority: {self.priority} ", color="black", size=12)),
             )
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
 
