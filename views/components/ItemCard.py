@@ -35,7 +35,7 @@ class ItemCard(Column):
                     bgcolor="#FFFFFF",
                     border_radius=border_radius.all(5),
                     padding=padding.only(3, 1, 3, 1),
-                    margin=margin.all(2),
+                    margin=margin.all(1),
                 )
                 if i < 3 else
                 Text(f"+{len(self.tags)-3}", color="black", size=17)
@@ -88,7 +88,7 @@ class ItemCard(Column):
             ]
             ),
             bgcolor="#DDDDDD",
-            border=border.all(2, "#6686BD"),
+            border=border.all(1.5, "#6686BD"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             width=250,
