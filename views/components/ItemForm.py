@@ -34,8 +34,9 @@ class ItemForm(AlertDialog):
         self.stage = DropdownInput(self.stage_options)
         self.assignee = MultipleSelectInput(self.users)
         self.footer = [
-            ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
             ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
+            
         ]
 
         if self.mode == "add":
@@ -121,10 +122,10 @@ class ItemForm(AlertDialog):
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
             ),
-            bgcolor="pink",
+            bgcolor="#6686BD",
             width=self.page.width * 0.5,
             height=self.page.height * 0.85,
-            padding=padding.all(15),
+            padding=padding.all(10),
             border_radius=border_radius.all(10),
         )
     
