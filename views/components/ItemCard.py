@@ -31,14 +31,14 @@ class ItemCard(Column):
         for i in range(0, min(len(self.tags), 4)):
             tags.content.controls.append(
                 Container(
-                    content=Text(self.tags[i], color="black", size=12),
-                    bgcolor="#F1F1F1",
+                    content=Text(self.tags[i], color="black", size=17),
+                    bgcolor="#FFFFFF",
                     border_radius=border_radius.all(5),
                     padding=padding.only(3, 1, 3, 1),
-                    margin=margin.all(2),
+                    margin=margin.all(1),
                 )
                 if i < 3 else
-                Text(f"+{len(self.tags)-3}", color="black", size="12")
+                Text(f"+{len(self.tags)-3}", color="black", size=17)
             )
         task_title = Container(
             content=Text(
@@ -47,8 +47,7 @@ class ItemCard(Column):
                 size=20,
                 max_lines=2,
                 overflow=TextOverflow.ELLIPSIS
-            ),
-            bgcolor="#CADEED",
+            )
         )
             
         details = Row([
@@ -69,14 +68,14 @@ class ItemCard(Column):
         if self.story_points:
             details.controls[0].controls.insert(
                 0,
-                Container(Text(f"  Story Points: {self.story_points} ", color="black", size=12), bgcolor="#CADEED"),
+                Container(Text(f"Story Points: {self.story_points} ", color="black", size=14)),
             )
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
 
         if self.priority:
             details.controls[0].controls.insert(
                 0,
-                Container(Text(f"Priority: {self.priority} ", color="black", size=12), bgcolor="#CADEED"),
+                Container(Text(f"Priority: {self.priority} ", color="black", size=14)),
             )
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
 
@@ -88,8 +87,8 @@ class ItemCard(Column):
                 details
             ]
             ),
-            bgcolor="#BABDE2",
-            border=border.all(2, "#374375"),
+            bgcolor="#DDDDDD",
+            border=border.all(1.5, "#6686BD"),
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             width=250,
