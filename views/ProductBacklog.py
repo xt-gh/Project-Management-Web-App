@@ -108,7 +108,6 @@ class ProductBacklog(Column):
 
     def apply_filter(self):
         filtered_items = self.filter_data.handle_filter_item()
-        print(f"Filtered items: {filtered_items}")
         self.update_board(filtered_items)
 
     def update_board(self, filtered_items):
