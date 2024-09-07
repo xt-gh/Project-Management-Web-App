@@ -6,32 +6,22 @@ class DataFilter():
         self.data = Data()
         self.selected_tag = None
 
-    # This function sets the selected tag from the popup menu
-    def set_selected_tagf(self, e, tag):
+    # Set the selected tag from the popup menu
+    def set_selected_filtered_tag(self,tag):
         self.selected_tag = tag
 
-    # # This function will filter tasks based on the selected tag
-    # def handle_filter_item(self, e):
-    #     # If no tag is selected or "All Tasks" is chosen, show all items
-    #     if self.selected_tag and self.selected_tag != "All Tasks":
-    #         filtered_items = {
-    #             key: item for key, item in self.data.get_product_backlog_items().items()
-    #             if item['tag'] == self.selected_tag
-    #         }
-    #     else:
-    #         # Show all items if "All Tasks" is selected
-    #         filtered_items = self.data.get_product_backlog_items()
-        
-    #     return filtered_items
-
-     # This function filters tasks based on the selected tag
+     # Filter tasks based on the selected tag
     def handle_filter_item(self):
         product_backlog_items = self.data.get_product_backlog_items()
         filtered_items = {}
 
-        # Filter items based on the selected tag
-        for key, item in product_backlog_items.items():
-            if item['tag'] == self.selected_tag:
-                filtered_items[key] = item
+         # Filter items based on the selected tag
+        if self.selected_tag and self.selected_tag != "All Tasks":
+            for key, item in product_backlog_items.items():
+                if self.selected_tag in item['tags']:
+                    filtered_items[key] = item
+        else:
+            # If "All Tasks" is selected, show all items
+            filtered_items = product_backlog_items
 
         return filtered_items
