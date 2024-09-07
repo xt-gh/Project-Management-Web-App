@@ -126,4 +126,28 @@ class ProductBacklog(Column):
         # Update the UI with the filtered tasks
         self.update_board(filtered_items)
 
-    
+ # This function updates the board with the filtered items
+    def update_board(self, filtered_items):
+        board = GridView(
+            expand=1,
+            max_extent=300,
+            child_aspect_ratio=1.5,
+            spacing=10,
+            run_spacing=10,
+            padding=padding.all(5),
+        )
+
+        # Add the filtered items to the board
+        for key in filtered_items.keys():
+            board.controls.append(
+                Container(
+                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                )
+            )
+
+        # Replace the old board with the new filtered board
+        self.page.controls[-1] = board
+        self.page.update()
+
+ 
