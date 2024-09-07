@@ -40,14 +40,14 @@ class ItemForm(AlertDialog):
         ]
 
         if self.mode == "add":
-            self.header = [Text("Add Item", color="black", size=24)]
+            self.header = [Text("Add Item", color="#F5F5F5", size=24)]
 
         else:
             self.header = [
                 Text("Editing Item", color="#F5F5F5", size=24),
                 IconButton(
                     icon=icons.DELETE_FOREVER,
-                    icon_color="black",
+                    icon_color="#F5F5F5",
                     on_click=lambda e: print("Delete clicked"),
                 )
             ]
