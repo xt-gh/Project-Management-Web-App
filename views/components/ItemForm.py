@@ -34,20 +34,19 @@ class ItemForm(AlertDialog):
         self.stage = DropdownInput(self.stage_options)
         self.assignee = MultipleSelectInput(self.users)
         self.footer = [
-            ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
             ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
-            
+            ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
         ]
 
         if self.mode == "add":
-            self.header = [Text("Add Item", color="#F5F5F5", size=24)]
+            self.header = [Text("Add Item", color="black", size=24)]
 
         else:
             self.header = [
-                Text("Editing Item", color="#F5F5F5", size=24),
+                Text("Editing Item", color="black", size=24),
                 IconButton(
                     icon=icons.DELETE_FOREVER,
-                    icon_color="#F5F5F5",
+                    icon_color="black",
                     on_click=lambda e: print("Delete clicked"),
                 )
             ]
@@ -80,7 +79,7 @@ class ItemForm(AlertDialog):
             content=Column(
                 [Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN)] +
                 [Row(
-                    controls=[Text(title, color="#F5F5F5", size=20, width=150), form], 
+                    controls=[Text(title, color="black", size=20, width=150), form], 
                     alignment=MainAxisAlignment.SPACE_BETWEEN, 
                     vertical_alignment=CrossAxisAlignment.START) 
                     for title, form in title_to_form] +
@@ -125,7 +124,7 @@ class ItemForm(AlertDialog):
             bgcolor="#6686BD",
             width=self.page.width * 0.5,
             height=self.page.height * 0.85,
-            padding=padding.all(10),
+            padding=padding.all(15),
             border_radius=border_radius.all(10),
         )
     
