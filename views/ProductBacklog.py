@@ -88,25 +88,27 @@ class ProductBacklog(Column):
         self.filter_menu_button = PopupMenuButton(
             icon="filter_alt",
             items=[
-                PopupMenuItem(text="Front-end", on_click=lambda e: self.set_selected_tag(e, "Front-end")),
-                PopupMenuItem(text="Back-end", on_click=lambda e: self.set_selected_tag(e, "Back-end")),
-                PopupMenuItem(text="API", on_click=lambda e: self.set_selected_tag(e, "API")),
-                PopupMenuItem(text="Database", on_click=lambda e: self.set_selected_tag(e, "Database")),
-                PopupMenuItem(text="UI", on_click=lambda e: self.set_selected_tag(e, "UI")),
-                PopupMenuItem(text="UX", on_click=lambda e: self.set_selected_tag(e, "UX")),
-                PopupMenuItem(text="Testing", on_click=lambda e: self.set_selected_tag(e, "Testing")),
-                PopupMenuItem(text="Framework", on_click=lambda e: self.set_selected_tag(e, "Framework")),
-                PopupMenuItem(text="All Tasks", on_click=lambda e: self.set_selected_tag(e, "All Tasks"))
+                PopupMenuItem(text="All Tasks", on_click=lambda _: self.filter_selected_tag("All Tasks")),
+                PopupMenuItem(text="API", on_click=lambda _: self.filter_selected_tag("API")),
+                PopupMenuItem(text="Back-end", on_click=lambda _: self.filter_selected_tag("Back-end")),
+                PopupMenuItem(text="Database", on_click=lambda _: self.filter_selected_tag("Database")),
+                PopupMenuItem(text="Framework", on_click=lambda _: self.filter_selected_tag("Framework")),
+                PopupMenuItem(text="Front-end", on_click=lambda _: self.filter_selected_tag("Front-end")),
+                PopupMenuItem(text="Testing", on_click=lambda _: self.filter_selected_tag("Testing")),
+                PopupMenuItem(text="UI", on_click=lambda _: self.filter_selected_tag("UI")),
+                PopupMenuItem(text="UX", on_click=lambda _: self.filter_selected_tag("UX"))   
             ]
         )
         return self.filter_menu_button
     
-    def set_selected_tag(self, tag):
-        self.filter_data.set_selected_tag(tag)
+    def filter_selected_tag(self, tag):
+        print(f"Tag selected: {tag}")
+        self.filter_data.set_selected_filtered_tag(tag)
         self.apply_filter()
 
     def apply_filter(self):
         filtered_items = self.filter_data.handle_filter_item()
+        print(f"Filtered items: {filtered_items}")
         self.update_board(filtered_items)
 
     def update_board(self, filtered_items):
