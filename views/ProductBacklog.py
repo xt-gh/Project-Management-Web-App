@@ -2,6 +2,7 @@ from flet import *
 from .components.ItemCard import ItemCard
 from .components.ItemForm import ItemForm
 from data.manage_data import Data
+from data.filter_data import DataFilter 
 
 class ProductBacklog(Column):
     def __init__(self, page, update_active_view):
@@ -9,12 +10,13 @@ class ProductBacklog(Column):
         self.data = Data()
         self.page = page
         self.update_active_view = update_active_view
-        self.selected_tag = None # to store the selected tag
+        self.filter_data = DataFilter()
+
         print(page.height)
 
     def build(self):
 
-        board = GridView(
+        self.board = GridView(
             expand=1,
             # runs_count=3,
             max_extent=300,
@@ -28,14 +30,13 @@ class ProductBacklog(Column):
         product_backlog_items = self.data.get_product_backlog_items()
 
         for key in product_backlog_items.keys():
-            board.controls.append(
+            self.board.controls.append(
                 Container(
                     content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                 )
             )
 
-        self.filter_pop_up_button()
         # board.controls.sort(key=lambda container: int(container.content.story_points))
         
         return Container(
@@ -43,11 +44,11 @@ class ProductBacklog(Column):
                         Row([
                             Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
-                            self.filter_menu_button
+                            self.filter_pop_up_button(),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN,
                         ),
                         Container(
-                            content=board,
+                            content=self.board,
                             # bgcolor="pink",
                         )
                     ]),
@@ -82,9 +83,6 @@ class ProductBacklog(Column):
         self.page.close(self.detailed_view)
         self.update_active_view()
     
-    def set_selected_tag(self,e,tag):
-        self.selected_tag = tag
-
     def filter_pop_up_button(self):
         # Create PopupMenuButton for task filtering
         self.filter_menu_button = PopupMenuButton(
@@ -101,3 +99,29 @@ class ProductBacklog(Column):
                 PopupMenuItem(text="All Tasks", on_click=lambda e: self.set_selected_tag(e, "All Tasks"))
             ]
         )
+        return self.filter_menu_button
+    
+    def set_selected_tag(self, tag):
+        self.filter_data.set_selected_tag(tag)
+        self.apply_filter()
+
+    def apply_filter(self):
+        filtered_items = self.filter_data.handle_filter_item()
+        self.update_board(filtered_items)
+
+    def update_board(self, filtered_items):
+        # Clear the existing board content
+        self.board.controls.clear()
+
+        for key in filtered_items.keys():
+            self.board.controls.append(
+                Container(
+                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                )
+            )
+
+        # Update the page after modifying the board controls
+        self.page.update()
+
+        
