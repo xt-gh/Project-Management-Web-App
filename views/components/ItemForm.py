@@ -44,7 +44,7 @@ class ItemForm(AlertDialog):
 
         else:
             self.header = [
-                Text("Editing Item", color="black", size=24),
+                Text("Editing Item", color="#F5F5F5", size=24),
                 IconButton(
                     icon=icons.DELETE_FOREVER,
                     icon_color="black",
@@ -80,7 +80,7 @@ class ItemForm(AlertDialog):
             content=Column(
                 [Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN)] +
                 [Row(
-                    controls=[Text(title, color="black", size=20, width=150), form], 
+                    controls=[Text(title, color="#F5F5F5", size=20, width=150), form], 
                     alignment=MainAxisAlignment.SPACE_BETWEEN, 
                     vertical_alignment=CrossAxisAlignment.START) 
                     for title, form in title_to_form] +
