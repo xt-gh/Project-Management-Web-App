@@ -104,4 +104,26 @@ class ProductBacklog(Column):
             ]
         )
 
+        # Create ElevatedButton to apply the filter
+        self.filter_button = ElevatedButton(
+            text="Apply Filter",
+            icon="filter_alt",
+            on_click=self.handle_filter_item  # Apply filter when clicked
+        )
+
+     # This function will filter tasks based on the selected tag
+    def handle_filter_item(self, e):
+        # If no tag is selected or "All Tasks" is chosen, show all items
+        if self.selected_tag and self.selected_tag != "All Tasks":
+            filtered_items = {
+                key: item for key, item in self.data.get_product_backlog_items().items()
+                if item['tag'] == self.selected_tag
+            }
+        else:
+            # Show all items if "All Tasks" is selected
+            filtered_items = self.data.get_product_backlog_items()
+
+        # Update the UI with the filtered tasks
+        self.update_board(filtered_items)
+
     
