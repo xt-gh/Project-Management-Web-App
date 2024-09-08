@@ -86,7 +86,7 @@ class ProductBacklog(Column):
     def filter_pop_up_button(self):
         # Create PopupMenuButton for task filtering
         self.filter_menu_button = PopupMenuButton(
-            icon="filter_alt",
+            icon="filter_alt", icon_color='black',
             items=[
                 PopupMenuItem(text="All Tasks", on_click=lambda _: self.filter_selected_tag("All Tasks")),
                 PopupMenuItem(text="API", on_click=lambda _: self.filter_selected_tag("API")),
