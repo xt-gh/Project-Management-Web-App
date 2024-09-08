@@ -86,13 +86,13 @@ class MultipleSelectInput(Row):
             self.controls[-1] = self.build_popup_menu()
     
     def add_chip(self, tag):
-        chip = Chip(label=Text(tag, color="black"),
+        chip = Chip(label=Text(tag, color="white"),
                     color="green",
-                    border_side=BorderSide(color="black", width=1),
+                    border_side=BorderSide(color="white", width=1),
                     )
         if not self.disabled:
             chip.on_delete = lambda e: (self.handle_remove_tag(e.control.label.value), self.update())
-            chip.delete_icon_color = "black"
+            chip.delete_icon_color = "white"
 
         self.controls.insert(-1, chip)
 
