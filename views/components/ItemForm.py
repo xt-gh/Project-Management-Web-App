@@ -34,8 +34,8 @@ class ItemForm(AlertDialog):
         self.stage = DropdownInput(self.stage_options)
         self.assignee = MultipleSelectInput(self.users)
         self.footer = [
-            ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
             ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
         ]
 
         if self.mode == "add":
