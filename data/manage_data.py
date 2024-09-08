@@ -1,4 +1,12 @@
+from pymongo import MongoClient
+
 class Data():
+    def __init__(self, uri='mongodb+srv://mwon0072:AVsCzA9IbIECXMNX@helium.6iy1m.mongodb.net/', database_name='projectDatabase', collection_name='task'):
+        self.client = MongoClient(uri)
+        self.db = self.client[database_name]
+        self.collection = self.db[collection_name]
+    
+    
     product_backlog_items = {
 
         "item1": {
@@ -73,14 +81,14 @@ class Data():
         }
     }
 
-    def __init__(self):
-        pass
+    # def __init__(self):
+    #     pass
 
     def get_product_backlog_items(self):
-        return self.product_backlog_items
+        return self.collection.find()
     
     def get_product_backlog_item(self, id):
-        return self.product_backlog_items[id]
+        return self.collection.find_one({"_id": id})
 
     def add_product_backlog_item(self, item):
         item = {
@@ -92,14 +100,13 @@ class Data():
             "stage": item["stage"],
             "assignee": item["assignee"]
         }
-        self.product_backlog_items[f"item{len(self.product_backlog_items)+1}"] = item
+        self.collection.insert_one(item)
 
     def remove_product_backlog_item(self, id):
-        self.product_backlog_items.pop(id)
+        self.collection.delete_one({"_id": id})
 
     def update_product_backlog_item(self, id, item):
-        original_item = self.product_backlog_items[id]
-        original_item.update({
+        self.collection.update_one({
             "task_name": item["task_name"],
             "description": item["description"],
             "priority": item["priority"],
@@ -108,3 +115,13 @@ class Data():
             "stage": item["stage"],
             "assignee": item["assignee"]
         })
+
+data = Data()
+items = data.get_product_backlog_items()
+ids = []
+for item in items:
+    print(item)
+    ids.append(item["_id"])
+
+print()
+print(data.get_product_backlog_item(ids[-1]))
