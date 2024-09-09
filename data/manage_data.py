@@ -1,10 +1,17 @@
 from pymongo import MongoClient
+import requests
+import json
 
 class Data():
-    def __init__(self, uri='mongodb+srv://mwon0072:AVsCzA9IbIECXMNX@helium.6iy1m.mongodb.net/', database_name='projectDatabase', collection_name='task'):
-        self.client = MongoClient(uri)
-        self.db = self.client[database_name]
-        self.collection = self.db[collection_name]
+    def __init__(self):
+        self.base_url = 'https://ap-southeast-1.aws.data.mongodb-api.com/app/data-vevzgeu/endpoint/data/v1'
+        self.api_key = 'oFUhaqY07FnEp8S3hU4Bw8bxTMHM4plR3kWxT1856Wt3Hc0iiUjcn3vrhzDzLoyK'  # Replace with your API key
+        self.headers = {
+            "Content-Type": "application/json",
+            "api-key": self.api_key,
+        }
+        self.database_name = "projectDatabase"
+        self.collection_name = "task"
     
     
     product_backlog_items = {
@@ -84,44 +91,106 @@ class Data():
     # def __init__(self):
     #     pass
 
+    # Method to get all product backlog items
     def get_product_backlog_items(self):
-        return self.collection.find()
-    
-    def get_product_backlog_item(self, id):
-        return self.collection.find_one({"_id": id})
-
-    def add_product_backlog_item(self, item):
-        item = {
-            "task_name": item["task_name"],
-            "description": item["description"],
-            "priority": item["priority"],
-            "story_points": item["story_points"],
-            "tags": item["tags"],
-            "stage": item["stage"],
-            "assignee": item["assignee"]
-        }
-        self.collection.insert_one(item)
-
-    def remove_product_backlog_item(self, id):
-        self.collection.delete_one({"_id": id})
-
-    def update_product_backlog_item(self, id, item):
-        self.collection.update_one({
-            "task_name": item["task_name"],
-            "description": item["description"],
-            "priority": item["priority"],
-            "story_points": item["story_points"],
-            "tags": item["tags"],
-            "stage": item["stage"],
-            "assignee": item["assignee"]
+        url = f"{self.base_url}/action/find"
+        payload = json.dumps({
+            "dataSource": "helium",  # Replace with your data source name
+            "database": self.database_name,
+            "collection": self.collection_name,
         })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
 
-data = Data()
-items = data.get_product_backlog_items()
-ids = []
-for item in items:
-    print(item)
-    ids.append(item["_id"])
+    # Method to get a single product backlog item by its _id
+    def get_product_backlog_item(self, item_id):
+        url = f"{self.base_url}/action/findOne"
+        payload = json.dumps({
+            "dataSource": "helium",  # Replace with your data source name
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": item_id}}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
 
-print()
-print(data.get_product_backlog_item(ids[-1]))
+    # Method to add a new product backlog item
+    def add_product_backlog_item(self, item):
+        url = f"{self.base_url}/action/insertOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "document": item
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
+
+    # Method to update a product backlog item
+    def update_product_backlog_item(self, item_id, updated_fields):
+        url = f"{self.base_url}/action/updateOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": item_id}},
+            "update": {"$set": updated_fields}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
+
+    # Method to remove a product backlog item by its _id
+    def remove_product_backlog_item(self, item_id):
+        url = f"{self.base_url}/action/deleteOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": item_id}}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
+
+if __name__ == "__main__":
+    data_api = Data()
+
+    # Get all product backlog items
+    items = data_api.get_product_backlog_items()
+    print("All Backlog Items:", items)
+
+    # Add a new product backlog item
+    new_item = {
+        "task_name": "New Task",
+        "description": "New Task Description",
+        "priority": "High",
+        "story_points": 5,
+        "tags": ["API", "Front-end"],
+        "stage": "Development",
+        "status": "In Progress",
+        "type": "Bug",
+        "assignee": "John Doe",
+        "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
+    }
+    add_response = data_api.add_product_backlog_item(new_item)
+    print("New Item Added:", add_response)
+
+    # Get a specific product backlog item by ID
+    first_item_id = items['documents'][0]['_id']  # Extract ObjectId from first item
+    fetched_item = data_api.get_product_backlog_item(first_item_id)
+    print("Fetched Item:", fetched_item)
+
+    # Update an item
+    updated_fields = {
+        "status": "Completed",
+        "logs": ["Item was marked as completed on 2022-02-01"]
+    }
+    update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
+    print("Updated Item:", update_response)
+    items = data_api.get_product_backlog_items()
+    print("All Backlog Items:", items)
+
+    # Remove an item
+    remove_response = data_api.remove_product_backlog_item(first_item_id)
+    print("Item Removed:", remove_response)
+    items = data_api.get_product_backlog_items()
+    print("All Backlog Items:", items)
