@@ -92,7 +92,7 @@ class MultipleSelectInput(Row):
                     )
         if not self.disabled:
             chip.on_delete = lambda e: (self.handle_remove_tag(e.control.label.value), self.update())
-            chip.delete_icon_color = "white"
+            chip.delete_icon_color = "black"
 
         self.controls.insert(-1, chip)
 
