@@ -63,9 +63,11 @@ class ProductBacklog(Column):
             content=Column([
                         Row([
                             Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
-                            ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
-                            self.sort_menu_button,
-                            self.filter_pop_up_button(),
+                            Row([
+                                self.sort_menu_button,
+                                self.filter_pop_up_button(),
+                                ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
+                            ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN,
                         ),
                         Container(
@@ -74,7 +76,7 @@ class ProductBacklog(Column):
                         )
                     ]),
             bgcolor="#CADEED",
-            width=1115,
+            width=self.page.width - 330,
             height=self.page.height - 20,
             padding=padding.all(20),
             border_radius=border_radius.all(10),
