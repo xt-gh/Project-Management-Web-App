@@ -56,7 +56,6 @@ class ProductBacklog(Column):
                 Container(
                     content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
-                    bgcolor="yellow"
                 )
             )
         
