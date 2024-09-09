@@ -16,6 +16,8 @@ class Data():
             "story_points": "1",
             "tags": ["Front-end", "UI"],
             "stage": "Planning",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "John Doe",
             "logs": ["John Doe added this item on 2022-01-01 10:00 AM", "John Doe edited this item on 2022-01-02 11:00 AM"]
         },
@@ -26,6 +28,8 @@ class Data():
             "story_points": "2",
             "tags": ["Back-end", "API"],
             "stage": "Development",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "Jane Doe",
             "logs": ["Jane Doe added this item on 2022-01-02 11:00 AM", "Jane Doe edited this item on 2022-01-03 12:00 PM"]
         },
@@ -36,6 +40,8 @@ class Data():
             "story_points": "3",
             "tags": ["Database"],
             "stage": "Testing",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "John Smith",
             "logs": ["John Smith added this item on 2022-01-03 12:00 PM", "John Smith edited this item on 2022-01-04 01:00 PM"]
         },
@@ -46,6 +52,8 @@ class Data():
             "story_points": "5",
             "tags": ["UI", "Testing"],
             "stage": "Implementation",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "Jane Smith",
             "logs": ["Jane Smith added this item on 2022-01-04 01:00 PM", "Jane Smith edited this item on 2022-01-05 02:00 PM"]
         },
@@ -56,6 +64,8 @@ class Data():
             "story_points": "8",
             "tags": ["UX"],
             "stage": "Planning",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "John Doe",
             "logs": ["John Doe added this item on 2022-01-05 02:00 PM", "John Doe edited this item on 2022-01-06 03:00 PM"]
         },
@@ -66,6 +76,8 @@ class Data():
             "story_points": "13",
             "tags": ["Testing", "Framework"],
             "stage": "Development",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "Jane Doe",
             "logs": ["Jane Doe added this item on 2022-01-06 03:00 PM", "Jane Doe edited this item on 2022-01-07 04:00 PM"]
         },
@@ -76,6 +88,8 @@ class Data():
             "story_points": "20",
             "tags": ["Front-end", "Back-end", "API"],
             "stage": "Testing",
+            "status": "Not Started",
+            "type": "User Story",
             "assignee": "John Smith",
             "logs": ["John Smith added this item on 2022-01-07 04:00 PM", "John Smith edited this item on 2022-01-08 05:00 PM"]
         }
@@ -98,8 +112,10 @@ class Data():
             "description": item["description"],
             "priority": item["priority"],
             "story_points": item["story_points"],
-            "tags": item["tags"],
             "stage": item["stage"],
+            "status": item["status"],
+            "type": item["type"],
+            "tags": item["tags"],
             "assignee": item["assignee"]
         }
         new_key = f"item{len(self.product_backlog_items)+1}"
