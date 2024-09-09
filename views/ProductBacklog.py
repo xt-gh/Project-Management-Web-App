@@ -49,10 +49,10 @@ class ProductBacklog(Column):
     def build(self):
         product_backlog_items = self.data.get_product_backlog_items()
 
-        for key in product_backlog_items.keys():
+        for item in product_backlog_items:
             self.board.controls.append(
                 Container(
-                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    content=ItemCard(item_id=item["_id"], handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                 )
             )
@@ -95,7 +95,6 @@ class ProductBacklog(Column):
 
     def close_add_item_form(self):
         print("Closing form")
-        print(self.data.get_product_backlog_items())
         self.page.close(self.item_form)
         self.update_active_view()
 
@@ -126,37 +125,17 @@ class ProductBacklog(Column):
         self.page.update()
 
     def sort_oldest_to_newest(self):
-        product_backlog_items = self.data.get_product_backlog_items()
-
-        self.board.controls.clear()
-        for key in product_backlog_items.keys():
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
-        
-        
-        self.board.controls.reverse() # This works because items are retrived in chronological order
-        # Will need to add a creation_date attribute to the data base soon
+        self.board.controls.sort(key=lambda container: container.content.date, reverse=False)
+        self.page.update()
 
     
     def sort_newest_to_oldest(self):
-        product_backlog_items = self.data.get_product_backlog_items()
-
-        self.board.controls.clear()
-        for key in product_backlog_items.keys():
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
+        self.board.controls.sort(key=lambda container: container.content.date, reverse=True)
+        self.page.update()
 
 
     def priority_value(self, priority):
-        priorities = ["Low", "Medium", "Important", "Urgent"]
+        priorities = [None, "Low", "Medium", "Important", "Urgent"]
         priority_level = priorities.index(priority) + 1
         return priority_level
 
@@ -194,10 +173,10 @@ class ProductBacklog(Column):
         # Clear the existing board content
         self.board.controls.clear()
 
-        for key in filtered_items.keys():
+        for item in filtered_items:
             self.board.controls.append(
                 Container(
-                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    content=ItemCard(item_id=item["_id"], handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                 )
             )

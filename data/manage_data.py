@@ -115,7 +115,8 @@ class Data():
             "collection": self.collection_name,
         })
         response = requests.post(url, headers=self.headers, data=payload)
-        return response.json()
+        # print(response.json())
+        return response.json()['documents']
 
     # Method to get a single product backlog item by its _id
     def get_product_backlog_item(self, item_id):
@@ -127,7 +128,8 @@ class Data():
             "filter": {"_id": {"$oid": item_id}}
         })
         response = requests.post(url, headers=self.headers, data=payload)
-        return response.json()
+        # print(response.json())
+        return response.json()['document']
 
     # Method to add a new product backlog item
     def add_product_backlog_item(self, item):
@@ -171,7 +173,8 @@ if __name__ == "__main__":
 
     # Get all product backlog items
     items = data_api.get_product_backlog_items()
-    print("All Backlog Items:", items)
+    for item in items:
+        print(item)
 
     # Add a new product backlog item
     new_item = {
@@ -191,7 +194,7 @@ if __name__ == "__main__":
     print("New Item Added:", add_response)
 
     # Get a specific product backlog item by ID
-    first_item_id = items['documents'][0]['_id']  # Extract ObjectId from first item
+    first_item_id = items[0]['_id']  # Extract ObjectId from first item
     fetched_item = data_api.get_product_backlog_item(first_item_id)
     print("Fetched Item:", fetched_item)
 
@@ -202,11 +205,14 @@ if __name__ == "__main__":
     }
     update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
     print("Updated Item:", update_response)
+
     items = data_api.get_product_backlog_items()
-    print("All Backlog Items:", items)
+    for item in items:
+        print(item)
 
     # Remove an item
     remove_response = data_api.remove_product_backlog_item(first_item_id)
     print("Item Removed:", remove_response)
     items = data_api.get_product_backlog_items()
-    print("All Backlog Items:", items)
+    for item in items:
+        print(item)

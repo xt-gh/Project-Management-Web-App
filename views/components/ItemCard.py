@@ -15,6 +15,7 @@ class ItemCard(Column):
         self.tags = item["tags"]
         self.stage = item["stage"]
         self.assignee = item["assignee"]
+        self.date = item["admin_add_date"]
 
         self.handle_detailed_view = handle_detailed_view
 
