@@ -10,11 +10,9 @@ class ItemForm(AlertDialog):
         self.mode = mode # Mode can be "add" or "view" or "edit"
         self.item_id = id
         self.product_backlog_items = Data()
+        self.content_padding = 10
 
         self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
-        self.task_stage_options = ["Planning", "Development", "Testing", "Implementation"]
-        self.task_status_options = ["Not Started", "In Progress", "Completed"]
-        self.task_type_options = ["User Story", "Bug"]
         self.stage_options = ["Planning", "Development", "Testing", "Implementation"]
         self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
         self.priotity_options = ["Low", "Medium", "Important", "Urgent"]
@@ -33,14 +31,12 @@ class ItemForm(AlertDialog):
         self.task_description.min_lines = 3
         self.priority = DropdownInput(self.priotity_options)
         self.story_points = DropdownInput(self.fibbonacci)
-        self.task_stage = DropdownInput(self.task_stage_options)
-        self.task_status = DropdownInput(self.task_status_options)
-        self.task_type = DropdownInput(self.task_type_options)
         self.tags = MultipleSelectInput(self.tag_options)
-        self.assignee = TextFieldInput()
+        self.stage = DropdownInput(self.stage_options)
+        self.assignee = MultipleSelectInput(self.users)
         self.footer = [
-            ElevatedButton("Cancel", bgcolor="#DAE9FE", width=100, color="black", on_click=lambda e: self.close_form()),
-            ElevatedButton("Save", bgcolor="#DAE9FE", width=100, color="black", on_click=lambda e: self.handle_submit()),
+            ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
         ]
 
         if self.mode == "add":
@@ -62,33 +58,21 @@ class ItemForm(AlertDialog):
             self.task_description.value = item["description"]
             self.priority.value = item["priority"]
             self.story_points.value = item["story_points"]
-            self.task_stage.value = item["stage"]
-            self.task_status.value = item["status"]
-            self.task_type.value = item["type"]
-            self.assignee.value = item["assignee"]
+            self.stage.value = item["stage"]
             
             for tag in item["tags"]:
                 self.tags.handle_add_tag(tag)
 
-        # Give each form element a label
-        self.task_name.label = "Task Name"
-        self.task_description.label = "Description"
-        self.priority.label = "Priority"
-        self.story_points.label = "Story Points"
-        self.task_stage.label = "Stage"
-        self.task_status.label = "Status"
-        self.task_type.label = "Type"
-        self.assignee.label = "Assignee"
+            for user in item["assignee"]:
+                self.assignee.handle_add_tag(user)
         
         title_to_form = [
             ("Task Name", self.task_name),
             ("Description", self.task_description),
             ("Priority", self.priority),
             ("Story Points", self.story_points),
-            ("Stage", self.task_stage),
-            ("Status", self.task_status),
-            ("Type", self.task_type),
             ("Tags", self.tags),
+            ("Stage", self.stage),
             ("Assignee", self.assignee),
         ]
     
@@ -96,12 +80,11 @@ class ItemForm(AlertDialog):
             content=Column(
                 [Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN)] +
                 [Row(
-                    # controls=[Container(Text(title, color="black", size=20, width=150), margin=margin.all(5)), form], 
-                    controls=[form], 
+                    controls=[Text(title, color="white", size=20, width=150), form], 
                     alignment=MainAxisAlignment.SPACE_BETWEEN, 
                     vertical_alignment=CrossAxisAlignment.START) 
                     for title, form in title_to_form] +
-                [Container(Row (self.footer, alignment=MainAxisAlignment.END), padding=padding.only(0, 0, 0, 10))],
+                [Row (self.footer, alignment=MainAxisAlignment.SPACE_BETWEEN)],
                 #     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
                 #     Row([
                 #         Text("Task Name: ", color="black", size=20, width=150),
@@ -139,11 +122,12 @@ class ItemForm(AlertDialog):
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
             ),
-            # bgcolor="grey",
+            bgcolor="#6686BD",
             width=self.page.width * 0.5,
-            height=self.page.height * 0.85,
-            padding=padding.only(15, 15, 15, 15),
+            # height=self.page.height * 0.85,
+            padding=padding.all(15),
             border_radius=border_radius.all(10),
+            expand = 1
         )
     
     def is_valid_form(self):
@@ -157,11 +141,9 @@ class ItemForm(AlertDialog):
                 "description": self.task_description.value,
                 "priority": self.priority.value,
                 "story_points": self.story_points.value,
-                "stage": self.task_stage.value,
-                "status": self.task_status.value,
-                "type": self.task_type.value,
                 "tags": self.tags.selected_options,
-                "assignee": self.assignee.value
+                "stage": self.stage.value,
+                "assignee": self.assignee.selected_options
             }
             if self.mode == "add":
                 self.product_backlog_items.add_product_backlog_item(item)
