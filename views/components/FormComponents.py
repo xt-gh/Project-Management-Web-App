@@ -1,8 +1,11 @@
 from flet import *
 
 class DropdownInput(Dropdown):
-    def __init__(self, options, expand=1, is_required=False):
+    def __init__(self, options, label="", expand=1, is_required=False):
         super().__init__()
+        self.label = label
+        self.label_style = TextStyle(color="GREY_900", size=15)
+
         self.options_fill_horizontally = False
         self.expand = expand
         self.options = [dropdown.Option(val) for val in options]
@@ -34,6 +37,9 @@ class TextFieldInput(TextField):
     def __init__(self, label="", expand=1, is_required=False):
         super().__init__()
         self.label = label
+        self.label_style = TextStyle(color="GREY_900", size=15)
+        self.border_color = "black"
+
         self.expand = expand
         self.color = "black"
         self.size = 20
