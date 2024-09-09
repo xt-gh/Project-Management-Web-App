@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from datetime import datetime
 import requests
 import json
 
@@ -169,6 +170,7 @@ if __name__ == "__main__":
         "status": "In Progress",
         "type": "Bug",
         "assignee": "John Doe",
+        "admin_add_date": datetime.utcnow().isoformat(),
         "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
     }
     add_response = data_api.add_product_backlog_item(new_item)
