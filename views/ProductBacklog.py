@@ -42,7 +42,7 @@ class ProductBacklog(Column):
             expand=1,
             # runs_count=3,
             max_extent=300,
-            child_aspect_ratio=1.5,
+            child_aspect_ratio=1.40,
             # horizontal=True,
             spacing=10,
             run_spacing=10,
@@ -56,6 +56,7 @@ class ProductBacklog(Column):
                 Container(
                     content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
+                    bgcolor="yellow"
                 )
             )
         
