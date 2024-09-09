@@ -10,13 +10,11 @@ class ItemForm(AlertDialog):
         self.mode = mode # Mode can be "add" or "view" or "edit"
         self.item_id = id
         self.product_backlog_items = Data()
+        self.content_padding = 10
 
         # self.inset_padding = 10
 
         self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
-        self.task_stage_options = ["Planning", "Development", "Testing", "Implementation"]
-        self.task_status_options = ["Not Started", "In Progress", "Completed"]
-        self.task_type_options = ["User Story", "Bug"]
         self.stage_options = ["Planning", "Development", "Testing", "Implementation"]
         self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
         self.priotity_options = ["Low", "Medium", "Important", "Urgent"]
@@ -68,10 +66,7 @@ class ItemForm(AlertDialog):
             self.task_description.value = item["description"]
             self.priority.value = item["priority"]
             self.story_points.value = item["story_points"]
-            self.task_stage.value = item["stage"]
-            self.task_status.value = item["status"]
-            self.task_type.value = item["type"]
-            self.assignee.value = item["assignee"]
+            self.stage.value = item["stage"]
             
             for tag in item["tags"]:
                 self.tags.handle_add_tag(tag)
@@ -107,6 +102,7 @@ class ItemForm(AlertDialog):
             height=self.page.height * 0.7,
             padding=padding.only(15, 15, 15, 15),
             border_radius=border_radius.all(10),
+            expand = 1
         )
     
     def is_valid_form(self):
@@ -120,11 +116,9 @@ class ItemForm(AlertDialog):
                 "description": self.task_description.value,
                 "priority": self.priority.value,
                 "story_points": self.story_points.value,
-                "stage": self.task_stage.value,
-                "status": self.task_status.value,
-                "type": self.task_type.value,
                 "tags": self.tags.selected_options,
-                "assignee": self.assignee.value
+                "stage": self.stage.value,
+                "assignee": self.assignee.selected_options
             }
             if self.mode == "add":
                 self.product_backlog_items.add_product_backlog_item(item)
