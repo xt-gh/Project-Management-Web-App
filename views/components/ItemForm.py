@@ -1,6 +1,7 @@
 from flet import *
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
 from data.manage_data import Data
+from datetime import datetime
 
 class ItemForm(AlertDialog):
     def __init__(self, page, close_form, mode="add", id=None):
@@ -9,16 +10,18 @@ class ItemForm(AlertDialog):
         self.close_form = close_form
         self.mode = mode # Mode can be "add" or "view" or "edit"
         self.item_id = id
-        self.product_backlog_items = Data()
+        self.data = Data()
         self.content_padding = 10
 
         # self.inset_padding = 10
 
-        self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
-        self.stage_options = ["Planning", "Development", "Testing", "Implementation"]
-        self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
         self.priotity_options = ["Low", "Medium", "Important", "Urgent"]
-        self.users = ["John Doe", "Jane Doe", "John Smith", "Jane Smith"]
+        self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
+        self.task_stage_options = ["Planning", "Development", "Testing", "Implementation"]
+        self.task_status_options = ["Not Started", "In Progress", "Completed"]
+        self.task_type_options = ["User Story", "Bug"]
+        self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
+        self.logs = []
         self.header = []
         
         self.bgcolor = "#CADEED"
@@ -38,8 +41,8 @@ class ItemForm(AlertDialog):
         self.task_stage = DropdownInput(self.task_stage_options, label="Stage")
         self.task_status = DropdownInput(self.task_status_options, label="Status")
         self.task_type = DropdownInput(self.task_type_options, label="Type")
-        self.tags = MultipleSelectInput(self.tag_options)
         self.assignee = TextFieldInput(label="Assignee", expand=False)
+        self.tags = MultipleSelectInput(self.tag_options)
         self.footer = [
             ElevatedButton("Cancel", bgcolor=colors.GREY_400, width=100, color="black", on_click=lambda e: self.close_form()),
             ElevatedButton("Save", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
@@ -56,20 +59,25 @@ class ItemForm(AlertDialog):
                 IconButton(
                     icon=icons.DELETE_FOREVER,
                     icon_color="black",
-                    on_click=lambda e: print("Delete clicked"),
+                    on_click=lambda e: (self.data.remove_product_backlog_item(self.item_id), self.close_form()),
                 )
             ]
 
-            item = self.product_backlog_items.get_product_backlog_item(self.item_id)
+            item = self.data.get_product_backlog_item(self.item_id)
 
             self.task_name.value = item["task_name"]
             self.task_description.value = item["description"]
             self.priority.value = item["priority"]
             self.story_points.value = item["story_points"]
-            self.stage.value = item["stage"]
+            self.task_stage.value = item["stage"]
+            self.task_status.value = item["status"]
+            self.task_type.value = item["type"]
+            self.assignee.value = item["assignee"]
             
             for tag in item["tags"]:
                 self.tags.handle_add_tag(tag)
+            
+            self.logs = item["logs"]
     
         return Container(
             content=Column(
@@ -116,17 +124,23 @@ class ItemForm(AlertDialog):
                 "description": self.task_description.value,
                 "priority": self.priority.value,
                 "story_points": self.story_points.value,
+                "stage": self.task_stage.value,
+                "status": self.task_status.value,
+                "type": self.task_type.value,
+                "assignee": self.assignee.value,
                 "tags": self.tags.selected_options,
-                "stage": self.stage.value,
-                "assignee": self.assignee.selected_options
             }
             if self.mode == "add":
-                self.product_backlog_items.add_product_backlog_item(item)
-                print("Added new item:", self.product_backlog_items.get_product_backlog_items())
+                item["admin_add_date"] = datetime.utcnow().isoformat()
+                item["logs"] = ["Item created on " + item["admin_add_date"]]
+                self.data.add_product_backlog_item(item)
+                print("Added new item:", self.data.get_product_backlog_items())
 
             if self.mode == "view":
-                self.product_backlog_items.update_product_backlog_item(id=self.item_id, item=item)
-                print("Updated item:", self.product_backlog_items.get_product_backlog_item(id=self.item_id))
+                item["logs"] = self.logs
+                item["logs"].append("Item updated on " + datetime.utcnow().isoformat())
+                self.data.update_product_backlog_item(item_id=self.item_id, updated_fields=item)
+                print("Updated item:", self.data.get_product_backlog_item(item_id=self.item_id))
             self.close_form()
             self.page.update()
         

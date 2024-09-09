@@ -13,13 +13,13 @@ class DataFilter():
      # Filter tasks based on the selected tag
     def handle_filter_item(self):
         product_backlog_items = self.data.get_product_backlog_items()
-        filtered_items = {}
+        filtered_items = []
 
          # Filter items based on the selected tag
         if self.selected_tag and self.selected_tag != "All Tasks":
-            for key, item in product_backlog_items.items():
+            for item in product_backlog_items:
                 if self.selected_tag in item['tags']:
-                    filtered_items[key] = item
+                    filtered_items.append(item)
         else:
             # If "All Tasks" is selected, show all items
             filtered_items = product_backlog_items
