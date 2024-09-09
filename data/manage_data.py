@@ -102,13 +102,15 @@ class Data():
             "stage": item["stage"],
             "assignee": item["assignee"]
         }
-        self.collection.insert_one(item)
+        new_key = f"item{len(self.product_backlog_items)+1}"
+        self.product_backlog_items[new_key] = item
+        # self.collection.insert_one(item)
 
     def remove_product_backlog_item(self, id):
         self.collection.delete_one({"_id": id})
 
     def update_product_backlog_item(self, id, item):
-        self.collection.update_one({
+        item = {
             "task_name": item["task_name"],
             "description": item["description"],
             "priority": item["priority"],
@@ -116,7 +118,19 @@ class Data():
             "tags": item["tags"],
             "stage": item["stage"],
             "assignee": item["assignee"]
-        })
+        }
+        new_key = f"item{len(self.product_backlog_items)+1}"
+        self.product_backlog_items[new_key] = item
+
+        # self.collection.update_one({
+        #     "task_name": item["task_name"],
+        #     "description": item["description"],
+        #     "priority": item["priority"],
+        #     "story_points": item["story_points"],
+        #     "tags": item["tags"],
+        #     "stage": item["stage"],
+        #     "assignee": item["assignee"]
+        # })
 
 # data = Data()
 # items = data.get_product_backlog_items()
