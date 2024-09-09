@@ -35,9 +35,6 @@ class ProductBacklog(Column):
             ]
         )
 
-
-    def build(self):
-
         self.board = GridView(
             expand=1,
             # runs_count=3,
@@ -49,6 +46,7 @@ class ProductBacklog(Column):
             padding=padding.all(5),
         )
 
+    def build(self):
         product_backlog_items = self.data.get_product_backlog_items()
 
         for key in product_backlog_items.keys():
@@ -58,6 +56,8 @@ class ProductBacklog(Column):
                     alignment=alignment.center,
                 )
             )
+        
+        print("BOARD REBUILT")
         
         return Container(
             content=Column([
@@ -202,4 +202,5 @@ class ProductBacklog(Column):
                 )
             )
 
+        self.page.update()
         
