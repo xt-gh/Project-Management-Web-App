@@ -136,6 +136,32 @@ class ProductBacklog(Column):
                     alignment=alignment.center,
                 )
             )
+        
+        
+        self.board.controls.reverse() # This works because items are retrived in chronological order
+        # Will need to add a creation_date attribute to the data base soon
+
+    
+    def sort_newest_to_oldest(self):
+        product_backlog_items = self.data.get_product_backlog_items()
+
+        self.board.controls.clear()
+        for key in product_backlog_items.keys():
+            self.board.controls.append(
+                Container(
+                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                )
+            )
+
+
+    def priority_value(self, priority):
+        priorities = ["Low", "Medium", "Important", "Urgent"]
+        priority_level = priorities.index(priority) + 1
+        return priority_level
+
+        # Update the page after modifying the board controls
+        self.page.update()
     
     def filter_pop_up_button(self):
         # Create PopupMenuButton for task filtering
@@ -175,29 +201,5 @@ class ProductBacklog(Column):
                     alignment=alignment.center,
                 )
             )
-        
-        self.board.controls.reverse() # This works because items are retrived in chronological order
-        # Will need to add a creation_date attribute to the data base soon
-
-    def sort_newest_to_oldest(self):
-        product_backlog_items = self.data.get_product_backlog_items()
-
-        self.board.controls.clear()
-        for key in product_backlog_items.key():
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
-
-
-    def priority_value(self, priority):
-        priorities = ["Low", "Medium", "Important", "Urgent"]
-        priority_level = priorities.index(priority) + 1
-        return priority_level
-
-        # Update the page after modifying the board controls
-        self.page.update()
 
         
