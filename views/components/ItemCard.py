@@ -25,20 +25,20 @@ class ItemCard(Column):
             content=Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN, 
                 tight=True), 
-            bgcolor="#CADEED", 
+            # bgcolor="#CADEED", 
             alignment=alignment.center_left
         )
         for i in range(0, min(len(self.tags), 4)):
             tags.content.controls.append(
                 Container(
-                    content=Text(self.tags[i], color="black", size=17),
+                    content=Text(self.tags[i], color="black", size=12),
                     bgcolor="#FFFFFF",
                     border_radius=border_radius.all(5),
                     padding=padding.only(3, 1, 3, 1),
-                    margin=margin.all(1),
+                    margin=margin.only(0, 0, 6, 0),
                 )
                 if i < 3 else
-                Text(f"+{len(self.tags)-3}", color="black", size=17)
+                Text(f"+{len(self.tags)-3}", color="black", size=12)
             )
         task_title = Container(
             content=Text(
