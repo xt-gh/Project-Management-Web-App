@@ -11,6 +11,8 @@ class ItemForm(AlertDialog):
         self.item_id = id
         self.product_backlog_items = Data()
 
+        # self.inset_padding = 10
+
         self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
         self.task_stage_options = ["Planning", "Development", "Testing", "Implementation"]
         self.task_status_options = ["Not Started", "In Progress", "Completed"]
@@ -25,33 +27,37 @@ class ItemForm(AlertDialog):
         self.clip_behavior = ClipBehavior.HARD_EDGE
         
         self.content = self.build_add_item_form() 
+        self.inset_padding = 10
+        self.actions_padding = 20
         
     def build_add_item_form(self):
-        self.task_name = TextFieldInput(is_required=True)
-        self.task_description = TextFieldInput()
+        self.task_name = TextFieldInput(label="Task Name", is_required=True)
+        self.task_description = TextFieldInput(label="Description")
         self.task_description.multiline = True
         self.task_description.min_lines = 3
-        self.priority = DropdownInput(self.priotity_options)
-        self.story_points = DropdownInput(self.fibbonacci)
-        self.task_stage = DropdownInput(self.task_stage_options)
-        self.task_status = DropdownInput(self.task_status_options)
-        self.task_type = DropdownInput(self.task_type_options)
+        self.priority = DropdownInput(self.priotity_options, label="Priority")
+        self.story_points = DropdownInput(self.fibbonacci, label="Story Points")
+        self.task_stage = DropdownInput(self.task_stage_options, label="Stage")
+        self.task_status = DropdownInput(self.task_status_options, label="Status")
+        self.task_type = DropdownInput(self.task_type_options, label="Type")
         self.tags = MultipleSelectInput(self.tag_options)
-        self.assignee = TextFieldInput()
+        self.assignee = TextFieldInput(label="Assignee", expand=False)
         self.footer = [
-            ElevatedButton("Cancel", bgcolor="#DAE9FE", width=100, color="black", on_click=lambda e: self.close_form()),
-            ElevatedButton("Save", bgcolor="#DAE9FE", width=100, color="black", on_click=lambda e: self.handle_submit()),
+            ElevatedButton("Cancel", bgcolor=colors.GREY_400, width=100, color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
         ]
 
+        self.actions = self.footer
+
         if self.mode == "add":
-            self.header = [Text("Add Item", color="white", size=24)]
+            self.header = [Text("Add Item", color="black", size=24)]
 
         else:
             self.header = [
-                Text("Editing Item", color="white", size=24),
+                Text("Editing Item", color="black", size=24),
                 IconButton(
                     icon=icons.DELETE_FOREVER,
-                    icon_color="white",
+                    icon_color="black",
                     on_click=lambda e: print("Delete clicked"),
                 )
             ]
@@ -69,79 +75,36 @@ class ItemForm(AlertDialog):
             
             for tag in item["tags"]:
                 self.tags.handle_add_tag(tag)
-
-        # Give each form element a label
-        self.task_name.label = "Task Name"
-        self.task_description.label = "Description"
-        self.priority.label = "Priority"
-        self.story_points.label = "Story Points"
-        self.task_stage.label = "Stage"
-        self.task_status.label = "Status"
-        self.task_type.label = "Type"
-        self.assignee.label = "Assignee"
-        
-        title_to_form = [
-            ("Task Name", self.task_name),
-            ("Description", self.task_description),
-            ("Priority", self.priority),
-            ("Story Points", self.story_points),
-            ("Stage", self.task_stage),
-            ("Status", self.task_status),
-            ("Type", self.task_type),
-            ("Tags", self.tags),
-            ("Assignee", self.assignee),
-        ]
     
         return Container(
             content=Column(
-                [Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN)] +
-                [Row(
-                    # controls=[Container(Text(title, color="black", size=20, width=150), margin=margin.all(5)), form], 
-                    controls=[form], 
-                    alignment=MainAxisAlignment.SPACE_BETWEEN, 
-                    vertical_alignment=CrossAxisAlignment.START) 
-                    for title, form in title_to_form] +
-                [Container(Row (self.footer, alignment=MainAxisAlignment.END), padding=padding.only(0, 0, 0, 10))],
-                #     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Task Name: ", color="black", size=20, width=150),
-                #         self.task_name,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Description: ", color="black", size=20, width=150),
-                #         self.task_description,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Priority: ", color="black", size=20, width=150),
-                #         self.priority,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Story Points: ", color="black", size=20, width=150),
-                #         self.story_points,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Tags: ", color="black", size=20, width=150),
-                #         self.tags,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Stage: ", color="black", size=20, width=150),
-                #         self.stage,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         Text("Assignee: ", color="black", size=20, width=150),
-                #         self.assignee,
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                #     Row([
-                #         ElevatedButton("Save", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.handle_submit()),
-                #         ElevatedButton("Cancel", bgcolor="#DAE9FE", color="black", on_click=lambda e: self.close_form()),
-                #     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                # ],
+                [
+                    Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    Row([self.task_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    Row([self.task_description], alignment=MainAxisAlignment.SPACE_BETWEEN),
+
+                    Row([
+                        Container(self.priority, padding=padding.only(0, 0, 5, 0), expand=1),
+                        Container(self.story_points, padding=5, expand=1),
+                        Container(self.task_stage, padding=padding.only(5, 0, 0, 0), expand=1),
+                    ], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    
+                    Row([
+                        Container(self.task_status, padding=padding.only(0, 0, 5, 0), expand=1),
+                        Container(self.task_type, padding=5, expand=1),
+                        Container(self.assignee, padding=padding.only(5, 0, 0, 0), expand=1),
+                    ], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    
+                    Text("Tags:", color="black", size=15),
+                    Column([self.tags], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
+                alignment=MainAxisAlignment.START,
             ),
             # bgcolor="grey",
-            width=self.page.width * 0.5,
-            height=self.page.height * 0.85,
+            width=self.page.width * 0.4,
+            height=self.page.height * 0.7,
             padding=padding.only(15, 15, 15, 15),
             border_radius=border_radius.all(10),
         )

@@ -50,6 +50,7 @@ def main(page):
     page.title = "Project Management App"
     page.padding = 10
     page.bgcolor = "#DBEBE2"
+    page.theme_mode = ThemeMode.LIGHT
 
     app = App(page)
 
