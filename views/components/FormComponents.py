@@ -119,7 +119,7 @@ class MultipleSelectInput(Row):
             items=[
                 PopupMenuItem(text=option, on_click=lambda e: (self.handle_add_tag(e.control.text), self.update())) for option in self.options
             ],
-            icon=icons.ADD,
+            icon=icons.ADD,icon_color="black"
         )
     
     # @property
