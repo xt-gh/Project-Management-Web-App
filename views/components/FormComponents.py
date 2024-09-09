@@ -86,8 +86,8 @@ class MultipleSelectInput(Row):
             self.controls[-1] = self.build_popup_menu()
     
     def add_chip(self, tag):
-        chip = Chip(label=Text(tag, color="white"),
-                    color="green",
+        chip = Chip(label=Text(tag, color="black"),
+                    color="#DBEBE2",
                     border_side=BorderSide(color="white", width=1),
                     )
         if not self.disabled:
