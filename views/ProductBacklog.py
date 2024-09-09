@@ -3,6 +3,7 @@ import flet as ft
 from .components.ItemCard import ItemCard
 from .components.ItemForm import ItemForm
 from data.manage_data import Data
+from data.filter_data import DataFilter 
 
 class ProductBacklog(Column):
     def __init__(self, page, update_active_view):
@@ -10,6 +11,8 @@ class ProductBacklog(Column):
         self.data = Data()
         self.page = page
         self.update_active_view = update_active_view
+        self.filter_data = DataFilter()
+
         print(page.height)
         self.sort_options = ["High to Low", "Low to High", "Oldest to Newest"]
 
@@ -35,7 +38,7 @@ class ProductBacklog(Column):
 
     def build(self):
 
-        board = GridView(
+        self.board = GridView(
             expand=1,
             # runs_count=3,
             max_extent=300,
@@ -49,7 +52,7 @@ class ProductBacklog(Column):
         product_backlog_items = self.data.get_product_backlog_items()
 
         for key in product_backlog_items.keys():
-            board.controls.append(
+            self.board.controls.append(
                 Container(
                     content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
@@ -59,20 +62,21 @@ class ProductBacklog(Column):
         return Container(
             content=Column([
                         Row([
-                            Text("Product Backlog", color=colors.GREEN_800, size=24),
+                            Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
                             self.sort_menu_button,
+                            self.filter_pop_up_button(),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN,
                         ),
                         Container(
-                            content=board,
+                            content=self.board,
                             # bgcolor="pink",
                         )
                     ]),
             bgcolor="#CADEED",
             width=self.page.width - 300,
             height=self.page.height - 30,
-            padding=padding.all(15),
+            padding=padding.all(20),
             border_radius=border_radius.all(10),
         )
 
@@ -132,6 +136,45 @@ class ProductBacklog(Column):
                     alignment=alignment.center,
                 )
             )
+    
+    def filter_pop_up_button(self):
+        # Create PopupMenuButton for task filtering
+        self.filter_menu_button = PopupMenuButton(
+            icon="filter_alt", icon_color='black',
+            items=[
+                PopupMenuItem(text="All Tasks", on_click=lambda _: self.filter_selected_tag("All Tasks")),
+                PopupMenuItem(text="API", on_click=lambda _: self.filter_selected_tag("API")),
+                PopupMenuItem(text="Back-end", on_click=lambda _: self.filter_selected_tag("Back-end")),
+                PopupMenuItem(text="Database", on_click=lambda _: self.filter_selected_tag("Database")),
+                PopupMenuItem(text="Framework", on_click=lambda _: self.filter_selected_tag("Framework")),
+                PopupMenuItem(text="Front-end", on_click=lambda _: self.filter_selected_tag("Front-end")),
+                PopupMenuItem(text="Testing", on_click=lambda _: self.filter_selected_tag("Testing")),
+                PopupMenuItem(text="UI", on_click=lambda _: self.filter_selected_tag("UI")),
+                PopupMenuItem(text="UX", on_click=lambda _: self.filter_selected_tag("UX"))   
+            ]
+        )
+        return self.filter_menu_button
+    
+    def filter_selected_tag(self, tag):
+        print(f"Tag selected: {tag}")
+        self.filter_data.set_selected_filtered_tag(tag)
+        self.apply_filter()
+
+    def apply_filter(self):
+        filtered_items = self.filter_data.handle_filter_item()
+        self.update_board(filtered_items)
+
+    def update_board(self, filtered_items):
+        # Clear the existing board content
+        self.board.controls.clear()
+
+        for key in filtered_items.keys():
+            self.board.controls.append(
+                Container(
+                    content=ItemCard(item_id=key, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                )
+            )
         
         self.board.controls.reverse() # This works because items are retrived in chronological order
         # Will need to add a creation_date attribute to the data base soon
@@ -153,3 +196,8 @@ class ProductBacklog(Column):
         priorities = ["Low", "Medium", "Important", "Urgent"]
         priority_level = priorities.index(priority) + 1
         return priority_level
+
+        # Update the page after modifying the board controls
+        self.page.update()
+
+        
