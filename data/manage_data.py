@@ -1,14 +1,14 @@
 from pymongo import MongoClient
 
 class Data():
-    def __init__(self, uri='mongodb+srv://mwon0072:AVsCzA9IbIECXMNX@helium.6iy1m.mongodb.net/', database_name='projectDatabase', collection_name='task'):
-        self.client = MongoClient(uri)
-        self.db = self.client[database_name]
-        self.collection = self.db[collection_name]
+    # def __init__(self, uri='mongodb+srv://mwon0072:AVsCzA9IbIECXMNX@helium.6iy1m.mongodb.net/', database_name='projectDatabase', collection_name='task'):
+    #     self.client = MongoClient(uri)
+    #     self.db = self.client[database_name]
+    #     self.collection = self.db[collection_name]
     
     
     product_backlog_items = {
-
+        
         "item1": {
             "task_name": "Task 1",
             "description": "Description 1",
@@ -16,7 +16,7 @@ class Data():
             "story_points": "1",
             "tags": ["Front-end", "UI"],
             "stage": "Planning",
-            "assignee": ["John Doe"],
+            "assignee": "John Doe",
             "logs": ["John Doe added this item on 2022-01-01 10:00 AM", "John Doe edited this item on 2022-01-02 11:00 AM"]
         },
         "item2": {
@@ -26,7 +26,7 @@ class Data():
             "story_points": "2",
             "tags": ["Back-end", "API"],
             "stage": "Development",
-            "assignee": ["Jane Doe"],
+            "assignee": "Jane Doe",
             "logs": ["Jane Doe added this item on 2022-01-02 11:00 AM", "Jane Doe edited this item on 2022-01-03 12:00 PM"]
         },
         "item3": {
@@ -36,7 +36,7 @@ class Data():
             "story_points": "3",
             "tags": ["Database"],
             "stage": "Testing",
-            "assignee": ["John Smith"],
+            "assignee": "John Smith",
             "logs": ["John Smith added this item on 2022-01-03 12:00 PM", "John Smith edited this item on 2022-01-04 01:00 PM"]
         },
         "item4": {
@@ -46,7 +46,7 @@ class Data():
             "story_points": "5",
             "tags": ["UI", "Testing"],
             "stage": "Implementation",
-            "assignee": ["Jane Smith"],
+            "assignee": "Jane Smith",
             "logs": ["Jane Smith added this item on 2022-01-04 01:00 PM", "Jane Smith edited this item on 2022-01-05 02:00 PM"]
         },
         "item5": {
@@ -56,7 +56,7 @@ class Data():
             "story_points": "8",
             "tags": ["UX"],
             "stage": "Planning",
-            "assignee": ["John Doe"],
+            "assignee": "John Doe",
             "logs": ["John Doe added this item on 2022-01-05 02:00 PM", "John Doe edited this item on 2022-01-06 03:00 PM"]
         },
         "item6": {
@@ -66,7 +66,7 @@ class Data():
             "story_points": "13",
             "tags": ["Testing", "Framework"],
             "stage": "Development",
-            "assignee": ["Jane Doe"],
+            "assignee": "Jane Doe",
             "logs": ["Jane Doe added this item on 2022-01-06 03:00 PM", "Jane Doe edited this item on 2022-01-07 04:00 PM"]
         },
         "item7": {
@@ -76,7 +76,7 @@ class Data():
             "story_points": "20",
             "tags": ["Front-end", "Back-end", "API"],
             "stage": "Testing",
-            "assignee": ["John Smith"],
+            "assignee": "John Smith",
             "logs": ["John Smith added this item on 2022-01-07 04:00 PM", "John Smith edited this item on 2022-01-08 05:00 PM"]
         }
     }
@@ -85,10 +85,12 @@ class Data():
     #     pass
 
     def get_product_backlog_items(self):
-        return self.collection.find()
+        return self.product_backlog_items
+        # return self.collection.find()
     
     def get_product_backlog_item(self, id):
-        return self.collection.find_one({"_id": id})
+        return self.product_backlog_items[id]
+        # return self.collection.find_one({"_id": id})
 
     def add_product_backlog_item(self, item):
         item = {
@@ -116,12 +118,12 @@ class Data():
             "assignee": item["assignee"]
         })
 
-data = Data()
-items = data.get_product_backlog_items()
-ids = []
-for item in items:
-    print(item)
-    ids.append(item["_id"])
+# data = Data()
+# items = data.get_product_backlog_items()
+# ids = []
+# for item in items:
+#     print(item)
+#     ids.append(item["_id"])
 
-print()
-print(data.get_product_backlog_item(ids[-1]))
+# print()
+# print(data.get_product_backlog_item(ids[-1]))
