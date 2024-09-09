@@ -1,8 +1,11 @@
 from flet import *
 
 class DropdownInput(Dropdown):
-    def __init__(self, options, expand=1, is_required=False):
+    def __init__(self, options, label="", expand=1, is_required=False):
         super().__init__()
+        self.label = label
+        self.label_style = TextStyle(color="GREY_900", size=15)
+
         self.options_fill_horizontally = False
         self.expand = expand
         self.options = [dropdown.Option(val) for val in options]
@@ -34,6 +37,9 @@ class TextFieldInput(TextField):
     def __init__(self, label="", expand=1, is_required=False):
         super().__init__()
         self.label = label
+        self.label_style = TextStyle(color="GREY_900", size=15)
+        self.border_color = "black"
+
         self.expand = expand
         self.color = "black"
         self.size = 20
@@ -87,8 +93,8 @@ class MultipleSelectInput(Row):
     
     def add_chip(self, tag):
         chip = Chip(label=Text(tag, color="black"),
-                    color="green",
-                    border_side=BorderSide(color="black", width=1),
+                    color="#DBEBE2",
+                    border_side=BorderSide(color="white", width=1),
                     )
         if not self.disabled:
             chip.on_delete = lambda e: (self.handle_remove_tag(e.control.label.value), self.update())
@@ -119,7 +125,7 @@ class MultipleSelectInput(Row):
             items=[
                 PopupMenuItem(text=option, on_click=lambda e: (self.handle_add_tag(e.control.text), self.update())) for option in self.options
             ],
-            icon=icons.ADD,
+            icon=icons.ADD,icon_color="black"
         )
     
     # @property
