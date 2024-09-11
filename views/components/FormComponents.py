@@ -82,7 +82,7 @@ class MultipleSelectInput(Row):
         self.expand = expand
     
     def handle_add_tag(self, tag):
-        print("Add tag clicked for item", tag)
+        # print("Add tag clicked for item", tag)
         self.selected_options.append(tag)
         print("REMOVING TAG", tag)
         self.options.remove(tag)
@@ -104,7 +104,7 @@ class MultipleSelectInput(Row):
         self.controls.insert(-1, chip)
 
     def handle_remove_tag(self, tag):
-        print("Remove tag clicked for item", tag)
+        # print("Remove tag clicked for item", tag)
         self.selected_options.remove(tag)
         self.options.append(tag)
         self.remove_chip(tag)
