@@ -2,18 +2,20 @@ from flet import *
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
 from data.manage_data import Data
 from datetime import datetime
+import asyncio
 
 class ItemForm(AlertDialog):
-    def __init__(self, page, close_form, mode="add", id=None):
+    def __init__(self, page, close_form, mode="add", item_dict=None):
+        print("Item form initialized")
         super().__init__()
         self.page = page
         self.close_form = close_form
         self.mode = mode # Mode can be "add" or "view" or "edit"
-        self.item_id = id
-        self.data = Data()
+        self.item_dict = item_dict
+        # self.data = Data()
         self.content_padding = 10
 
-        # self.inset_padding = 10
+        self.inset_padding = 10
 
         self.priotity_options = ["Low", "Medium", "Important", "Urgent"]
         self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
@@ -43,9 +45,10 @@ class ItemForm(AlertDialog):
         self.task_type = DropdownInput(self.task_type_options, label="Type")
         self.assignee = TextFieldInput(label="Assignee", expand=False)
         self.tags = MultipleSelectInput(self.tag_options)
+        self.task_logs = Row([Text(" ", color="black", size=15),])
         self.footer = [
-            ElevatedButton("Cancel", bgcolor=colors.GREY_400, width=100, color="black", on_click=lambda e: self.close_form()),
-            ElevatedButton("Save", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
+            ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor=colors.GREEN_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
         ]
 
         self.actions = self.footer
@@ -59,11 +62,12 @@ class ItemForm(AlertDialog):
                 IconButton(
                     icon=icons.DELETE_FOREVER,
                     icon_color="black",
-                    on_click=lambda e: (self.data.remove_product_backlog_item(self.item_id), self.close_form()),
+                    on_click=lambda e: (asyncio.run(Data().remove_product_backlog_item(self.item_dict["_id"])), self.close_form()),
                 )
             ]
 
-            item = self.data.get_product_backlog_item(self.item_id)
+            # item = asyncio.run(self.data.get_product_backlog_item(self.item_id))
+            item = self.item_dict
 
             self.task_name.value = item["task_name"]
             self.task_description.value = item["description"]
@@ -78,6 +82,8 @@ class ItemForm(AlertDialog):
                 self.tags.handle_add_tag(tag)
             
             self.logs = item["logs"]
+
+            # self.task_logs = 
     
         return Container(
             content=Column(
@@ -99,7 +105,13 @@ class ItemForm(AlertDialog):
                     ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                     
                     Text("Tags:", color="black", size=15),
-                    Column([self.tags], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    Row([self.tags]),
+
+                    # self.task_logs,
+                    Row([
+                        Text("Logs:", color="black", size=15),
+                        Column([Container(Text(f"{log.split('T')[0]} {log.split('T')[1].split('.')[0]}", color="black")) for log in self.logs ]),
+                    ] if self.logs != [] else [], vertical_alignment=CrossAxisAlignment.START),
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
@@ -133,16 +145,16 @@ class ItemForm(AlertDialog):
             if self.mode == "add":
                 item["admin_add_date"] = datetime.utcnow().isoformat()
                 item["logs"] = ["Item created on " + item["admin_add_date"]]
-                self.data.add_product_backlog_item(item)
-                print("Added new item:", self.data.get_product_backlog_items())
+                asyncio.run(Data().add_product_backlog_item(item))
+                # print("Added new item:", self.data.get_product_backlog_items())
 
             if self.mode == "view":
                 item["logs"] = self.logs
                 item["logs"].append("Item updated on " + datetime.utcnow().isoformat())
-                self.data.update_product_backlog_item(item_id=self.item_id, updated_fields=item)
-                print("Updated item:", self.data.get_product_backlog_item(item_id=self.item_id))
+                asyncio.run(Data().update_product_backlog_item(item_id=self.item_dict["_id"], updated_fields=item))
+                # print("Updated item:", self.data.get_product_backlog_item(item_id=self.item_id))
             self.close_form()
-            self.page.update()
+            # self.page.update()
         
         else:
             print("Form is invalid")

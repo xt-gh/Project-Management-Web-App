@@ -1,187 +1,149 @@
 from flet import *
-import flet as ft
 from .components.ItemCard import ItemCard
 from .components.ItemForm import ItemForm
+from .components.SortPopupButton import SortPopupButton
+from .components.FilterPopupButton import FilterPopupButton
 from data.manage_data import Data
 from data.filter_data import DataFilter 
+from data.task_filter import TaskFilter
+from data.task_sorter import TaskSorter
+import asyncio
 
 class ProductBacklog(Column):
     def __init__(self, page, update_active_view):
+        print("Product backlog initialized")
         super().__init__()
-        self.data = Data()
+        self.item_list = []
         self.page = page
         self.update_active_view = update_active_view
-        self.filter_data = DataFilter()
 
-        print(page.height)
-        self.sort_options = ["High to Low", "Low to High", "Oldest to Newest"]
+        self.filter_tag = "All Tasks"
+        self.sort_label = "Oldest to Newest"
 
-        
-        # Initialize the MenuBar for sorting menu
-        self.sort_dropdown = Dropdown(
-            label="Sort by",
-            hint_text="Select sorting option",
-            options=[dropdown.Option(option) for option in self.sort_options]
-        )
+        # self.width = self.page.width - 330
+        # self.height =  self.page.height - 20
+        # self.bgcolor = "#CADEED"
+        # self.border_radius = border_radius.all(10)
+        # self.padding = padding.all(20)
 
-        self.sort_menu_button = PopupMenuButton(
-            icon="sort",
-            icon_color="black",
-            items=[
-                PopupMenuItem(text="High to Low", on_click=lambda e: self.handle_sort_option("High to Low")),
-                PopupMenuItem(text="Low to High", on_click=lambda e: self.handle_sort_option("Low to High")),
-                PopupMenuItem(text="Oldest to Newest", on_click=lambda e: self.handle_sort_option("Oldest to Newest")),
-                PopupMenuItem(text="Newest to Oldest", on_click=lambda e: self.handle_sort_option("Newest to Oldest")),
-            ]
-        )
+    def build(self):
+        print("Building product backlog")
 
         self.board = GridView(
             expand=1,
-            # runs_count=3,
             max_extent=300,
             child_aspect_ratio=1.40,
-            # horizontal=True,
             spacing=10,
             run_spacing=10,
             padding=padding.all(5),
         )
 
-    def build(self):
-        product_backlog_items = self.data.get_product_backlog_items()
+        self.loading_screen = Container(
+            content=Column([
+                    ProgressRing(width=30, height=30, stroke_width=5),
+                    Text("Retriving from database...", color=colors.BLACK, size=20)
+                ],
+                alignment=MainAxisAlignment.CENTER,
+                horizontal_alignment=CrossAxisAlignment.CENTER),
+            expand=1,
+        )
+    
+        self.body = self.loading_screen
 
-        for item in product_backlog_items:
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_id=item["_id"], handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
-        
-        print("BOARD REBUILT")
-        
         return Container(
             content=Column([
                         Row([
                             Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             Row([
-                                self.sort_menu_button,
-                                self.filter_pop_up_button(),
+                                SortPopupButton(self.handle_sort_option),
+                                FilterPopupButton(self.filter_selected_tag),
                                 ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
                             ], alignment=MainAxisAlignment.END),
-                        ], alignment=MainAxisAlignment.SPACE_BETWEEN,
-                        ),
+                        ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
-                            content=self.board,
-                            # bgcolor="pink",
+                            content=self.body,
+                            alignment=alignment.center,
+                            expand=1,
                         )
                     ]),
+            padding=padding.all(20),
+            border_radius=border_radius.all(10),
             bgcolor="#CADEED",
             width=self.page.width - 330,
             height=self.page.height - 20,
-            padding=padding.all(20),
-            border_radius=border_radius.all(10),
         )
+
+    
+    def before_update(self):
+        print("Product backlog updated")
+        try:
+            if self.page:
+                self.controls[0].width = self.page.width - 330
+                self.controls[0].height =  self.page.height - 20
+        
+        except Exception as e:
+            print(e)
+            
+    
+    def did_mount(self):
+        print("\033[33mProduct backlog mounted\033[0m")
+        asyncio.run(self.populate_board(refetch=True))
+        self.controls[0].content.controls[1].content = self.board
+        self.update_active_view()
+
+    
+    async def populate_board(self, refetch=False):
+        self.board.controls.clear()
+        print("Populating board")
+        if refetch:
+            self.item_list = await (Data().get_product_backlog_items())
+            print("Fetching product backlog items")
+            
+        items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
+        items = TaskFilter().filter_tasks(items, self.filter_tag)
+        for item in items:
+            self.board.controls.append(
+                Container(
+                    content=ItemCard(item_dict=item, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                )
+            )
+        print("Board populated")
 
     def handle_add_item(self, e):
         print("Add item clicked")
-
         self.item_form = ItemForm(self.page, self.close_add_item_form)
-        
+        print("Opening form")
         self.page.open(self.item_form)
     
     def handle_detailed_view(self, id):
         print("Detailed view clicked")
-
-        self.detailed_view = ItemForm(self.page, self.close_detailed_view, mode="view", id=id)
-        self.page.open(self.detailed_view)
+        for item in self.item_list:
+            if item["_id"] == id:
+                self.detailed_view = ItemForm(self.page, self.close_detailed_view, mode="view", item_dict=item)
+                self.page.open(self.detailed_view)
+                break
 
     def close_add_item_form(self):
         print("Closing form")
         self.page.close(self.item_form)
+        asyncio.run(self.populate_board(refetch=True))
         self.update_active_view()
 
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
+        asyncio.run(self.populate_board(refetch=True))
         self.update_active_view()
     
+    def handle_sort_option(self, sort_option):
+        print("Sort option selected:", sort_option)
+        self.sort_label = sort_option
+        asyncio.run(self.populate_board())
+        self.update()
 
-    def handle_sort_option(self, e):
-        selected_option = e # Get the selected value from the dropdown
-        if selected_option == "High to Low":
-            self.sort_high_to_low()
-        elif selected_option == "Low to High":
-            self.sort_low_to_high()
-        elif selected_option == "Oldest to Newest":
-            self.sort_oldest_to_newest()
-        elif selected_option == "Newest to Oldest":
-            self.sort_newest_to_oldest()
-        self.page.update()
-    
-    def sort_low_to_high(self):
-        self.board.controls.sort(key=lambda container: self.priority_value(container.content.priority), reverse=False)
-        self.page.update()
-
-    def sort_high_to_low(self):
-        self.board.controls.sort(key=lambda container: self.priority_value(container.content.priority), reverse=True)
-        self.page.update()
-
-    def sort_oldest_to_newest(self):
-        self.board.controls.sort(key=lambda container: container.content.date, reverse=False)
-        self.page.update()
-
-    
-    def sort_newest_to_oldest(self):
-        self.board.controls.sort(key=lambda container: container.content.date, reverse=True)
-        self.page.update()
-
-
-    def priority_value(self, priority):
-        priorities = [None, "Low", "Medium", "Important", "Urgent"]
-        priority_level = priorities.index(priority) + 1
-        return priority_level
-
-        # Update the page after modifying the board controls
-        self.page.update()
-    
-    def filter_pop_up_button(self):
-        # Create PopupMenuButton for task filtering
-        self.filter_menu_button = PopupMenuButton(
-            icon="filter_alt", icon_color='black',
-            items=[
-                PopupMenuItem(text="All Tasks", on_click=lambda _: self.filter_selected_tag("All Tasks")),
-                PopupMenuItem(text="API", on_click=lambda _: self.filter_selected_tag("API")),
-                PopupMenuItem(text="Back-end", on_click=lambda _: self.filter_selected_tag("Back-end")),
-                PopupMenuItem(text="Database", on_click=lambda _: self.filter_selected_tag("Database")),
-                PopupMenuItem(text="Framework", on_click=lambda _: self.filter_selected_tag("Framework")),
-                PopupMenuItem(text="Front-end", on_click=lambda _: self.filter_selected_tag("Front-end")),
-                PopupMenuItem(text="Testing", on_click=lambda _: self.filter_selected_tag("Testing")),
-                PopupMenuItem(text="UI", on_click=lambda _: self.filter_selected_tag("UI")),
-                PopupMenuItem(text="UX", on_click=lambda _: self.filter_selected_tag("UX"))   
-            ]
-        )
-        return self.filter_menu_button
-    
     def filter_selected_tag(self, tag):
-        print(f"Tag selected: {tag}")
-        self.filter_data.set_selected_filtered_tag(tag)
-        self.apply_filter()
-
-    def apply_filter(self):
-        filtered_items = self.filter_data.handle_filter_item()
-        self.update_board(filtered_items)
-
-    def update_board(self, filtered_items):
-        # Clear the existing board content
-        self.board.controls.clear()
-
-        for item in filtered_items:
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_id=item["_id"], handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
-
-        self.page.update()
-        
+        print("Filter selected:", tag)
+        self.filter_tag = tag
+        asyncio.run(self.populate_board())
+        self.update()

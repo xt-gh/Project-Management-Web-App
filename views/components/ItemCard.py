@@ -1,12 +1,13 @@
 from flet import *
 from data.manage_data import Data
+import asyncio
 
-class ItemCard(Column):
-    def __init__(self, item_id, handle_detailed_view=None):
+class ItemCard(Container):
+    def __init__(self, item_dict, handle_detailed_view=None):
+        print("Item card initialized")
         super().__init__()
-        self.item_id = item_id
-        self.data = Data()
-        item = self.data.get_product_backlog_item(self.item_id) 
+        self.item_id = item_dict["_id"]
+        item = item_dict
 
         self.task_name = item["task_name"]
         self.task_description = item["description"]
@@ -19,14 +20,25 @@ class ItemCard(Column):
 
         self.handle_detailed_view = handle_detailed_view
 
+        self.bgcolor = "#DDDDDD"
+        self.border = border.all(1.5, "#6686BD")
+        self.border_radius = border_radius.all(10)
+        self.padding = padding.all(10)
+        self.margin = margin.all(8)
+        self.expand = 1
+        self.ink = True
+        self.on_click = lambda e: print("Clickable without Ink clicked!")
+        self.content = Column([
+            self.build_tags(),
+            self.card_title(),
+            self.card_details()
+        ])
 
-    def build(self):
-
+    def build_tags(self):
         tags = Container(
             content=Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN, 
                 tight=True), 
-            # bgcolor="#CADEED", 
             alignment=alignment.center_left
         )
         for i in range(0, min(len(self.tags), 4)):
@@ -41,7 +53,10 @@ class ItemCard(Column):
                 if i < 3 else
                 Text(f"+{len(self.tags)-3}", color="black", size=12)
             )
-        task_title = Container(
+        return tags
+
+    def card_title(self):
+        return Container(
             content=Text(
                 self.task_name,
                 color="black", 
@@ -51,7 +66,8 @@ class ItemCard(Column):
                 overflow=TextOverflow.ELLIPSIS
             )
         )
-            
+
+    def card_details(self):
         details = Row([
             Column(),
             IconButton(
@@ -80,23 +96,14 @@ class ItemCard(Column):
                 Container(Text(f"Priority: {self.priority} ", color="black", size=14)),
             )
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
+        return details
 
-
-        return Container(
-            content=Column([
-                tags,
-                task_title,
-                details
-            ]
-            ),
-            bgcolor="#DDDDDD",
-            border=border.all(1.5, "#6686BD"),
-            border_radius=border_radius.all(10),
-            padding=padding.all(10),
-            margin=margin.all(8),
-            # width=250,
-            expand=1,
-            on_click=lambda e: print("Clickable without Ink clicked!"),
-            ink=True
-        )
-    
+    # def before_update(self):
+    #     print("Item card updated")
+    #     self.bgcolor = "#DDDDDD"
+    #     self.border = border.all(1.5, "#6686BD")
+    #     self.border_radius = border_radius.all(10)
+    #     self.padding = padding.all(10)
+    #     self.margin = margin.all(8)
+    #     self.expand = 1
+    #     self.ink = True
