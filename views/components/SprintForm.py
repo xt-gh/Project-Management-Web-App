@@ -5,10 +5,10 @@ from datetime import datetime
 import asyncio
 
 
-class SprintFrom(AlertDialog):
+class SprintForm(AlertDialog):
     def __init__(self, page, close_form, mode="add", item_dict=None):
         print("Item form initialized")
-        super().__init__
+        super().__init__()
         self.page = page
         self.close_form = close_form
         self.mode = mode # Mode can be "add" or "view" or "edit"
@@ -21,6 +21,8 @@ class SprintFrom(AlertDialog):
         self.status_options = ["Not Started", "In progress", "Completed"]
         self.bgcolor = "#CADEED"
         self.clip_behavior = ClipBehavior.HARD_EDGE
+        
+        self.assignees = []
 
         self.content = self.build_add_sprint_form()
         self.inset_padding = 10
@@ -91,7 +93,7 @@ class SprintFrom(AlertDialog):
             return form_content
         
     def add_assignee(self, e):
-        assignee_name = slef.assignee_input.value.strip()
+        assignee_name = self.assignee_input.value.strip()
         if assignee_name:
             assignees.append(assignee_name)
             self.assignee_input.value = ""  # Clear input field after adding
