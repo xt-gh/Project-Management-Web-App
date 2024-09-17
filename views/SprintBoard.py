@@ -82,23 +82,23 @@ class SprintBoard(Column):
         self.controls[0].content.controls[1].content = self.board
         self.update_active_view()
 
-    async def populate_board(self, refetch=False):
-        self.board.controls.clear()
-        print("Populating board")
-        if refetch:
-            self.item_list = await (Data().get_product_backlog_items())
-            print("Fetching product backlog items")
+    # async def populate_board(self, refetch=False):
+    #     self.board.controls.clear()
+    #     print("Populating board")
+    #     if refetch:
+    #         self.item_list = await (Data().get_product_backlog_items())
+    #         print("Fetching product backlog items")
             
-        items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
-        items = TaskFilter().filter_tasks(items, self.filter_tag)
-        for item in items:
-            self.board.controls.append(
-                Container(
-                    content=ItemCard(item_dict=item, handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                )
-            )
-        print("Board populated")
+    #     items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
+    #     items = TaskFilter().filter_tasks(items, self.filter_tag)
+    #     for item in items:
+    #         self.board.controls.append(
+    #             Container(
+    #                 content=ItemCard(item_dict=item, handle_detailed_view=self.handle_detailed_view),
+    #                 alignment=alignment.center,
+    #             )
+    #         )
+    #     print("Board populated")
 
     # def handle_add_sprint(self, e):
     #     print("Add Sprint clicked")
