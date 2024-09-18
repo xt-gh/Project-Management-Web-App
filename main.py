@@ -15,7 +15,7 @@ class App(Row):
         # self.active_view = ProductBacklog(self.page, self.update_active_view)
         self.routes = {
             "/productbacklog": ProductBacklog(self.page, self.update_active_view),
-            "/sprintboard": SprintBoard(self.page),
+            "/sprintboard": SprintBoard(self.page, self.update_active_view),
             "/collaborators": Collaborators(self.page),
         }
         self.active_view = self.routes["/productbacklog"]
@@ -46,5 +46,9 @@ def main(page):
     page.go("/productbacklog")
     page.on_route_change = app.route_change
     page.add(app)
+
+    # page.go("/sprintboard")
+    # page.on_route_change = app.route_change
+    # page.add(app)
 
 flet.app(target=main, assets_dir="./assets")
