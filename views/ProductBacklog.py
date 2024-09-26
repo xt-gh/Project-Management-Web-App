@@ -41,7 +41,7 @@ class ProductBacklog(Column):
         self.loading_screen = Container(
             content=Column([
                     ProgressRing(width=30, height=30, stroke_width=5),
-                    Text("Retriving from database...", color=colors.BLACK, size=20)
+                    Text("Retriving Items From Database...", color=colors.BLACK, size=20)
                 ],
                 alignment=MainAxisAlignment.CENTER,
                 horizontal_alignment=CrossAxisAlignment.CENTER),
@@ -57,7 +57,7 @@ class ProductBacklog(Column):
                             Row([
                                 SortPopupButton(self.handle_sort_option),
                                 FilterPopupButton(self.filter_selected_tag),
-                                ElevatedButton("Add item", icon="add", on_click=self.handle_add_item),
+                                ElevatedButton("Add item", icon="add", on_click=lambda e: self.handle_add_item(e)),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
@@ -75,7 +75,7 @@ class ProductBacklog(Column):
 
     
     def before_update(self):
-        print("Product backlog updated")
+        print("\033[33mProduct backlog updated\033[0m")
         try:
             if self.page:
                 self.controls[0].width = self.page.width - 330
@@ -89,7 +89,8 @@ class ProductBacklog(Column):
         print("\033[33mProduct backlog mounted\033[0m")
         asyncio.run(self.populate_board(refetch=True))
         self.controls[0].content.controls[1].content = self.board
-        self.update_active_view()
+        # self.update_active_view()
+        self.page.update()
 
     
     async def populate_board(self, refetch=False):
@@ -128,13 +129,15 @@ class ProductBacklog(Column):
         print("Closing form")
         self.page.close(self.item_form)
         asyncio.run(self.populate_board(refetch=True))
-        self.update_active_view()
+        # self.update_active_view()
+        self.page.update()
 
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board(refetch=True))
-        self.update_active_view()
+        # self.update_active_view()
+        self.page.update()
     
     def handle_sort_option(self, sort_option):
         print("Sort option selected:", sort_option)

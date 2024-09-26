@@ -1,3 +1,4 @@
+from datetime import datetime
 from flet import *
 
 class DropdownInput(Dropdown):
@@ -52,7 +53,7 @@ class TextFieldInput(TextField):
     def handle_blur(self, e):
         print("on_blur fired")
         if self.is_required:
-            if self.value is "":
+            if self.value.strip() is "":
                 self.error_text = "This field is required"
             else:
                 self.error_text = None
@@ -61,7 +62,7 @@ class TextFieldInput(TextField):
     def handle_change(self, e):
         print("on_change fired")
         if self.is_required:
-            if self.value is "":
+            if self.value.strip() is "":
                 self.error_text = "This field is required"
             else:
                 self.error_text = None
@@ -129,16 +130,54 @@ class MultipleSelectInput(Row):
             icon=icons.ADD,icon_color="black"
         )
     
-    # @property
-    # def disabled(self):
-    #     return self._disabled
-    
-    # @disabled.setter
-    # def disabled(self, value):
-    #     self._disabled = value
-    #     if self._disabled:
-    #         self.controls.pop() # remove the popup menu
+class TextFieldDatePicker(Container):
+    def __init__(self, page, label="", expand=1, is_required=False):
+        super().__init__()
+        self.page = page
+        self.is_required = is_required
+        self.label = label
 
-    #         for control in self.controls:
-    #             if isinstance(control, Chip):
-    #                 control.on_delete = None
+        self.content = Row(
+            [
+                IconButton(
+                    icon=icons.CALENDAR_MONTH,
+                    icon_size=30,
+                    on_click=lambda e: self.open_date_picker(e),
+                ),
+                TextField(
+                    label=label,
+                    border_color="black",
+                    expand=expand,
+                    color="black",
+                    fill_color="white",
+                    read_only=True,
+                ),
+            ],
+            vertical_alignment=CrossAxisAlignment.START,
+        )
+        
+        self.value = self.content.controls[1].value
+        # self.width = ""
+        # self.height = "50"
+        
+
+    def open_date_picker(self, e):
+        print("opening date picker")
+        self.page.open(
+            DatePicker(
+                first_date=datetime(year=2015, month=1, day=1),
+                help_text=self.label,
+                on_change=lambda e: self.change_date_picker_handler(e), 
+            )
+        )
+
+    def change_date_picker_handler(self, e):
+        print("Date changed")
+        self.content.controls[1].error_text = None
+        self.content.controls[1].value = e.control.value.strftime('%d-%m-%Y')
+        self.value = self.content.controls[1].value
+        self.update()
+    
+    def set_date(self, date):
+        self.content.controls[1].value = date
+        self.value = date
