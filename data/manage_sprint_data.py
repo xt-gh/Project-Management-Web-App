@@ -90,22 +90,21 @@ class SprintData():
             "dataSource": "helium",
             "database": self.database_name,
             "collection": self.collection_name,
-            "filter": {"_id": {"$oid": sprint_id}},
-            "update": {"$set": updated_fields}
         })
         response = requests.post(url, headers=self.headers, data=payload)
-        print("\033[42mDATABASE: Sprint updated\033[0m")
-        return response.json()
+        # print(response.json())
+        print("\033[42mDATABASE: Sprints fetched\033[0m")
+        return response.json()['documents']
     
-    # Method to delete a sprint
-    async def remove_sprint_item(self, sprint_id):
-        print("\033[42mDATABASE: Removing sprint\033[0m")
-        url = f"{self.base_url}/action/deleteOne"
+    # Method to get a single sprint by its _id
+    async def get_sprint_item(self, item_id):
+        print("\033[42mDATABASE: Getting sprint", item_id)
+        url = f"{self.base_url}/action/findOne"
         payload = json.dumps({
-            "dataSource": "helium",
+            "dataSource": "helium",  # Replace with your data source name
             "database": self.database_name,
             "collection": self.collection_name,
-            "filter": {"_id": {"$oid": sprint_id}}
+            "filter": {"_id": {"$oid": item_id}}
         })
         response = requests.post(url, headers=self.headers, data=payload)
         print(response.json())
