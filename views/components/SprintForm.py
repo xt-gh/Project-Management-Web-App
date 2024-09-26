@@ -1,22 +1,17 @@
 import asyncio
-import asyncio
 from flet import *
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput, TextFieldDatePicker
-from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput, TextFieldDatePicker
 from data.manage_data import Data
-from data.manage_sprint_data import SprintData
 from data.manage_sprint_data import SprintData
 from datetime import datetime
 
 class SprintForm(AlertDialog):
-    def __init__(self, page, close_form, mode="add", sprint_dict=None):
     def __init__(self, page, close_form, mode="add", sprint_dict=None):
         print("Item form initialized")
         super().__init__()
         self.page = page
         self.close_form = close_form
         self.mode = mode  # Mode can be "add" or "view" or "edit"
-        self.sprint_dict = sprint_dict
         self.sprint_dict = sprint_dict
         self.content_padding = 10
         self.inset_padding = 10
@@ -51,8 +46,6 @@ class SprintForm(AlertDialog):
 
         if self.mode == "add":
             self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
-        if self.mode == "add":
-            self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
 
         else:
             self.header = [
@@ -76,7 +69,6 @@ class SprintForm(AlertDialog):
             content=Column(
                 [
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
-                    # self.sprint_name,
                     # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
                     # Row([self.product_owner, self.scrum_master], alignment=MainAxisAlignment.SPACE_BETWEEN),
@@ -116,8 +108,6 @@ class SprintForm(AlertDialog):
                 scroll=ScrollMode.AUTO,
                 alignment=MainAxisAlignment.START,
             ),
-            width=self.page.width * 0.3,
-            height=self.page.height * 0.6,
             width=self.page.width * 0.3,
             height=self.page.height * 0.6,
             padding=padding.only(15, 15, 15, 15),
@@ -236,11 +226,7 @@ class SprintForm(AlertDialog):
         if self.is_valid_form():
             print("Form is valid")
             sprint = {
-            sprint = {
                 "sprint_name": self.sprint_name.value,
-                "product_owner": self.product_owner.value,
-                "scrum_master": self.scrum_master.value,
-                "scrum_team": self.scrum_team.selected_options,
                 "product_owner": self.product_owner.value,
                 "scrum_master": self.scrum_master.value,
                 "scrum_team": self.scrum_team.selected_options,
