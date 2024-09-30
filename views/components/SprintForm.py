@@ -1,7 +1,8 @@
 import asyncio
 from flet import *
-from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
+from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput, TextFieldDatePicker
 from data.manage_data import Data
+from data.manage_sprint_data import SprintData
 from datetime import datetime
 
 class SprintForm(AlertDialog):
@@ -18,10 +19,6 @@ class SprintForm(AlertDialog):
         self.bgcolor = "#CADEED"
         self.clip_behavior = ClipBehavior.HARD_EDGE
         
-        self.assignees = []
-        self.start_date_value = ""
-        self.end_date_value = ""
-
         # Build the form content
         self.content = self.build_add_sprint_form()
         self.inset_padding = 10
@@ -67,25 +64,14 @@ class SprintForm(AlertDialog):
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
                     # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    # Row([self.product_owner, self.scrum_master], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    self.product_owner,
+                    self.scrum_master,
+                    Text("Scrum team:", color="black", size=15),
+                    Row([self.scrum_team]),
 
-                    Row([
-                        Container(self.start_date_field, width=150, padding=padding.only(0, 0, 5, 0), expand=1),
-                        Container(ElevatedButton("Pick Start Date",icon="date_range", on_click=self.open_start_date_picker)),
-                        # Container(self.end_date_field, width=100, padding=padding.only(5, 0, 0, 0), expand=1),
-                        # Container(ElevatedButton("Pick End Date", icon="date_range", on_click=self.open_end_date_picker)),
-                    ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-
-                    Row([
-                        Container(self.end_date_field,width=150, padding=padding.only(0, 0, 5, 0), expand=1),
-                        Container(ElevatedButton("Pick End Date",icon="date_range", on_click=self.open_end_date_picker)),
-                    ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-
-
-                    Row([self.status], alignment=MainAxisAlignment.SPACE_BETWEEN),
-
-                    Row([self.assignee_input, self.add_assignee_button]),
-                    Text("Assignees:"),
-                    self.tag_container,
+                    self.start_date,
+                    self.end_date,
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,

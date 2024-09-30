@@ -41,7 +41,7 @@ class SprintBoard(Column):
                         Row([
                             Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             Row([
-                                ElevatedButton("Add Sprint", icon="add", on_click=self.handle_add_sprint),
+                                ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(

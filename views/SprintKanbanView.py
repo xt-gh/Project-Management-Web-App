@@ -3,8 +3,10 @@ from datetime import datetime
 from flet import *
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
+from views.components.ItemFormInSprint import ItemFormInSprint
 from views.components.ItemCard import DraggableItemCard
 from views.components.LoadingCard import LoadingCard
+from views.components.Alert import Alert
 
 class SprintKanbanView(Column):
     def __init__(self, page):
@@ -45,6 +47,7 @@ class SprintKanbanView(Column):
                         item_dict=not_started_item,
                         handle_drag_start=self.set_drag_source,
                         on_drag_complete=lambda e: self.reset_drag_source(),
+                        handle_detailed_view=self.handle_detailed_view,
                     )
                 )
                 body.content.controls.sort(key=lambda x: x.task_name)
@@ -98,6 +101,7 @@ class SprintKanbanView(Column):
                         item_dict=in_progress_item,
                         handle_drag_start=self.set_drag_source,
                         on_drag_complete=lambda e: self.reset_drag_source(),
+                        handle_detailed_view=self.handle_detailed_view,
                     )
                 )
                 body.content.controls.sort(key=lambda x: x.task_name)
@@ -151,6 +155,7 @@ class SprintKanbanView(Column):
                         item_dict=completed_item,
                         handle_drag_start=self.set_drag_source,
                         on_drag_complete=lambda e: self.reset_drag_source(),
+                        handle_detailed_view=self.handle_detailed_view,
                     )
                 )
                 body.content.controls.sort(key=lambda x: x.task_name)
@@ -223,6 +228,10 @@ class SprintKanbanView(Column):
                 self.controls[0].content.controls[1].content.controls[2].height = self.page.height - 120
 
             asyncio.run(self.populate_board())
+            asyncio.run(self.set_item_list())
+
+    async def set_item_list(self):
+        self.item_list = await Data().get_product_backlog_items()
     
     async def populate_board(self):
         print("Populating sprint kanban board")
@@ -291,6 +300,20 @@ class SprintKanbanView(Column):
         source = self.drag_source
         target = self.drag_target
         print("Moving item")
+
+        if source["status"] == "Not Started" and source["assignee"] == "":
+            print("Item must have an assignee before moving")
+
+            def handle_close():
+                self.page.close(alert)
+
+            alert = Alert(
+                alert_text="Tasks must have an assignee before moving.\nPlease assign a team member a try again.",
+                handle_close=handle_close,
+            )
+
+            self.page.open(alert)
+            return
         
         if target == "not_started":
             source["status"] = "Not Started"
@@ -309,5 +332,20 @@ class SprintKanbanView(Column):
 
         asyncio.run(Data().update_product_backlog_item(item_id=id, updated_fields=source))
 
+        asyncio.run(self.populate_board())
+        asyncio.run(self.set_item_list())
+        self.page.update()
+
+    def handle_detailed_view(self, id):
+        print("Detailed view clicked")
+        for item in self.item_list:
+            if item["_id"] == id:
+                self.detailed_view = ItemFormInSprint(self.page, self.close_detailed_view, mode="view", item_dict=item)
+                self.page.open(self.detailed_view)
+                break
+    
+    def close_detailed_view(self):
+        print("Closing detailed view")
+        self.page.close(self.detailed_view)
         asyncio.run(self.populate_board())
         self.page.update()

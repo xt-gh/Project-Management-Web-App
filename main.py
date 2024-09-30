@@ -32,7 +32,7 @@ class App(Row):
 
 
         self.vertical_alignment = CrossAxisAlignment.START
-        self.page.on_resized = lambda e: (print("Window resized"), self.update_active_view())
+        self.page.on_resized = lambda e: (print("Window resized"), self.page.update())
         asyncio.run(Data().ping())
 
     def route_change(self, e: RouteChangeEvent):
@@ -76,8 +76,8 @@ class App(Row):
         print("Current route:", self.page.route)
 
     def update_active_view(self):
-        print("UPDATE ACTIVE VIEW")
-        self.page.update()
+        self.controls[0].update()
+        self.controls[1].update()
 
 def main(page):
     page.title = "Project Management App"

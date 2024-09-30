@@ -83,7 +83,7 @@ class ItemCard(Container):
 
         if self.handle_detailed_view is None:
             details.controls.pop()
-            
+
         if self.story_points:
             details.controls[0].controls.insert(
                 0,
