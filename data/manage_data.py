@@ -1,4 +1,5 @@
 import asyncio
+import asyncio
 from datetime import datetime
 import requests
 import json
@@ -145,6 +146,7 @@ class Data():
         })
         response = requests.post(url, headers=self.headers, data=payload)
         print(response.json())
+        print(response.json())
         return response.json()
 
     # Method to remove a product backlog item by its _id
@@ -166,6 +168,7 @@ if __name__ == "__main__":
     # Add a new product backlog item
     new_item = {
         "task_name": "task 1",
+        "task_name": "task 1",
         "description": "New Task Description",
         "priority": "High",
         "story_points": 5,
@@ -185,3 +188,27 @@ if __name__ == "__main__":
     # Get all product backlog items
     for item in items:
         print(json.dumps(item, indent=4))
+
+    # # Get a specific product backlog item by ID
+    # first_item_id = items[0]['_id']  # Extract ObjectId from first item
+    # fetched_item = data_api.get_product_backlog_item(first_item_id)
+    # print("DATABASE: Fetched Item:", fetched_item)
+
+    # # Update an item
+    # updated_fields = {
+    #     "status": "Completed",
+    #     "logs": ["Item was marked as completed on 2022-02-01"]
+    # }
+    # update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
+    # print("DATABASE: Updated Item:", update_response)
+
+    # items = data_api.get_product_backlog_items()
+    # for item in items:
+    #     print(item)
+
+    # # Remove an item
+    # remove_response = data_api.remove_product_backlog_item(first_item_id)
+    # print("DATABASE: Item Removed:", remove_response)
+    # items = data_api.get_product_backlog_items()
+    # for item in items:
+    #     print(item)

@@ -253,6 +253,26 @@ class SprintBacklogView(Column):
         e.control.content.bgcolor = colors.GREEN  
         e.control.update()
 
+    # def drag_accept(self, e: DragTargetAcceptEvent):
+    #     print(f"Item accepted: {e.data}")
+        
+    #     dropped_item = e.data 
+
+    #     sprint_backlog_column = e.control.content.controls[1].content.controls[0]
+    #     sprint_backlog_column.controls.append(
+    #         Container(
+    #             content=DraggableItemCard(dropped_item), 
+    #             alignment=alignment.center
+    #         )
+    #     )
+        
+    #     # Remove the item from the product backlog 
+    #     product_backlog_column = e.control.content.controls[1].content.controls[0]
+    #     product_backlog_column.controls = [item for item in product_backlog_column.controls if item.data != dropped_item]
+        
+    #     e.control.update()  
+
+
     def drag_accept(self, e: DragTargetAcceptEvent):
         print(f"Item accepted: {e.data}")
 
