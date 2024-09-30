@@ -1,6 +1,4 @@
 from flet import *
-from data.manage_data import Data
-import asyncio
 
 class ItemCard(Container):
     def __init__(self, item_dict, handle_detailed_view=None):
@@ -83,6 +81,9 @@ class ItemCard(Container):
         # tight=True,
         )
 
+        if self.handle_detailed_view is None:
+            details.controls.pop()
+
         if self.story_points:
             details.controls[0].controls.insert(
                 0,
@@ -98,12 +99,13 @@ class ItemCard(Container):
             details.alignment=MainAxisAlignment.SPACE_BETWEEN
         return details
 
-    # def before_update(self):
-    #     print("Item card updated")
-    #     self.bgcolor = "#DDDDDD"
-    #     self.border = border.all(1.5, "#6686BD")
-    #     self.border_radius = border_radius.all(10)
-    #     self.padding = padding.all(10)
-    #     self.margin = margin.all(8)
-    #     self.expand = 1
-    #     self.ink = True
+class DraggableItemCard(Draggable):
+    def __init__(self, group, item_dict, handle_drag_start, on_drag_complete, handle_detailed_view=None):
+        handle_drag_start_event = lambda e: handle_drag_start(item_dict)
+        self.task_name = item_dict["task_name"]
+        super().__init__(
+            group=group,
+            content=ItemCard(item_dict, handle_detailed_view),
+            on_drag_start=handle_drag_start_event,
+            on_drag_complete=on_drag_complete
+        )
