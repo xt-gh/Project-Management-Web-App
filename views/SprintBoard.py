@@ -1,14 +1,8 @@
 from flet import *
-# from .components.ItemCard import ItemCard
-# from .components.ItemForm import ItemForm
-from .components.SprintCard import SprintCard
 from .components.SprintCard import SprintCard
 from .components.SprintForm import SprintForm
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
-from data.manage_sprint_data import SprintData
-from data.task_filter import TaskFilter
-from data.task_sorter import TaskSorter
 import asyncio
 
 class SprintBoard(Column):
@@ -37,7 +31,6 @@ class SprintBoard(Column):
                 ],
                 alignment=MainAxisAlignment.CENTER,
                 horizontal_alignment=CrossAxisAlignment.CENTER),
-            expand=1,
         )
 
         self.body = self.loading_screen
@@ -48,9 +41,11 @@ class SprintBoard(Column):
                             Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             Row([
                                 ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
+                                ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
+                            content=self.body,
                             alignment=alignment.top_center,
                             expand=1,
                         )
@@ -97,6 +92,18 @@ class SprintBoard(Column):
                 )
             )
         print("Board populated")
+        # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
+        # items = TaskFilter().filter_tasks(items, self.filter_tag)
+        items = self.sprint_list
+        for sprint in items:
+            self.board.controls.append(
+                Container(
+                    content=SprintCard(page=self.page, sprint_dict=sprint, handle_detailed_view=self.handle_detailed_view),
+                    alignment=alignment.center,
+                    padding=padding.only(0,0,10,0),
+                )
+            )
+        print("Board populated")
 
     def handle_add_sprint(self, e):
         print("Add Sprint clicked")
@@ -115,17 +122,11 @@ class SprintBoard(Column):
         for sprint in self.sprint_list:
             if sprint["_id"] == id:
                 self.detailed_view = SprintForm(self.page, self.close_detailed_view, mode="view", sprint_dict=sprint)
-        print("Detailed view clicked") 
-        for sprint in self.sprint_list:
-            if sprint["_id"] == id:
-                self.detailed_view = SprintForm(self.page, self.close_detailed_view, mode="view", sprint_dict=sprint)
                 self.page.open(self.detailed_view)
                 break
 
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
-        asyncio.run(self.populate_board(refetch=True))
-        self.page.update()
         asyncio.run(self.populate_board(refetch=True))
         self.page.update()
