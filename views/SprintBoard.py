@@ -31,6 +31,7 @@ class SprintBoard(Column):
                 ],
                 alignment=MainAxisAlignment.CENTER,
                 horizontal_alignment=CrossAxisAlignment.CENTER),
+            expand=1,
         )
 
         self.body = self.loading_screen
@@ -40,8 +41,7 @@ class SprintBoard(Column):
                         Row([
                             Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             Row([
-                                ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
-                                ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
+                                ElevatedButton("Add Sprint", icon="add", on_click=self.handle_add_sprint),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
@@ -80,18 +80,6 @@ class SprintBoard(Column):
             self.sprint_list = await (SprintData().get_sprint_items())
             print("Fetching product backlog items")
             
-        # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
-        # items = TaskFilter().filter_tasks(items, self.filter_tag)
-        items = self.sprint_list
-        for sprint in items:
-            self.board.controls.append(
-                Container(
-                    content=SprintCard(page=self.page, sprint_dict=sprint, handle_detailed_view=self.handle_detailed_view),
-                    alignment=alignment.center,
-                    padding=padding.only(0,0,10,0),
-                )
-            )
-        print("Board populated")
         # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
         # items = TaskFilter().filter_tasks(items, self.filter_tag)
         items = self.sprint_list
