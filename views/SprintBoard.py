@@ -2,8 +2,10 @@ from flet import *
 # from .components.ItemCard import ItemCard
 # from .components.ItemForm import ItemForm
 from .components.SprintCard import SprintCard
+from .components.SprintCard import SprintCard
 from .components.SprintForm import SprintForm
 from data.manage_data import Data
+from data.manage_sprint_data import SprintData
 from data.manage_sprint_data import SprintData
 from data.task_filter import TaskFilter
 from data.task_sorter import TaskSorter
@@ -49,7 +51,6 @@ class SprintBoard(Column):
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
-                            content=self.body,
                             alignment=alignment.top_center,
                             expand=1,
                         )
@@ -90,7 +91,7 @@ class SprintBoard(Column):
         for sprint in items:
             self.board.controls.append(
                 Container(
-                    content=SprintCard(sprint_dict=sprint, handle_detailed_view=self.handle_detailed_view),
+                    content=SprintCard(page=self.page, sprint_dict=sprint, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                     padding=padding.only(0,0,10,0),
                 )
@@ -114,11 +115,17 @@ class SprintBoard(Column):
         for sprint in self.sprint_list:
             if sprint["_id"] == id:
                 self.detailed_view = SprintForm(self.page, self.close_detailed_view, mode="view", sprint_dict=sprint)
+        print("Detailed view clicked") 
+        for sprint in self.sprint_list:
+            if sprint["_id"] == id:
+                self.detailed_view = SprintForm(self.page, self.close_detailed_view, mode="view", sprint_dict=sprint)
                 self.page.open(self.detailed_view)
                 break
 
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
+        asyncio.run(self.populate_board(refetch=True))
+        self.page.update()
         asyncio.run(self.populate_board(refetch=True))
         self.page.update()

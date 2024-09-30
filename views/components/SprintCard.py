@@ -4,10 +4,11 @@ import asyncio
 from datetime import datetime
 
 class SprintCard(Container):
-    def __init__(self, sprint_dict, handle_detailed_view=None):
+    def __init__(self, page, sprint_dict, handle_detailed_view=None):
         print("Sprint card initialized")
         super().__init__()
 
+        self.page = page
         self.id = sprint_dict["_id"]
         self.sprint_name = sprint_dict["sprint_name"]
         self.product_owner = sprint_dict["product_owner"]  
@@ -28,11 +29,15 @@ class SprintCard(Container):
         self.margin = margin.all(8)
         self.expand = 1
         self.ink = True
-        self.on_click = lambda e: print("Clickable without Ink clicked!")
+        self.on_click = lambda e: self.handle_on_click()
         self.content = Column([
             self.card_title(),
             self.card_details()
         ])
+
+    def handle_on_click(self):
+        print("Clickable without Ink clicked!")
+        # self.page.go("/sprintkanban/" + self.id)
 
 
     def card_title(self):
@@ -50,6 +55,17 @@ class SprintCard(Container):
     def card_details(self):
         details = Row([
             Column(),
+            # But buttons below are temporary, only for development purposes
+            ElevatedButton(
+                "DEV: click to see sprint details", 
+                icon=icons.MONITOR, 
+                on_click=lambda e: (print("Sprint details clicked"), self.page.go("/sprintbacklog/" + self.id))
+            ),
+            ElevatedButton(
+                "DEV: click to see sprint kanban", 
+                icon=icons.MONITOR, 
+                on_click=lambda e: (print("Sprint kanban clicked"), self.page.go("/sprintkanban/" + self.id))
+            ),
             IconButton(
                 icon=icons.MORE_HORIZ_ROUNDED,
                 icon_color="black",

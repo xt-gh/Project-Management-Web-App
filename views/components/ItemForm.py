@@ -110,8 +110,17 @@ class ItemForm(AlertDialog):
                     # self.task_logs,
                     Row([
                         Text("Logs:", color="black", size=15),
-                        Column([Container(Text(f"{log.split('T')[0]} {log.split('T')[1].split('.')[0]}", color="black")) for log in self.logs ]),
-                    ] if self.logs != [] else [], vertical_alignment=CrossAxisAlignment.START),
+                        Column(
+                            [
+                                Container(
+                                    Text(log, color="black"),
+                                    # Text(f"{log.split('T')[0]} {log.split('T')[1].split('.')[0]}", color="black")
+                                ) for log in self.logs
+                            ]
+                        ),
+                        ] if self.logs != [] else [],
+                        vertical_alignment=CrossAxisAlignment.START
+                    ),
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
@@ -141,6 +150,8 @@ class ItemForm(AlertDialog):
                 "type": self.task_type.value,
                 "assignee": self.assignee.value,
                 "tags": self.tags.selected_options,
+                "sprint_id": "",
+                "date_completed": "",
             }
             if self.mode == "add":
                 item["admin_add_date"] = datetime.utcnow().isoformat()

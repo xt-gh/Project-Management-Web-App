@@ -1,5 +1,3 @@
-from datetime import datetime
-import time
 import requests
 import json
 import asyncio
@@ -111,6 +109,20 @@ class SprintData():
         print("\033[42mDATABASE: Sprint deleted\033[0m")
         return response.json()
 
+    # Method to delete a sprint
+    async def remove_sprint_item(self, sprint_id):
+        print("\033[42mDATABASE: Removing sprint\033[0m")
+        url = f"{self.base_url}/action/deleteOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": sprint_id}}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print(response.json())
+        print("\033[42mDATABASE: Sprint deleted\033[0m")
+        return response.json()
     
     # Method to get a single sprint by its _id
     async def get_sprint_item(self, item_id):
@@ -127,11 +139,6 @@ class SprintData():
         print("\033[42mDATABASE: Sprint fetched\033[0m")
         return response.json()['document']
 
-# SPRINTS =  asyncio.run(SprintData().get_sprint_items())
-# for sprint in SPRINTS:
-#     print(sprint)
-#     asyncio.run(SprintData().remove_sprint_item(sprint['_id']))
-
     
 if __name__ == "__main__":
     data_api = SprintData()
@@ -139,19 +146,6 @@ if __name__ == "__main__":
     async def main():
         # Get all sprints
         items = await data_api.get_sprint_items()  # Await the async function
-        # for item in items:
-        #     print(item)
-
-        # # Add a new sprint
-        # new_item = {
-        #     "sprint_name":"Sprint 5",
-        #     "start_date":"2024-09-27T10:00:00Z",
-        #     "end_date":"2024-10-10T10:00:00Z",
-        #     "status":"In progress",
-        #     "Asignee":["Aiyowei","Minyee"]
-        # }
-        # add_response = await data_api.add_sprint_item(new_item)
-        # print("DATABASE: New Item Added:", add_response)
 
         # Get a specific sprint by ID
         first_item_id = items[0]['_id']  # Extract ObjectId from first item

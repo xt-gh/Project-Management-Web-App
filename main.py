@@ -1,4 +1,5 @@
 import time
+import time
 import flet
 from flet import *
 from data.manage_data import Data
@@ -6,6 +7,8 @@ from views.SideBar import SideBar
 from views.ProductBacklog import ProductBacklog
 from views.Collaborators import Collaborators
 from views.SprintBoard import SprintBoard
+from views.SprintBacklogView import SprintBacklogView
+from views.SprintKanbanView import SprintKanbanView
 import asyncio
 
 class App(Row):
@@ -13,30 +16,20 @@ class App(Row):
         super().__init__()
         self.page = page
         self.sidebar = SideBar(page)
-        # self.active_view = ProductBacklog(self.page, self.update_active_view)
-        # self.routes = {
-        #     "/productbacklog": lambda: ProductBacklog(self.page, self.update_active_view),
-        #     "/sprintboard": lambda: SprintBoard(self.page, self.update_active_view),
-        #     "/collaborators": lambda: Collaborators(self.page),
-        # }
-        # self.active_view = self.routes["/productbacklog"]()
-        self.routes = {
-            "/productbacklog": ProductBacklog(self.page, self.update_active_view),
-            "/sprintboard": SprintBoard(self.page, self.update_active_view),
-            "/collaborators": Collaborators(self.page),
-        }
-        self.active_view = self.routes["/productbacklog"]
 
         self.product_backlog = ProductBacklog(self.page, self.update_active_view)
         self.sprint_board = SprintBoard(self.page, self.update_active_view)
         self.collaborators = Collaborators(self.page)
+        self.sprint_backlog_view = SprintBacklogView(self.page)
+        self.sprint_kanban_view = SprintKanbanView(self.page)
         
         self.product_backlog.visible = True
         self.sprint_board.visible = False
         self.collaborators.visible = False
+        self.sprint_backlog_view.visible = False
+        self.sprint_kanban_view.visible = False
 
-        # self.controls=[self.sidebar, self.active_view]
-        self.controls = [self.sidebar, self.product_backlog, self.sprint_board, self.collaborators]
+        self.controls = [self.sidebar, self.product_backlog, self.sprint_board, self.collaborators, self.sprint_backlog_view, self.sprint_kanban_view]
 
 
         self.vertical_alignment = CrossAxisAlignment.START
@@ -49,32 +42,43 @@ class App(Row):
             self.product_backlog.visible = True
             self.sprint_board.visible = False
             self.collaborators.visible = False
+            self.sprint_backlog_view.visible = False
+            self.sprint_kanban_view.visible = False
         
         elif route == "/sprintboard":
             self.product_backlog.visible = False
             self.sprint_board.visible = True
             self.collaborators.visible = False
+            self.sprint_backlog_view.visible = False
+            self.sprint_kanban_view.visible = False
         
         elif route == "/collaborators":
             self.product_backlog.visible = False
             self.sprint_board.visible = False
             self.collaborators.visible = True
+            self.sprint_backlog_view.visible = False
+            self.sprint_kanban_view.visible = False
 
-        # self.controls[1] = self.routes[e.route]
+        elif route.startswith("/sprintbacklog/"):
+            self.product_backlog.visible = False
+            self.sprint_board.visible = False
+            self.collaborators.visible = False
+            self.sprint_backlog_view.visible = True
+            self.sprint_kanban_view.visible = False
+
+        elif route.startswith("/sprintkanban/"):
+            self.product_backlog.visible = False
+            self.sprint_board.visible = False
+            self.collaborators.visible = False
+            self.sprint_backlog_view.visible = False
+            self.sprint_kanban_view.visible = True
+
         self.page.update()
-
-        # self.update_active_view()
-        # try:
-        #     self.page.update()
-        # except e:
-        #     print(e)
         print("Current route:", self.page.route)
 
     def update_active_view(self):
         print("UPDATE ACTIVE VIEW")
         self.page.update()
-        # self.controls[0].update()
-        # self.controls[1].update()
 
 def main(page):
     page.title = "Project Management App"
