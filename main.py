@@ -2,13 +2,16 @@ import time
 import flet
 from flet import *
 from data.manage_data import Data
+from data.manage_sprint_data import SprintData
 from views.SideBar import SideBar
 from views.ProductBacklog import ProductBacklog
 from views.Collaborators import Collaborators
 from views.SprintBoard import SprintBoard
 from views.SprintBacklogView import SprintBacklogView
 from views.SprintKanbanView import SprintKanbanView
+from views.components.ColourPopupButton import ColourPopupButton
 import asyncio
+import threading
 
 class App(Row):
     def __init__(self, page):
@@ -28,12 +31,60 @@ class App(Row):
         self.sprint_backlog_view.visible = False
         self.sprint_kanban_view.visible = False
 
-        self.controls = [self.sidebar, self.product_backlog, self.sprint_board, self.collaborators, self.sprint_backlog_view, self.sprint_kanban_view]
+        self.change_color_button = ColourPopupButton(self.change_color_callback)
 
+        self.controls = [
+            Stack(
+                controls=[
+                    Column(controls=[self.sidebar]),
+                    Row(
+                        controls=[self.change_color_button],
+                        alignment=MainAxisAlignment.END,  # Align button to the right
+                        spacing=0,  # No space between button and sidebar
+                    ),
+                ]
+            ),
+            self.product_backlog,
+            self.sprint_board,
+            self.collaborators,
+            self.sprint_backlog_view,
+            self.sprint_kanban_view
+        ]
 
-        self.vertical_alignment = CrossAxisAlignment.START
-        self.page.on_resized = lambda e: (print("Window resized"), self.page.update())
-        asyncio.run(Data().ping())
+        # self.vertical_alignment = CrossAxisAlignment.START
+        self.page.on_resized = lambda e: (print("Window resized"), self.update_active_view())
+
+        self.product_backlog_data = []
+        self.sprint_data = []
+
+        # Set up a timer for regular polling
+        self.timer_interval = 5  # Check every 10 seconds
+        self.start_timer()
+
+    def start_timer(self):
+        """Start a background timer to poll for data changes every 10 seconds."""
+        self.timer = threading.Timer(self.timer_interval, self.poll_data)
+        self.timer.daemon = True  # Ensure the timer thread exits with the main thread
+        self.timer.start()
+
+    def poll_data(self):
+        while True:
+            # Fetch the latest data from the product backlog and sprint databases
+            latest_product_backlog_data = asyncio.run(Data().get_product_backlog_items())
+            latest_sprint_data = asyncio.run(SprintData().get_sprint_items())
+
+            # Check if product backlog data has changed
+            if latest_product_backlog_data != self.product_backlog_data:
+                self.product_backlog_data = latest_product_backlog_data
+                self.product_backlog.refresh_data()  # Assuming refresh_data updates the view
+
+            # Check if sprint data has changed
+            if latest_sprint_data != self.sprint_data:
+                self.sprint_data = latest_sprint_data
+                self.sprint_board.refresh_data()  # Assuming refresh_data updates the view
+
+            # Sleep for the specified interval
+            time.sleep(self.timer_interval)
 
     def route_change(self, e: RouteChangeEvent):
         route = e.route
@@ -74,6 +125,41 @@ class App(Row):
 
         self.page.update()
         print("Current route:", self.page.route)
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bg_color = selected_color
+        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.page.update()
+
+    def change_color_callback(self, selected_color):
+        """Handle the color change when the button is clicked."""
+        color_map = {
+        "Default": ["#DBEBE2", "#CADEED", "#6686BD"],
+        "Blue": ["#D8E3EC", "#B8E2F4", "#3271A5"],
+        "Pink": ["#FFDBE0", "#FFD3DA", "#FFBDC7"],
+        "Red": ["#FFCCCC", "#FFB3B3", "#FF8080"],
+        "Orange": ["#FFDECC", "#FFCEB3", "#FFAD80"],
+        "Yellow": ["#FFFFCC", "#FFFEB3", "#C9BB8E"],
+        "Green": ["#DBE8D7", "#CFE1C9", "#B8D1AE"],
+        "Purple": ["#E0DFF6", "#D1CFF1", "#C2BFED"],
+        "Brown": ["#D9D1C4", "#C5B6A3", "#826F51"],
+        "Grey": ["#CFCFCF", "#ADAAAB", "#777475"],
+        "Eyeprotection": ["#DBE8D7", "#CCE8CF", "#6E7B6C"],
+        "Colourblindness": ["#A8A8A8", "#333333", "#00BFFF"],
+    }
+        related_colors = ["#DBEBE2", "#CADEED", "#6686BD"]
+
+        if selected_color in color_map:
+            related_colors = color_map[selected_color]
+
+        self.product_backlog.change_bg_colour(related_colors[1])
+        self.sidebar.change_bg_colour(related_colors[0])
+        self.sidebar.change_navigator_bg_colour(related_colors[2])
+        self.sprint_board.change_bg_colour(related_colors[1])
+        self.sprint_backlog_view.change_bg_colour(related_colors[1])
+        self.sprint_kanban_view.change_bg_colour(related_colors[1])
+        self.collaborators.change_bg_colour(related_colors[1])
 
     def update_active_view(self):
         self.controls[0].update()

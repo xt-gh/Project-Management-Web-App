@@ -1,7 +1,9 @@
 import asyncio
+import asyncio
 from flet import *
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput, TextFieldDatePicker
 from data.manage_data import Data
+from data.manage_sprint_data import SprintData
 from data.manage_sprint_data import SprintData
 from datetime import datetime
 
@@ -12,6 +14,7 @@ class SprintForm(AlertDialog):
         self.page = page
         self.close_form = close_form
         self.mode = mode  # Mode can be "add" or "view" or "edit"
+        self.sprint_dict = sprint_dict
         self.sprint_dict = sprint_dict
         self.content_padding = 10
         self.inset_padding = 10
@@ -39,6 +42,8 @@ class SprintForm(AlertDialog):
 
         if self.mode == "add":
             self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
+        if self.mode == "add":
+            self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
 
         else:
             self.header = [
@@ -63,6 +68,7 @@ class SprintForm(AlertDialog):
                 [
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
                     # self.sprint_name,
+                    # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
                     # Row([self.product_owner, self.scrum_master], alignment=MainAxisAlignment.SPACE_BETWEEN),
                     self.product_owner,
@@ -72,6 +78,7 @@ class SprintForm(AlertDialog):
 
                     self.start_date,
                     self.end_date,
+
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
@@ -137,12 +144,36 @@ class SprintForm(AlertDialog):
                     return "End date should be after start date"
         
         return True
+    def is_valid_form(self):
+        is_valid = True
+        if self.sprint_name.value.strip() == "":
+            is_valid = False
+
+        if self.product_owner.value == "":
+            is_valid = False
+        
+        if self.scrum_master.value == "":
+            is_valid = False
+        
+        if self.start_date.value == "":
+            is_valid = False
+        
+        if self.end_date.value == "":
+            is_valid = False
+
+        if self.are_dates_valid() is not True:
+            is_valid = False
+
+        return is_valid
     
     def handle_submit(self):
         if self.is_valid_form():
             print("Form is valid")
             sprint = {
                 "sprint_name": self.sprint_name.value,
+                "product_owner": self.product_owner.value,
+                "scrum_master": self.scrum_master.value,
+                "scrum_team": self.scrum_team.selected_options,
                 "product_owner": self.product_owner.value,
                 "scrum_master": self.scrum_master.value,
                 "scrum_team": self.scrum_team.selected_options,
@@ -154,11 +185,29 @@ class SprintForm(AlertDialog):
                 asyncio.run(SprintData().add_sprint_item(sprint))
             
             else:
-                sprint["_id"] = self.sprint_dict["_id"]
-                asyncio.run(SprintData().update_sprint_item(sprint_id=sprint["_id"], updated_fields=sprint))
+                # sprint["_id"] = self.sprint_dict["_id"]
+                asyncio.run(SprintData().update_sprint_item(sprint_id=self.sprint_dict["_id"], updated_fields=sprint))
             self.close_form()
 
         else:
+            if self.sprint_name.value.strip() == "":
+                self.sprint_name.error_text = "Sprint name is required"
+            if self.product_owner.value == "":
+                self.product_owner.error_text = "Product owner is required"
+            if self.scrum_master.value == "":
+                self.scrum_master.error_text = "Scrum master is required"
+            if self.start_date.value == "":
+                self.start_date.content.controls[1].error_text = "Start date is required"
+            if self.end_date.value == "":
+                self.end_date.content.controls[1].error_text = "End date is required"
+            
+            if self.are_dates_valid() is not True:
+                date_error_message = self.are_dates_valid()
+                if date_error_message.startswith("Start"):
+                    self.start_date.content.controls[1].error_text = date_error_message
+                elif date_error_message.startswith("End"):
+                    self.end_date.content.controls[1].error_text = date_error_message
+
             if self.sprint_name.value.strip() == "":
                 self.sprint_name.error_text = "Sprint name is required"
             if self.product_owner.value == "":

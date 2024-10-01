@@ -3,10 +3,10 @@ from datetime import datetime
 from flet import *
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
+from data.color_data import ColourData
 from views.components.ItemFormInSprint import ItemFormInSprint
 from views.components.ItemCard import DraggableItemCard
 from views.components.LoadingCard import LoadingCard
-from views.components.Alert import Alert
 
 class SprintKanbanView(Column):
     def __init__(self, page):
@@ -230,6 +230,18 @@ class SprintKanbanView(Column):
             asyncio.run(self.populate_board())
             asyncio.run(self.set_item_list())
 
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Sprint KanBan View":
+                self.bgcolor = item['background_color']
+                self.controls[0].bgcolor = self.bgcolor
+                break
+
+    def did_mount(self):
+        print("\033[33mSprint KanBan mounted\033[0m")
+        asyncio.run(self.load_initial_background_color())
+
     async def set_item_list(self):
         self.item_list = await Data().get_product_backlog_items()
     
@@ -300,20 +312,6 @@ class SprintKanbanView(Column):
         source = self.drag_source
         target = self.drag_target
         print("Moving item")
-
-        if source["status"] == "Not Started" and source["assignee"] == "":
-            print("Item must have an assignee before moving")
-
-            def handle_close():
-                self.page.close(alert)
-
-            alert = Alert(
-                alert_text="Tasks must have an assignee before moving.\nPlease assign a team member a try again.",
-                handle_close=handle_close,
-            )
-
-            self.page.open(alert)
-            return
         
         if target == "not_started":
             source["status"] = "Not Started"
@@ -349,3 +347,10 @@ class SprintKanbanView(Column):
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board())
         self.page.update()
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bgcolor = selected_color
+        self.controls[0].bgcolor = self.bgcolor  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Sprint KanBan View", self.bgcolor))
