@@ -9,6 +9,9 @@ from views.Collaborators import Collaborators
 from views.SprintBoard import SprintBoard
 from views.SprintBacklogView import SprintBacklogView
 from views.SprintKanbanView import SprintKanbanView
+from views.SprintBacklogView import SprintBacklogView
+from views.SprintKanbanView import SprintKanbanView
+from views.SprintListView import SprintListView
 from views.components.ColourPopupButton import ColourPopupButton
 import asyncio
 import threading
@@ -24,12 +27,14 @@ class App(Row):
         self.collaborators = Collaborators(self.page)
         self.sprint_backlog_view = SprintBacklogView(self.page)
         self.sprint_kanban_view = SprintKanbanView(self.page)
+        self.sprint_list_view = SprintListView(self.page)
         
         self.product_backlog.visible = True
         self.sprint_board.visible = False
         self.collaborators.visible = False
         self.sprint_backlog_view.visible = False
         self.sprint_kanban_view.visible = False
+        self.sprint_list_view.visible = False
 
         self.change_color_button = ColourPopupButton(self.change_color_callback)
 
@@ -48,17 +53,18 @@ class App(Row):
             self.sprint_board,
             self.collaborators,
             self.sprint_backlog_view,
-            self.sprint_kanban_view
+            self.sprint_kanban_view,
+            self.sprint_list_view,
         ]
 
         # self.vertical_alignment = CrossAxisAlignment.START
-        self.page.on_resized = lambda e: (print("Window resized"), self.update_active_view())
+        self.page.on_resized = lambda e: (print("Window resized"), self.page.update())
 
         self.product_backlog_data = []
         self.sprint_data = []
 
         # Set up a timer for regular polling
-        self.timer_interval = 5  # Check every 10 seconds
+        self.timer_interval = 5  # Check every 5 seconds
         self.start_timer()
 
     def start_timer(self):
@@ -94,6 +100,7 @@ class App(Row):
             self.collaborators.visible = False
             self.sprint_backlog_view.visible = False
             self.sprint_kanban_view.visible = False
+            self.sprint_list_view.visible = False
         
         elif route == "/sprintboard":
             self.product_backlog.visible = False
@@ -101,6 +108,7 @@ class App(Row):
             self.collaborators.visible = False
             self.sprint_backlog_view.visible = False
             self.sprint_kanban_view.visible = False
+            self.sprint_list_view.visible = False
         
         elif route == "/collaborators":
             self.product_backlog.visible = False
@@ -108,6 +116,7 @@ class App(Row):
             self.collaborators.visible = True
             self.sprint_backlog_view.visible = False
             self.sprint_kanban_view.visible = False
+            self.sprint_list_view.visible = False
 
         elif route.startswith("/sprintbacklog/"):
             self.product_backlog.visible = False
@@ -115,6 +124,7 @@ class App(Row):
             self.collaborators.visible = False
             self.sprint_backlog_view.visible = True
             self.sprint_kanban_view.visible = False
+            self.sprint_list_view.visible = False
 
         elif route.startswith("/sprintkanban/"):
             self.product_backlog.visible = False
@@ -122,6 +132,15 @@ class App(Row):
             self.collaborators.visible = False
             self.sprint_backlog_view.visible = False
             self.sprint_kanban_view.visible = True
+            self.sprint_list_view.visible = False
+
+        elif route.startswith("/sprintlist/"):
+            self.product_backlog.visible = False
+            self.sprint_board.visible = False
+            self.collaborators.visible = False
+            self.sprint_backlog_view.visible = False
+            self.sprint_kanban_view.visible = False
+            self.sprint_list_view.visible = True
 
         self.page.update()
         print("Current route:", self.page.route)
@@ -159,6 +178,7 @@ class App(Row):
         self.sprint_board.change_bg_colour(related_colors[1])
         self.sprint_backlog_view.change_bg_colour(related_colors[1])
         self.sprint_kanban_view.change_bg_colour(related_colors[1])
+        self.sprint_list_view.change_bg_colour(related_colors[1])
         self.collaborators.change_bg_colour(related_colors[1])
 
     def update_active_view(self):

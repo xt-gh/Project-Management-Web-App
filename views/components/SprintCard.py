@@ -66,6 +66,11 @@ class SprintCard(Container):
                 icon=icons.MONITOR, 
                 on_click=lambda e: (print("Sprint kanban clicked"), self.page.go("/sprintkanban/" + self.id))
             ),
+            ElevatedButton(
+                "DEV: click to see sprint backlog", 
+                icon=icons.MONITOR, 
+                on_click=lambda e: (print("Sprint backlog clicked"), self.page.go("/sprintlist/" + self.id))
+            ),
             IconButton(
                 icon=icons.MORE_HORIZ_ROUNDED,
                 icon_color="black",

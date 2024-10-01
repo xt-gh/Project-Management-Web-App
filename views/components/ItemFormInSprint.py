@@ -259,9 +259,14 @@ class ItemFormInSprint(AlertDialog):
         )
 
         # Time log section
-        time_log_display = [
+        
+        try:
+            time_log_display = [
             Text(f"Total Accumulated Time: {self.time_accumulation[0]} hours {self.time_accumulation[1]} minutes", color="black")
-        ] + [Text(log, color="black") for log in self.track_time] if self.track_time else [Text("No time records yet", color="black")]
+            ] + [Text(log, color="black") for log in self.track_time] if self.track_time else [Text("No time records yet", color="black")]
+        except Exception as e:
+            print(f"Error generating time log display: {e}")
+            time_log_display = [Text("Error displaying time records", color="red")]
 
         self.user_track_time = Column(time_log_display)
 

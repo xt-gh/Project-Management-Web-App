@@ -34,7 +34,6 @@ class SprintBoard(Column):
                 ],
                 alignment=MainAxisAlignment.CENTER,
                 horizontal_alignment=CrossAxisAlignment.CENTER),
-            expand=1,
         )
 
         self.body = self.loading_screen
