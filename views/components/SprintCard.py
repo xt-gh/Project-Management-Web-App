@@ -121,6 +121,16 @@ class SprintCard(Container):
                     icon=icons.DRIVE_FILE_MOVE_OUTLINED, 
                     on_click=lambda e: (print("Sprint details clicked"), self.page.go("/sprintbacklog/" + self.id))
                 ),
+                ElevatedButton(
+                    "View Sprint Kanban", 
+                    icon=icons.VIEW_KANBAN_OUTLINED, 
+                    on_click=lambda e: (print("Sprint kanban clicked"), self.page.go("/sprintkanban/" + self.id))
+                ),
+                ElevatedButton(
+                    "View Sprint Backlog", 
+                    icon=icons.FEATURED_PLAY_LIST_OUTLINED, 
+                    on_click=lambda e: (print("Sprint backlog clicked"), self.page.go("/sprintlist/" + self.id))
+                ),
             ],
             alignment=MainAxisAlignment.START)
         
