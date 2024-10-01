@@ -27,6 +27,7 @@ class ItemForm(AlertDialog):
         self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
         self.logs = []
         self.header = []
+        self.sprint_id = ""
         
         self.bgcolor = "#CADEED"
         self.clip_behavior = ClipBehavior.HARD_EDGE

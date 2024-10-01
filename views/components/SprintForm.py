@@ -23,8 +23,6 @@ class SprintForm(AlertDialog):
         
         
         self.assignees = []
-        self.start_date_value = ""
-        self.end_date_value = ""
 
         # Build the form content
         self.content = self.build_add_sprint_form()
@@ -69,6 +67,8 @@ class SprintForm(AlertDialog):
             content=Column(
                 [
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    # self.sprint_name,
+                    # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
 
                     self.product_owner,

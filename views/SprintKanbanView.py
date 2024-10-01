@@ -7,6 +7,7 @@ from data.color_data import ColourData
 from views.components.ItemFormInSprint import ItemFormInSprint
 from views.components.ItemCard import DraggableItemCard
 from views.components.LoadingCard import LoadingCard
+from views.components.BurndownChartPopup import BurndownChartPopup
 
 class SprintKanbanView(Column):
     def __init__(self, page):
@@ -190,7 +191,7 @@ class SprintKanbanView(Column):
                 Row([
                     Text("Sprint Kanban", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                     Row([
-                        ElevatedButton("Burndown Chart", icon=icons.SSID_CHART, on_click=lambda e: print("Burndown chart clicked")),
+                        ElevatedButton("Burndown Chart", icon=icons.SSID_CHART, on_click=lambda e: self.show_burndown_chart(e)),
                         IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard")),
                     ])
                 ], alignment=MainAxisAlignment.SPACE_BETWEEN),
@@ -314,6 +315,7 @@ class SprintKanbanView(Column):
         print("Moving item")
         
         if target == "not_started":
+            source["date_completed"] = ""
             source["status"] = "Not Started"
             source["logs"].append({
                 "user": "John Doe",
@@ -323,6 +325,7 @@ class SprintKanbanView(Column):
             })
 
         elif target == "in_progress":
+            source["date_completed"] = ""
             source["status"] = "In Progress"
             source["logs"].append({
                 "user": "John Doe",
@@ -332,6 +335,7 @@ class SprintKanbanView(Column):
             })
         
         elif target == "completed":
+            source["date_completed"] = datetime.now().strftime("%d-%m-%Y")
             source["status"] = "Completed"
             source["logs"].append({
                 "user": "John Doe",
@@ -362,6 +366,16 @@ class SprintKanbanView(Column):
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board())
         self.page.update()
+
+    def show_burndown_chart(self, e):
+        sprint_id = self.page.route.split("/")[2]
+        sprint_data = asyncio.run(SprintData().get_sprint_item(sprint_id))
+        
+        burndown_popup = BurndownChartPopup(sprint_id, self.page)
+
+        # burndown_popup.open()
+
+        asyncio.run(burndown_popup.display_burndown_chart(sprint_id))
 
     def change_bg_colour(self, selected_color):
         """Change the background color of the product backlog."""
