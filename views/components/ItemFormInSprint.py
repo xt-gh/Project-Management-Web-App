@@ -126,7 +126,7 @@ class ItemFormInSprint(AlertDialog):
                     Row([Text("Tags:", color="black", size=15)]),
                     Row([self.tags]),
 
-                    self.chart,
+                    # self.chart,
 
                     Row([self.time_input_field, add_time_button], alignment=MainAxisAlignment.SPACE_BETWEEN),
 
@@ -260,7 +260,7 @@ class ItemFormInSprint(AlertDialog):
                 "assignee": self.assignee.value,
                 "tags": self.tags.selected_options,
                 "track_time": self.track_time,
-                "time_accumulation": [],
+                "time_accumulation": self.time_accumulation,
             }
 
             item["logs"] = self.logs

@@ -90,6 +90,8 @@ class SprintData():
             "dataSource": "helium",
             "database": self.database_name,
             "collection": self.collection_name,
+            "filter": {"_id": {"$oid": sprint_id}},
+            "update": {"$set": updated_fields}
         })
         response = requests.post(url, headers=self.headers, data=payload)
         # print(response.json())
@@ -153,8 +155,8 @@ if __name__ == "__main__":
     async def main():
         # Get all sprints
         items = await data_api.get_sprint_items()  # Await the async function
-        # for item in items:
-        #     print(item)
+        for item in items:
+            print(json.dumps(item, indent=4))
 
         # # Add a new sprint
         # new_item = {
@@ -168,12 +170,13 @@ if __name__ == "__main__":
         # print("DATABASE: New Item Added:", add_response)
 
         # Get a specific sprint by ID
-        first_item_id = items[0]['_id']  # Extract ObjectId from first item
-        fetched_item = await data_api.get_sprint_item(first_item_id)
-        fetched_item['sprint_name'] = "Completed"
-        await data_api.update_sprint_item(first_item_id, fetched_item)
+        # first_item_id = items[0]['_id']  # Extract ObjectId from first item
+        # fetched_item = await data_api.get_sprint_item(first_item_id)
+        # fetched_item['start_date'] = "01-10-2024"
+        # del fetched_item['_id']
+        # response = await data_api.update_sprint_item(sprint_id=first_item_id, updated_fields=fetched_item)
+        # print("DATABASE: Updated Item:", response)
 
-
-        print("DATABASE: Fetched Item:", await data_api.get_sprint_item(first_item_id))
+        # print("DATABASE: Fetched Item:", await data_api.get_sprint_item(first_item_id))
 
     asyncio.run(main())

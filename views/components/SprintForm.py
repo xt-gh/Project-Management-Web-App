@@ -58,9 +58,12 @@ class SprintForm(AlertDialog):
             self.sprint_name.value = self.sprint_dict["sprint_name"]
             self.product_owner.value = self.sprint_dict["product_owner"]
             self.scrum_master.value = self.sprint_dict["scrum_master"]
-            self.scrum_team.selected_options = self.sprint_dict["scrum_team"]
             self.start_date.set_date(self.sprint_dict["start_date"])
             self.end_date.set_date(self.sprint_dict["end_date"])
+
+            
+            for member in self.sprint_dict["scrum_team"]:
+                self.scrum_team.handle_add_tag(member)
 
 
         return Container(

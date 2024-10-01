@@ -158,7 +158,7 @@ class Data():
         #     if item['_id'] == item_id:
         #         self.product_backlog_items.pop(i)
                 # return item
-        print("\033[42mDATABASE: Removing product backlog item", item_id)
+        print("\033[42mDATABASE: Removing product backlog item\033[0m", item_id)
         url = f"{self.base_url}/action/deleteOne"
         payload = json.dumps({
             "dataSource": "helium",
@@ -172,57 +172,32 @@ class Data():
 if __name__ == "__main__":
     data_api = Data()
 
-    def add_new_item():
-        # Add a new product backlog item
-        new_item = {
-            "task_name": "test task",
-            "description": "New Task Description",
-            "priority": "High",
-            "story_points": 5,
-            "tags": ["API", "Front-end"],
-            "stage": "Development",
-            "status": "In Progress",
-            "type": "Bug",
-            "assignee": "John Doe",
-            "admin_add_date": datetime.utcnow().isoformat(),
-            # "logs": ["John Doe added this item on 2022-01-08 10:00 AM"],
-            "logs": [
-                {
-                    "author": "John Doe",
-                    "action": "added this item",
-                    "date": "2022-01-08",
-                    "time": "10:00 AM"
-                },
-                {
-                    "author": "John Doe",
-                    "action": "edited this item",
-                    "date": "2022-01-09",
-                    "time": "11:00 AM"
-                },
-                {
-                    "author": "John Doe",
-                    "action": "added a comment",
-                    "date": "2022-01-10",
-                    "time": "12:00 PM"
-                }
-            ],
-            "sprint_id": "test sprint id",
-            "THIS IS A NEW TEST FIELD": "This is a test field"
-        }
+    # # Get all product backlog items
+    # items = data_api.get_product_backlog_items()
+    # for item in items:
+    #     print(item)
 
-        print(asyncio.run(data_api.add_product_backlog_item(new_item)))
-    
-    def delete_all_items():
-        items = asyncio.run(data_api.get_product_backlog_items())
-        for item in items:
-            asyncio.run(data_api.remove_product_backlog_item(item["_id"]))
+    # # Add a new product backlog item
+    # new_item = {
+    #     "task_name": "New Task",
+    #     "description": "New Task Description",
+    #     "priority": "High",
+    #     "story_points": 5,
+    #     "tags": ["API", "Front-end"],
+    #     "stage": "Development",
+    #     "status": "In Progress",
+    #     "type": "Bug",
+    #     "assignee": "John Doe",
+    #     "admin_add_date": datetime.utcnow().isoformat(),
+    #     "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
+    # }
+    # add_response = data_api.add_product_backlog_item(new_item)
+    # print("DATABASE: New Item Added:", add_response)
 
-    def print_all_items():
-        items = asyncio.run(data_api.get_product_backlog_items())
-        for item in items:
-            print(json.dumps(item, indent=4))
-            
-    print_all_items()
+    # # Get a specific product backlog item by ID
+    # first_item_id = items[0]['_id']  # Extract ObjectId from first item
+    # fetched_item = data_api.get_product_backlog_item(first_item_id)
+    # print("DATABASE: Fetched Item:", fetched_item)
 
     # # Update an item
     # updated_fields = {
@@ -232,9 +207,10 @@ if __name__ == "__main__":
     # update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
     # print("DATABASE: Updated Item:", update_response)
 
-    # items = data_api.get_product_backlog_items()
-    # for item in items:
-    #     print(item)
+    items = asyncio.run(data_api.get_product_backlog_items())
+    for item in items:
+        asyncio.run(data_api.remove_product_backlog_item(item['_id']))
+        print(json.dumps(item, indent=4))
 
     # # Remove an item
     # remove_response = data_api.remove_product_backlog_item(first_item_id)
@@ -242,4 +218,3 @@ if __name__ == "__main__":
     # items = data_api.get_product_backlog_items()
     # for item in items:
     #     print(item)
-    

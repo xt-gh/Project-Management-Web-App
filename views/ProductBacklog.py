@@ -111,6 +111,7 @@ class ProductBacklog(Column):
         print("Populating board")
         if refetch:
             self.item_list = await (Data().get_product_backlog_items())
+            self.item_list = list(filter(lambda x: x["sprint_id"] == "", self.item_list))
             print("Fetching product backlog items")
             
         items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
