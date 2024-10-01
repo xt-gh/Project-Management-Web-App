@@ -182,8 +182,10 @@ class App(Row):
         self.collaborators.change_bg_colour(related_colors[1])
 
     def update_active_view(self):
-        self.controls[0].update()
-        self.controls[1].update()
+        print("UPDATE ACTIVE VIEW")
+        self.page.update()
+        # self.controls[0].update()
+        # self.controls[1].update()
 
 def main(page):
     page.title = "Project Management App"

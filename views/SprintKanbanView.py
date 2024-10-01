@@ -315,15 +315,30 @@ class SprintKanbanView(Column):
         
         if target == "not_started":
             source["status"] = "Not Started"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
+            source["logs"].append({
+                "user": "John Doe",
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "time": datetime.now().strftime("%I:%M %p"),
+                "action": "Moved to Not Started",
+            })
 
         elif target == "in_progress":
             source["status"] = "In Progress"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
+            source["logs"].append({
+                "user": "John Doe",
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "time": datetime.now().strftime("%I:%M %p"),
+                "action": "Moved to In Progress",
+            })
         
         elif target == "completed":
             source["status"] = "Completed"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
+            source["logs"].append({
+                "user": "John Doe",
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "time": datetime.now().strftime("%I:%M %p"),
+                "action": "Moved to Completed",
+            })
 
         id = source["_id"]
         del source["_id"]

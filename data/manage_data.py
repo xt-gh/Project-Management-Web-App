@@ -172,36 +172,57 @@ class Data():
 if __name__ == "__main__":
     data_api = Data()
 
-    # Add a new product backlog item
-    new_item = {
-        "task_name": "task 1",
-        "description": "New Task Description",
-        "priority": "High",
-        "story_points": 5,
-        "tags": ["API", "Front-end"],
-        "stage": "Development",
-        "status": "In Progress",
-        "type": "Bug",
-        "assignee": "John Doe",
-        "admin_add_date": datetime.utcnow().isoformat(),
-        "logs": ["John Doe added this item on 2022-01-08 10:00 AM"],
-        "sprint_id": "test sprint id",
-        "THIS IS A NEW TEST FIELD": "This is a test field"
-    }
+    def add_new_item():
+        # Add a new product backlog item
+        new_item = {
+            "task_name": "test task",
+            "description": "New Task Description",
+            "priority": "High",
+            "story_points": 5,
+            "tags": ["API", "Front-end"],
+            "stage": "Development",
+            "status": "In Progress",
+            "type": "Bug",
+            "assignee": "John Doe",
+            "admin_add_date": datetime.utcnow().isoformat(),
+            # "logs": ["John Doe added this item on 2022-01-08 10:00 AM"],
+            "logs": [
+                {
+                    "author": "John Doe",
+                    "action": "added this item",
+                    "date": "2022-01-08",
+                    "time": "10:00 AM"
+                },
+                {
+                    "author": "John Doe",
+                    "action": "edited this item",
+                    "date": "2022-01-09",
+                    "time": "11:00 AM"
+                },
+                {
+                    "author": "John Doe",
+                    "action": "added a comment",
+                    "date": "2022-01-10",
+                    "time": "12:00 PM"
+                }
+            ],
+            "sprint_id": "test sprint id",
+            "THIS IS A NEW TEST FIELD": "This is a test field"
+        }
 
-    items = asyncio.run(data_api.get_product_backlog_items())
-    # asyncio.run(data_api.add_product_backlog_item(new_item))
-    # asyncio.run(data_api.remove_product_backlog_item(items[0]["_id"]))
-    # update_response = asyncio.run(data_api.update_product_backlog_item(items[0]["_id"], {"THIS IS A NEW TEST FIELD": "This is a test field"}))
+        print(asyncio.run(data_api.add_product_backlog_item(new_item)))
+    
+    def delete_all_items():
+        items = asyncio.run(data_api.get_product_backlog_items())
+        for item in items:
+            asyncio.run(data_api.remove_product_backlog_item(item["_id"]))
 
-    # Get all product backlog items
-    for item in items:
-        print(json.dumps(item, indent=4))
-
-    # # Get a specific product backlog item by ID
-    # first_item_id = items[0]['_id']  # Extract ObjectId from first item
-    # fetched_item = data_api.get_product_backlog_item(first_item_id)
-    # print("DATABASE: Fetched Item:", fetched_item)
+    def print_all_items():
+        items = asyncio.run(data_api.get_product_backlog_items())
+        for item in items:
+            print(json.dumps(item, indent=4))
+            
+    print_all_items()
 
     # # Update an item
     # updated_fields = {
@@ -221,3 +242,4 @@ if __name__ == "__main__":
     # items = data_api.get_product_backlog_items()
     # for item in items:
     #     print(item)
+    

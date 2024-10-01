@@ -142,14 +142,12 @@ class ProductBacklog(Column):
         print("Closing form")
         self.page.close(self.item_form)
         asyncio.run(self.populate_board(refetch=True))
-        # self.update_active_view()
         self.page.update()
 
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board(refetch=True))
-        # self.update_active_view()
         self.page.update()
     
     def handle_sort_option(self, sort_option):
