@@ -7,6 +7,7 @@ from data.manage_data import Data
 from data.filter_data import DataFilter 
 from data.task_filter import TaskFilter
 from data.task_sorter import TaskSorter
+from data.color_data import ColourData
 import asyncio
 
 class ProductBacklog(Column):
@@ -83,15 +84,27 @@ class ProductBacklog(Column):
         
         except Exception as e:
             print(e)
+
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Product Backlog":
+                self.bgcolor = item['background_color']
+                self.controls[0].bgcolor = self.bgcolor
+                break
             
     
     def did_mount(self):
         print("\033[33mProduct backlog mounted\033[0m")
+        asyncio.run(self.load_initial_background_color())
         asyncio.run(self.populate_board(refetch=True))
         self.controls[0].content.controls[1].content = self.board
         # self.update_active_view()
         self.page.update()
 
+    def refresh_data(self):
+        asyncio.run(self.populate_board(refetch=True))
+        self.page.update()
     
     async def populate_board(self, refetch=False):
         self.board.controls.clear()
@@ -150,3 +163,10 @@ class ProductBacklog(Column):
         self.filter_tag = tag
         asyncio.run(self.populate_board())
         self.update()
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bg_color = selected_color
+        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Product Backlog", self.bg_color))

@@ -1,4 +1,6 @@
 from flet import *
+from data.color_data import ColourData
+import asyncio
 
 class SideBar(Column):
     def __init__(self, page):
@@ -42,5 +44,30 @@ class SideBar(Column):
         if self.page:
             self.navigator.height = self.page.height - 230
 
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Side Bar":
+                self.bg_color = item['background_color']
+                self.controls[0].bgcolor = self.bg_color
+            elif item['component'] == "Side Bar Navigator":
+                self.navigator.bgcolor = item['background_color']
+                self.bgcolor = self.navigator.bgcolor     
+
     def did_mount(self):
         print("\033[33mSidebar mounted\033[0m")
+        asyncio.run(self.load_initial_background_color())
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bg_color = selected_color
+        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Side Bar", self.bg_color))
+
+    def change_navigator_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.navigator.bgcolor = selected_color
+        self.bgcolor = self.navigator.bgcolor  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Side Bar Navigator", self.navigator.bgcolor))

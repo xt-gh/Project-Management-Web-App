@@ -3,6 +3,9 @@ from .components.SprintCard import SprintCard
 from .components.SprintForm import SprintForm
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
+from data.color_data import ColourData
+from data.task_filter import TaskFilter
+from data.task_sorter import TaskSorter
 import asyncio
 
 class SprintBoard(Column):
@@ -66,11 +69,24 @@ class SprintBoard(Column):
         except Exception as e:
             print(e)
 
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Sprint Board":
+                self.bg_color = item['background_color']
+                self.controls[0].bgcolor = self.bg_color
+                break
+
     def did_mount(self):
         print("\033[33mSprint board mounted\033[0m")
         asyncio.run(SprintData().get_sprint_items())
+        asyncio.run(self.load_initial_background_color())
         asyncio.run(self.populate_board(refetch=True))
         self.controls[0].content.controls[1].content = self.board
+        self.page.update()
+
+    def refresh_data(self):
+        asyncio.run(self.populate_board(refetch=True))
         self.page.update()
 
     async def populate_board(self, refetch=False):
@@ -118,3 +134,10 @@ class SprintBoard(Column):
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board(refetch=True))
         self.page.update()
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bg_color = selected_color
+        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Sprint Board", self.bg_color))

@@ -11,7 +11,7 @@ class ItemForm(AlertDialog):
         self.page = page
         self.close_form = close_form
         self.mode = mode # Mode can be "add" or "view" or "edit"
-        self.item_dict = item_dict
+        self.item_dict = item_dict or {}
         # self.data = Data()
         self.content_padding = 10
 
@@ -150,8 +150,6 @@ class ItemForm(AlertDialog):
                 "type": self.task_type.value,
                 "assignee": self.assignee.value,
                 "tags": self.tags.selected_options,
-                "sprint_id": "",
-                "date_completed": "",
             }
             if self.mode == "add":
                 item["admin_add_date"] = datetime.utcnow().isoformat()

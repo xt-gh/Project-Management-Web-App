@@ -3,6 +3,7 @@ from datetime import datetime
 from flet import *
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
+from data.color_data import ColourData
 from views.components.ItemCard import ItemCard, DraggableItemCard
 from views.components.LoadingCard import LoadingCard
 
@@ -164,6 +165,18 @@ class SprintBacklogView(Column):
 
             asyncio.run(self.populate_product_backlog())
             asyncio.run(self.populate_sprint_backlog())
+    
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Sprint Board":
+                self.bg_color = item['background_color']
+                self.controls[0].bgcolor = self.bg_color
+                break
+
+    def did_mount(self):
+        print("\033[33mSprint backlog mounted\033[0m")
+        asyncio.run(self.load_initial_background_color())
 
     async def populate_product_backlog(self):
         all_items = await Data().get_product_backlog_items()
@@ -299,3 +312,10 @@ class SprintBacklogView(Column):
         # Reset the background color of the drop target
         e.control.content.bgcolor = colors.BLUE_GREY_100 
         e.control.update()
+
+    def change_bg_colour(self, selected_color):
+        """Change the background color of the product backlog."""
+        self.bg_color = selected_color
+        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.page.update()
+        asyncio.run(ColourData().save_background_color("Sprint Backlog View", self.bgcolor))

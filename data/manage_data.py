@@ -134,6 +134,11 @@ class Data():
 
     # Method to update a product backlog item
     async def update_product_backlog_item(self, item_id, updated_fields):
+        # for item in self.product_backlog_items:
+        #     if item['_id'] == item_id:
+        #         for key, value in updated_fields.items():
+        #             item[key] = value
+                # return item
         print("\033[42mDATABASE: Updating product backlog item\033[0m", str(updated_fields))
         url = f"{self.base_url}/action/updateOne"
         payload = json.dumps({
@@ -149,7 +154,11 @@ class Data():
 
     # Method to remove a product backlog item by its _id
     async def remove_product_backlog_item(self, item_id):
-        print("\033[42mDATABASE: Removing product backlog item\033[0m", item_id)
+        # for i, item in enumerate(self.product_backlog_items):
+        #     if item['_id'] == item_id:
+        #         self.product_backlog_items.pop(i)
+                # return item
+        print("\033[42mDATABASE: Removing product backlog item", item_id)
         url = f"{self.base_url}/action/deleteOne"
         payload = json.dumps({
             "dataSource": "helium",
@@ -175,25 +184,17 @@ if __name__ == "__main__":
         "type": "Bug",
         "assignee": "John Doe",
         "admin_add_date": datetime.utcnow().isoformat(),
-        "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
+        "logs": ["John Doe added this item on 2022-01-08 10:00 AM"],
+        "sprint_id": "test sprint id",
+        "THIS IS A NEW TEST FIELD": "This is a test field"
     }
-    add_response = data_api.add_product_backlog_item(new_item)
-    print("DATABASE: New Item Added:", add_response)
 
-    # Get a specific product backlog item by ID
-    first_item_id = items[0]['_id']  # Extract ObjectId from first item
-    fetched_item = data_api.get_product_backlog_item(first_item_id)
-    print("DATABASE: Fetched Item:", fetched_item)
+    items = asyncio.run(data_api.get_product_backlog_items())
+    # asyncio.run(data_api.add_product_backlog_item(new_item))
+    # asyncio.run(data_api.remove_product_backlog_item(items[0]["_id"]))
+    # update_response = asyncio.run(data_api.update_product_backlog_item(items[0]["_id"], {"THIS IS A NEW TEST FIELD": "This is a test field"}))
 
-    # Update an item
-    updated_fields = {
-        "status": "Completed",
-        "logs": ["Item was marked as completed on 2022-02-01"]
-    }
-    update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
-    print("DATABASE: Updated Item:", update_response)
-
-    items = data_api.get_product_backlog_items()
+    # Get all product backlog items
     for item in items:
         print(json.dumps(item, indent=4))
 

@@ -94,7 +94,7 @@ class SprintData():
         response = requests.post(url, headers=self.headers, data=payload)
         # print(response.json())
         print("\033[42mDATABASE: Sprints fetched\033[0m")
-        return response.json()['documents']
+        return response.json()
     
     # Method to get a single sprint by its _id
     async def get_sprint_item(self, item_id):
