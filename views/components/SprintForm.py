@@ -15,12 +15,12 @@ class SprintForm(AlertDialog):
         self.close_form = close_form
         self.mode = mode  # Mode can be "add" or "view" or "edit"
         self.sprint_dict = sprint_dict
-        self.sprint_dict = sprint_dict
         self.content_padding = 10
         self.inset_padding = 10
         self.status_options = ["Not Started", "In progress", "Completed"]
         self.bgcolor = "#CADEED"
         self.clip_behavior = ClipBehavior.HARD_EDGE
+        
         
         # Build the form content
         self.content = self.build_add_sprint_form()
@@ -40,8 +40,6 @@ class SprintForm(AlertDialog):
             ElevatedButton("Save", bgcolor=colors.GREEN_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
         ]
 
-        if self.mode == "add":
-            self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
         if self.mode == "add":
             self.header = [Text("Add Sprint" if self.mode == "add" else "Editing Item", color="black", size=24)]
 
@@ -67,10 +65,8 @@ class SprintForm(AlertDialog):
             content=Column(
                 [
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
-                    # self.sprint_name,
-                    # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                    # Row([self.product_owner, self.scrum_master], alignment=MainAxisAlignment.SPACE_BETWEEN),
+
                     self.product_owner,
                     self.scrum_master,
                     Text("Scrum team:", color="black", size=15),
@@ -78,7 +74,6 @@ class SprintForm(AlertDialog):
 
                     self.start_date,
                     self.end_date,
-
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
@@ -144,27 +139,6 @@ class SprintForm(AlertDialog):
                     return "End date should be after start date"
         
         return True
-    def is_valid_form(self):
-        is_valid = True
-        if self.sprint_name.value.strip() == "":
-            is_valid = False
-
-        if self.product_owner.value == "":
-            is_valid = False
-        
-        if self.scrum_master.value == "":
-            is_valid = False
-        
-        if self.start_date.value == "":
-            is_valid = False
-        
-        if self.end_date.value == "":
-            is_valid = False
-
-        if self.are_dates_valid() is not True:
-            is_valid = False
-
-        return is_valid
     
     def handle_submit(self):
         if self.is_valid_form():
@@ -190,23 +164,6 @@ class SprintForm(AlertDialog):
             self.close_form()
 
         else:
-            if self.sprint_name.value.strip() == "":
-                self.sprint_name.error_text = "Sprint name is required"
-            if self.product_owner.value == "":
-                self.product_owner.error_text = "Product owner is required"
-            if self.scrum_master.value == "":
-                self.scrum_master.error_text = "Scrum master is required"
-            if self.start_date.value == "":
-                self.start_date.content.controls[1].error_text = "Start date is required"
-            if self.end_date.value == "":
-                self.end_date.content.controls[1].error_text = "End date is required"
-            
-            if self.are_dates_valid() is not True:
-                date_error_message = self.are_dates_valid()
-                if date_error_message.startswith("Start"):
-                    self.start_date.content.controls[1].error_text = date_error_message
-                elif date_error_message.startswith("End"):
-                    self.end_date.content.controls[1].error_text = date_error_message
 
             if self.sprint_name.value.strip() == "":
                 self.sprint_name.error_text = "Sprint name is required"
