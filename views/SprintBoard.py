@@ -99,7 +99,8 @@ class SprintBoard(Column):
         # items = TaskFilter().filter_tasks(items, self.filter_tag)
         items = self.sprint_list
         for sprint in items:
-            self.board.controls.append(
+            self.board.controls.insert(
+                0,
                 Container(
                     content=SprintCard(page=self.page, sprint_dict=sprint, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,

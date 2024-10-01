@@ -22,6 +22,10 @@ class SprintForm(AlertDialog):
         self.clip_behavior = ClipBehavior.HARD_EDGE
         
         
+        self.assignees = []
+        self.start_date_value = ""
+        self.end_date_value = ""
+
         # Build the form content
         self.content = self.build_add_sprint_form()
         self.inset_padding = 10
@@ -182,5 +186,4 @@ class SprintForm(AlertDialog):
                     self.start_date.content.controls[1].error_text = date_error_message
                 elif date_error_message.startswith("End"):
                     self.end_date.content.controls[1].error_text = date_error_message
-
             self.page.update()

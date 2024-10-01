@@ -17,8 +17,21 @@ class SprintCard(Container):
         self.start_date = sprint_dict["start_date"]
         self.end_date = sprint_dict["end_date"]
 
-        self.status = "Placeholder"
+        
+        today_date_object = datetime.now().date()
+        start_date_object = datetime.strptime(self.start_date, '%d-%m-%Y').date()
+        end_date_object = datetime.strptime(self.end_date, '%d-%m-%Y').date()
+        self.diff = end_date_object - start_date_object
+        self.days_left = end_date_object - today_date_object
 
+        if today_date_object < start_date_object:
+            self.status = "Not Started"
+        
+        elif today_date_object > end_date_object:
+            self.status = "Completed"
+
+        else:
+            self.status = "In Progress"
 
         self.handle_detailed_view = handle_detailed_view
 
@@ -39,70 +52,99 @@ class SprintCard(Container):
         print("Clickable without Ink clicked!")
         # self.page.go("/sprintkanban/" + self.id)
 
-
     def card_title(self):
-        return Container(
-            content=Text(
-                self.sprint_name,
+        return Row([
+            Text(
+                f"{self.sprint_name} ({self.status})",
                 color="black", 
-                size=20,
+                size=30,
+                weight=FontWeight.BOLD,
                 max_lines=2,
                 expand=1,
                 overflow=TextOverflow.ELLIPSIS
+            ),
+            IconButton(
+                icon=icons.EDIT_DOCUMENT,
+                icon_color="black",
+                icon_size=30,
+                on_click=lambda e: self.handle_detailed_view(self.id),
+                hover_color="#F1F1F1",
+                # disabled=self.status != "Not Started",
+                mouse_cursor=MouseCursor.CLICK if self.status == "Not Started" else MouseCursor.FORBIDDEN,
             )
+        ],
+        alignment=MainAxisAlignment.SPACE_BETWEEN
         )
 
     def card_details(self):
-        details = Row([
-            Column(),
-            # But buttons below are temporary, only for development purposes
-            ElevatedButton(
-                "DEV: click to see sprint details", 
-                icon=icons.MONITOR, 
-                on_click=lambda e: (print("Sprint details clicked"), self.page.go("/sprintbacklog/" + self.id))
-            ),
-            ElevatedButton(
-                "DEV: click to see sprint kanban", 
-                icon=icons.MONITOR, 
-                on_click=lambda e: (print("Sprint kanban clicked"), self.page.go("/sprintkanban/" + self.id))
-            ),
-            ElevatedButton(
-                "DEV: click to see sprint backlog", 
-                icon=icons.MONITOR, 
-                on_click=lambda e: (print("Sprint backlog clicked"), self.page.go("/sprintlist/" + self.id))
-            ),
-            IconButton(
-                icon=icons.MORE_HORIZ_ROUNDED,
-                icon_color="black",
-                icon_size=20,
-                on_click=lambda e: self.handle_detailed_view(self.id),
-                hover_color="#F1F1F1",
+        return Row([
+            self.status_details(),
+            self.member_details(),
+            self.controls_details()
+        ],
+        alignment=MainAxisAlignment.SPACE_BETWEEN,
+        vertical_alignment=CrossAxisAlignment.START)
 
-            )
-        ], 
-        alignment=MainAxisAlignment.END,
-        # tight=True,
-        )
+    def status_details(self):
+    
+        status_column = Column([
+            Text("Start Date: " + self.start_date, color="black", size=20),
+            Text("End Date: " + self.end_date, color="black", size=20),
+            Text("Duration: " + str(self.diff.days) + " days", color="black", size=20),
+            Text("Days Left: " + str(max(self.days_left.days, 0)) + " days", color="black", size=20)
+        ],
+        alignment=MainAxisAlignment.START)
+    
+        return status_column
 
-        if self.start_date:
-            details.controls[0].controls.insert(
-                0,
-                Container(Text(f"Start Date: {self.start_date} ", color="black", size=14)),
-            )
-            details.alignment=MainAxisAlignment.SPACE_BETWEEN
+    def member_details(self):
+        member_column = Column([
+            Text("Product Owner: Not Assigned", color="black", size=20),
+            Text("Scrum Master: Not Assigned", color="black", size=20),
+            Text("Scrum Team: Not Assigned", color="black", size=20),
+        ],
+        alignment=MainAxisAlignment.START)
+        if self.product_owner:
+            member_column.controls[0].value = "Product Owner: " + self.product_owner
+        if self.scrum_master:
+            member_column.controls[1].value = "Scrum Master: " + self.scrum_master
+        if self.scrum_team:
+            member_column.controls[2].value = "Scrum Team: " + str(self.scrum_team)
 
-        if self.end_date:
-            details.controls[0].controls.insert(
-                0,
-                Container(Text(f"End Date: {self.end_date} ", color="black", size=14)),
-            )
-            details.alignment=MainAxisAlignment.SPACE_BETWEEN
+        return member_column
+    
+    def controls_details(self):
+        if self.status == "Not Started":
+            return Column([
+                ElevatedButton(
+                    "Manage Sprint Backlog", 
+                    icon=icons.DRIVE_FILE_MOVE_OUTLINED, 
+                    on_click=lambda e: (print("Sprint details clicked"), self.page.go("/sprintbacklog/" + self.id))
+                ),
+            ],
+            alignment=MainAxisAlignment.START)
+        
+        if self.status == "In Progress":
+            return Column([
+                ElevatedButton(
+                    "View Sprint Kanban", 
+                    icon=icons.VIEW_KANBAN_OUTLINED, 
+                    on_click=lambda e: (print("Sprint kanban clicked"), self.page.go("/sprintkanban/" + self.id))
+                ),
+                ElevatedButton(
+                    "View Sprint Backlog", 
+                    icon=icons.FEATURED_PLAY_LIST_OUTLINED, 
+                    on_click=lambda e: (print("Sprint backlog clicked"), self.page.go("/sprintlist/" + self.id))
+                ),
+            ],
+            alignment=MainAxisAlignment.START)
 
-        if self.status:
-            details.controls[0].controls.insert(
-                0,
-                Container(Text(f"Status: {self.status} ", color="black", size=14)),
-            )
-            details.alignment=MainAxisAlignment.SPACE_BETWEEN
-
-        return details
+        if self.status == "Completed":
+            return Column([
+                ElevatedButton(
+                    "View Sprint Report", 
+                    icon=icons.MONITOR, 
+                    on_click=lambda e: (print("Sprint report clicked"), self.page.go("/sprintreport/" + self.id))
+                ),
+            ],
+            alignment=MainAxisAlignment.START)

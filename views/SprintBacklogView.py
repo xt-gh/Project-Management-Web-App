@@ -238,18 +238,25 @@ class SprintBacklogView(Column):
         print("Moving item" + str(source) + " to " + target)
         if target == "product_backlog":
             source["sprint_id"] = ""
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - Moved to " + target)
+            source["logs"].append({
+                "user": "User",
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "time": datetime.now().strftime("%I:%M %p"),
+                "action": "Moved to " + target
+            })
 
         elif target == "sprint_backlog":
             source["sprint_id"] = self.page.route.split("/")[2]
             print("Setting Sprint ID: ", source["sprint_id"])
-            source["logs"].append(
-                "Item updated on " + 
-                datetime.utcnow().isoformat() + 
-                " - Moved to " + 
-                target + " for sprint " +
-                self.page.route.split("/")[2]
-                )
+            
+            sprint_name = asyncio.run(SprintData().get_sprint_item(source["sprint_id"]))["sprint_name"]
+            source["logs"].append({
+                "user": "User",
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "time": datetime.now().strftime("%I:%M %p"),
+                "action": "Moved task to " + sprint_name
+            })
+            
         id = source["_id"]
         del source["_id"]
 
@@ -264,53 +271,6 @@ class SprintBacklogView(Column):
         
         # Change the background of the drop target to show it can accept the drop
         e.control.content.bgcolor = colors.GREEN  
-        e.control.update()
-
-    # def drag_accept(self, e: DragTargetAcceptEvent):
-    #     print(f"Item accepted: {e.data}")
-        
-    #     dropped_item = e.data 
-
-    #     sprint_backlog_column = e.control.content.controls[1].content.controls[0]
-    #     sprint_backlog_column.controls.append(
-    #         Container(
-    #             content=DraggableItemCard(dropped_item), 
-    #             alignment=alignment.center
-    #         )
-    #     )
-        
-    #     # Remove the item from the product backlog 
-    #     product_backlog_column = e.control.content.controls[1].content.controls[0]
-    #     product_backlog_column.controls = [item for item in product_backlog_column.controls if item.data != dropped_item]
-        
-    #     e.control.update()  
-
-
-    def drag_accept(self, e: DragTargetAcceptEvent):
-        print(f"Item accepted: {e.data}")
-
-        dropped_item = e.data 
-
-        # Access the sprint backlog column directly from the drop target control
-        sprint_backlog_column = e.control.content.controls[1].content.content
-
-        sprint_backlog_column.append(
-            Container(
-                content=DraggableItemCard(dropped_item), 
-                alignment=alignment.center
-            )
-        )
-
-        product_backlog_column = e.control.content.controls[0].content.content
-        product_backlog_column.controls = [item for item in product_backlog_column.controls if item.data != dropped_item]
-
-        e.control.update()
-
-    def drag_leave(self, e: DragTargetAcceptEvent):
-        print(f"Dragged item left target: {e.data}")
-        
-        # Reset the background color of the drop target
-        e.control.content.bgcolor = colors.BLUE_GREY_100 
         e.control.update()
 
     def change_bg_colour(self, selected_color):

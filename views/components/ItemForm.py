@@ -1,5 +1,6 @@
 from flet import *
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
+from .TaskLogTable import TaskLogTable
 from data.manage_data import Data
 from datetime import datetime
 import asyncio
@@ -19,6 +20,7 @@ class ItemForm(AlertDialog):
 
         self.priotity_options = ["Low", "Medium", "Important", "Urgent"]
         self.fibbonacci = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100]
+        self.story_points_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         self.task_stage_options = ["Planning", "Development", "Testing", "Implementation"]
         self.task_status_options = ["Not Started", "In Progress", "Completed"]
         self.task_type_options = ["User Story", "Bug"]
@@ -39,7 +41,7 @@ class ItemForm(AlertDialog):
         self.task_description.multiline = True
         self.task_description.min_lines = 3
         self.priority = DropdownInput(self.priotity_options, label="Priority")
-        self.story_points = DropdownInput(self.fibbonacci, label="Story Points")
+        self.story_points = DropdownInput(self.story_points_range, label="Story Points")
         self.task_stage = DropdownInput(self.task_stage_options, label="Stage")
         self.task_status = DropdownInput(self.task_status_options, label="Status")
         self.task_type = DropdownInput(self.task_type_options, label="Type")
@@ -83,7 +85,10 @@ class ItemForm(AlertDialog):
             
             self.logs = item["logs"]
 
-            # self.task_logs = 
+            self.task_logs = Column([
+                Text("Logs:", color="black", size=15),
+                Row([TaskLogTable(self.logs)], vertical_alignment=CrossAxisAlignment.START)
+            ])
     
         return Container(
             content=Column(
@@ -107,20 +112,7 @@ class ItemForm(AlertDialog):
                     Text("Tags:", color="black", size=15),
                     Row([self.tags]),
 
-                    # self.task_logs,
-                    Row([
-                        Text("Logs:", color="black", size=15),
-                        Column(
-                            [
-                                Container(
-                                    Text(log, color="black"),
-                                    # Text(f"{log.split('T')[0]} {log.split('T')[1].split('.')[0]}", color="black")
-                                ) for log in self.logs
-                            ]
-                        ),
-                        ] if self.logs != [] else [],
-                        vertical_alignment=CrossAxisAlignment.START
-                    ),
+                    self.task_logs
                 ],
                 on_scroll=lambda e: print("Scrolled"),
                 scroll=ScrollMode.AUTO,
@@ -150,16 +142,30 @@ class ItemForm(AlertDialog):
                 "type": self.task_type.value,
                 "assignee": self.assignee.value,
                 "tags": self.tags.selected_options,
+                "sprint_id": "",
+                "date_completed": "",
+                "track_time": [],
+                "time_accumulation": [0, 0]
             }
             if self.mode == "add":
                 item["admin_add_date"] = datetime.utcnow().isoformat()
-                item["logs"] = ["Item created on " + item["admin_add_date"]]
+                item["logs"] = [{
+                    "user": "John Doe",
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "time": datetime.now().strftime("%I:%M %p"),
+                    "action": "Added this item"
+                }]
                 asyncio.run(Data().add_product_backlog_item(item))
                 # print("Added new item:", self.data.get_product_backlog_items())
 
             if self.mode == "view":
                 item["logs"] = self.logs
-                item["logs"].append("Item updated on " + datetime.utcnow().isoformat())
+                item["logs"].append({
+                    "user": "John Doe",
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "time": datetime.now().strftime("%I:%M %p"),
+                    "action": "Updated this item"
+                })
                 asyncio.run(Data().update_product_backlog_item(item_id=self.item_dict["_id"], updated_fields=item))
                 # print("Updated item:", self.data.get_product_backlog_item(item_id=self.item_id))
             self.close_form()
