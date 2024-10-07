@@ -13,7 +13,6 @@ from views.SprintBacklogView import SprintBacklogView
 from views.SprintKanbanView import SprintKanbanView
 from views.SprintListView import SprintListView
 from views.components.ColourPopupButton import ColourPopupButton
-from views.LogInPage import LoginPage
 import asyncio
 import threading
 
@@ -25,7 +24,7 @@ class App(Row):
 
         self.product_backlog = ProductBacklog(self.page, self.update_active_view)
         self.sprint_board = SprintBoard(self.page, self.update_active_view)
-        self.collaborators = Collaborators(self.page, self.update_active_view)
+        self.collaborators = Collaborators(self.page)
         self.sprint_backlog_view = SprintBacklogView(self.page)
         self.sprint_kanban_view = SprintKanbanView(self.page)
         self.sprint_list_view = SprintListView(self.page)
@@ -65,8 +64,8 @@ class App(Row):
         self.sprint_data = []
 
         # Set up a timer for regular polling
-        self.timer_interval = 5  # Check every 10 seconds
-        # self.start_timer()
+        self.timer_interval = 5  # Check every 5 seconds
+        self.start_timer()
 
     def start_timer(self):
         """Start a background timer to poll for data changes every 10 seconds."""
@@ -194,17 +193,10 @@ def main(page):
     page.bgcolor = "#DBEBE2"
     page.theme_mode = ThemeMode.LIGHT
 
-    # Create a login page and handle login logic
-    def on_login_success():
-        # Clear the page and navigate to the main app after login is successful
-        page.clean()
-        app = App(page)
-        page.on_route_change = app.route_change
-        page.go("/productbacklog")
-        page.add(app)
+    app = App(page)
 
-    # Initialize login page with a callback to switch to the main app
-    login_page = LoginPage(page, on_login_success)
-    page.add(login_page)
+    page.on_route_change = app.route_change
+    page.go("/productbacklog")
+    page.add(app)
 
 flet.app(target=main, assets_dir="./assets")
