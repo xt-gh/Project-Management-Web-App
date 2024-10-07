@@ -168,53 +168,51 @@ class Data():
         })
         response = requests.post(url, headers=self.headers, data=payload)
         return response.json()
+    
+    # Method to get all items from a sprint
+    async def get_tasks_from_sprint_id(self, sprint_id):
+        print("\033[42mDATABASE: Getting tasks from sprint ID", sprint_id, "\033[0m")
+        url = f"{self.base_url}/action/find"
+        payload = json.dumps({
+            "dataSource": "helium",  # Replace with your data source name
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"sprint_id": sprint_id}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print("\033[42mDATABASE: Sprint task items fetched\033[0m")
+        return response.json()['documents']
 
 if __name__ == "__main__":
-    data_api = Data()
+    def print_all_items():
+        items = asyncio.run(Data().get_product_backlog_items())
+        for item in items:
+            print(json.dumps(item, indent=4))
 
-    # # Get all product backlog items
-    # items = data_api.get_product_backlog_items()
-    # for item in items:
-    #     print(item)
+    def delete_all_items():
+        items = asyncio.run(Data().get_product_backlog_items())
+        for item in items:
+            asyncio.run(Data().remove_product_backlog_item(item['_id']))
 
-    # # Add a new product backlog item
-    # new_item = {
-    #     "task_name": "New Task",
-    #     "description": "New Task Description",
-    #     "priority": "High",
-    #     "story_points": 5,
-    #     "tags": ["API", "Front-end"],
-    #     "stage": "Development",
-    #     "status": "In Progress",
-    #     "type": "Bug",
-    #     "assignee": "John Doe",
-    #     "admin_add_date": datetime.utcnow().isoformat(),
-    #     "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
-    # }
-    # add_response = data_api.add_product_backlog_item(new_item)
-    # print("DATABASE: New Item Added:", add_response)
+    def add_item():
+        new_item = {
+            "task_name": "New Task",
+            "description": "New Task Description",
+            "priority": "High",
+            "story_points": 5,
+            "tags": ["API", "Front-end"],
+            "stage": "Development",
+            "status": "In Progress",
+            "type": "Bug",
+            "assignee": "John Doe",
+            "admin_add_date": datetime.utcnow().isoformat(),
+            "logs": ["John Doe added this item on 2022-01-08 10:00 AM"]
+        }
+        asyncio.run(Data().add_product_backlog_item(new_item))
 
-    # # Get a specific product backlog item by ID
-    # first_item_id = items[0]['_id']  # Extract ObjectId from first item
-    # fetched_item = data_api.get_product_backlog_item(first_item_id)
-    # print("DATABASE: Fetched Item:", fetched_item)
+    def print_tasks_from_sprint_id(sprint_id):
+        tasks = asyncio.run(Data().get_tasks_from_sprint_id(sprint_id))
+        for task in tasks:
+            print(json.dumps(task, indent=4))
 
-    # # Update an item
-    # updated_fields = {
-    #     "status": "Completed",
-    #     "logs": ["Item was marked as completed on 2022-02-01"]
-    # }
-    # update_response = data_api.update_product_backlog_item(first_item_id, updated_fields)
-    # print("DATABASE: Updated Item:", update_response)
-
-    items = asyncio.run(data_api.get_product_backlog_items())
-    for item in items:
-        asyncio.run(data_api.remove_product_backlog_item(item['_id']))
-        print(json.dumps(item, indent=4))
-
-    # # Remove an item
-    # remove_response = data_api.remove_product_backlog_item(first_item_id)
-    # print("DATABASE: Item Removed:", remove_response)
-    # items = data_api.get_product_backlog_items()
-    # for item in items:
-    #     print(item)
+    print_all_items()

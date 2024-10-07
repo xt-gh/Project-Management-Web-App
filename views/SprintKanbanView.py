@@ -191,7 +191,7 @@ class SprintKanbanView(Column):
                 Row([
                     Text("Sprint Kanban", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                     Row([
-                        ElevatedButton("Burndown Chart", icon=icons.SSID_CHART, on_click=lambda e: self.show_burndown_chart(e)),
+                        ElevatedButton("Burndown Chart", icon=icons.SSID_CHART, on_click=lambda e: self.open_burndown_chart()),
                         IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard")),
                     ])
                 ], alignment=MainAxisAlignment.SPACE_BETWEEN),
@@ -347,7 +347,9 @@ class SprintKanbanView(Column):
         id = source["_id"]
         del source["_id"]
 
-        asyncio.run(Data().update_product_backlog_item(item_id=id, updated_fields=source))
+        response = asyncio.run(Data().update_product_backlog_item(item_id=id, updated_fields=source))
+
+        print(response)
 
         asyncio.run(self.populate_board())
         asyncio.run(self.set_item_list())
@@ -366,16 +368,21 @@ class SprintKanbanView(Column):
         self.page.close(self.detailed_view)
         asyncio.run(self.populate_board())
         self.page.update()
-
-    def show_burndown_chart(self, e):
+    
+    def open_burndown_chart(self):
         sprint_id = self.page.route.split("/")[2]
-        sprint_data = asyncio.run(SprintData().get_sprint_item(sprint_id))
-        
-        burndown_popup = BurndownChartPopup(sprint_id, self.page)
+        self.burndown_popup = BurndownChartPopup(
+            sprint_id=sprint_id,
+            page=self.page,
+            handle_close=lambda e: self.close_burndown_chart()
+        )
 
-        # burndown_popup.open()
+        print(self.burndown_popup)
+        self.page.open(self.burndown_popup)
 
-        asyncio.run(burndown_popup.display_burndown_chart(sprint_id))
+    def close_burndown_chart(self):
+        self.page.close(self.burndown_popup)
+        self.page.update()
 
     def change_bg_colour(self, selected_color):
         """Change the background color of the product backlog."""
