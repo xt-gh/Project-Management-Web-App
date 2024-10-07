@@ -1,4 +1,6 @@
 from flet import *
+
+from data.manage_user_data import UserData
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
 from .TaskLogTable import TaskLogTable
 from data.manage_data import Data
@@ -25,6 +27,7 @@ class ItemForm(AlertDialog):
         self.task_status_options = ["Not Started", "In Progress", "Completed"]
         self.task_type_options = ["User Story", "Bug"]
         self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
+        self.usernames = asyncio.run(UserData().get_all_usernames())
         self.logs = []
         self.header = []
         self.sprint_id = ""
@@ -38,15 +41,18 @@ class ItemForm(AlertDialog):
         
     def build_add_item_form(self):
         self.task_name = TextFieldInput(label="Task Name", is_required=True)
-        self.task_description = TextFieldInput(label="Description")
+        self.task_description = TextFieldInput(label="Description", is_required=True)
         self.task_description.multiline = True
         self.task_description.min_lines = 3
-        self.priority = DropdownInput(self.priotity_options, label="Priority")
-        self.story_points = DropdownInput(self.story_points_range, label="Story Points")
-        self.task_stage = DropdownInput(self.task_stage_options, label="Stage")
+        self.priority = DropdownInput(self.priotity_options, label="Priority", is_required=True)
+        self.story_points = DropdownInput(self.story_points_range, label="Story Points",is_required=True)
+        self.task_stage = DropdownInput(self.task_stage_options, label="Stage", is_required=True)
         self.task_status = DropdownInput(self.task_status_options, label="Status")
-        self.task_type = DropdownInput(self.task_type_options, label="Type")
-        self.assignee = TextFieldInput(label="Assignee", expand=False)
+        self.task_status.value = "Not Started"
+        self.task_status.disabled = True
+
+        self.task_type = DropdownInput(self.task_type_options, label="Type", is_required=True)
+        self.assignee = DropdownInput(self.usernames, label="Assignee", expand=False)
         self.tags = MultipleSelectInput(self.tag_options)
         self.task_logs = Row([Text(" ", color="black", size=15),])
         self.footer = [
@@ -128,7 +134,20 @@ class ItemForm(AlertDialog):
         )
     
     def is_valid_form(self):
-        return self.task_name.value != ""
+        is_valid = True
+        if self.task_name.value.strip() == "":
+            is_valid = False
+        if self.task_description.value.strip() == "":
+            is_valid = False
+        if self.priority.value == "":
+            is_valid = False
+        if self.story_points.value == "":
+            is_valid = False
+        if self.task_stage.value == "":
+            is_valid = False
+        if self.task_type.value == "":
+            is_valid = False
+        return is_valid
     
     def handle_submit(self):
         if self.is_valid_form():
@@ -174,6 +193,18 @@ class ItemForm(AlertDialog):
         
         else:
             print("Form is invalid")
-            self.task_name.error_text = "Task name is required"
+            
+            if self.task_name.value.strip() == "":
+                self.task_name.error_text = "Task name is required"
+            if self.task_description.value.strip() == "":
+                self.task_description.error_text = "Task description is required"
+            if self.priority.value == "":
+                self.priority.error_text = "Priority is required"
+            if self.story_points.value == "":
+                self.story_points.error_text = "Story points is required"
+            if self.task_stage.value == "":
+                self.task_stage.error_text = "Task stage is required"
+            if self.task_type.value == "":
+                self.task_stage.error_text = "Task type is required"
             self.page.update()
     
