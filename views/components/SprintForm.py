@@ -1,12 +1,10 @@
 import asyncio
 import asyncio
 from flet import *
-
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput, TextFieldDatePicker
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
 from data.manage_sprint_data import SprintData
-from data.manage_user_data import UserData
 from datetime import datetime
 
 class SprintForm(AlertDialog):
@@ -22,7 +20,7 @@ class SprintForm(AlertDialog):
         self.status_options = ["Not Started", "In progress", "Completed"]
         self.bgcolor = "#CADEED"
         self.clip_behavior = ClipBehavior.HARD_EDGE
-        self.usernames = asyncio.run(UserData().get_all_usernames())
+        
         
         self.assignees = []
 
@@ -33,9 +31,9 @@ class SprintForm(AlertDialog):
     
     def build_add_sprint_form(self):
         self.sprint_name = TextFieldInput(label="Sprint Name", is_required=True)
-        self.product_owner = DropdownInput(label="Product Owner", options=self.usernames, is_required=True)
-        self.scrum_master = DropdownInput(label="Scrum Master", options=self.usernames, is_required=True)
-        self.scrum_team = MultipleSelectInput(self.usernames)
+        self.product_owner = DropdownInput(label="Product Owner", options=["KX", "JN", "JX"], is_required=True)
+        self.scrum_master = DropdownInput(label="Scrum Master", options=["KX", "JN", "JX"], is_required=True)
+        self.scrum_team = MultipleSelectInput(["KX", "JN", "JX"])
         self.start_date = TextFieldDatePicker(page=self.page, label="Start Date", is_required=True)
         self.end_date = TextFieldDatePicker(page=self.page, label="End Date", is_required=True)
 
@@ -72,6 +70,8 @@ class SprintForm(AlertDialog):
             content=Column(
                 [
                     Row(self.header, alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    # self.sprint_name,
+                    # self.sprint_name,
                     Row([self.sprint_name], alignment=MainAxisAlignment.SPACE_BETWEEN),
 
                     self.product_owner,
@@ -190,5 +190,3 @@ class SprintForm(AlertDialog):
                 elif date_error_message.startswith("End"):
                     self.end_date.content.controls[1].error_text = date_error_message
             self.page.update()
-  
-

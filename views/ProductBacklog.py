@@ -18,8 +18,6 @@ class ProductBacklog(Column):
         self.page = page
         self.update_active_view = update_active_view
 
-        self.selected_tags = []
-
         self.filter_tag = "All Tasks"
         self.sort_label = "Oldest to Newest"
 
@@ -53,13 +51,10 @@ class ProductBacklog(Column):
     
         self.body = self.loading_screen
 
-        self.filter_tag_row = Row(controls=[], alignment=MainAxisAlignment.START)
-
         return Container(
             content=Column([
                         Row([
                             Text("Product Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
-                            self.filter_tag_row,
                             Row([
                                 SortPopupButton(self.handle_sort_option),
                                 FilterPopupButton(self.filter_selected_tag),
@@ -70,7 +65,7 @@ class ProductBacklog(Column):
                             content=self.body,
                             alignment=alignment.center,
                             expand=1,
-                        ),
+                        )
                     ]),
             padding=padding.all(20),
             border_radius=border_radius.all(10),
@@ -86,7 +81,6 @@ class ProductBacklog(Column):
             if self.page:
                 self.controls[0].width = self.page.width - 330
                 self.controls[0].height =  self.page.height - 20
-                self.populate_board()
         
         except Exception as e:
             print(e)
@@ -121,7 +115,7 @@ class ProductBacklog(Column):
             print("Fetching product backlog items")
             
         items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
-        items = TaskFilter().filter_task(items, self.selected_tags)
+        items = TaskFilter().filter_tasks(items, self.filter_tag)
         for item in items:
             self.board.controls.append(
                 Container(
@@ -165,20 +159,8 @@ class ProductBacklog(Column):
 
     def filter_selected_tag(self, tag):
         print("Filter selected:", tag)
-        
-        if tag == "All Tasks":
-            self.selected_tags = ["All Tasks"]
-        else:
-            if "All Tasks" in self.selected_tags:
-                self.selected_tags.remove("All Tasks")
-                
-            if tag in self.selected_tags:
-                self.selected_tags.remove(tag)
-            else:
-                self.selected_tags.append(tag)
-
+        self.filter_tag = tag
         asyncio.run(self.populate_board())
-        self.update_filter_tag_row(self.selected_tags)
         self.update()
 
     def change_bg_colour(self, selected_color):
@@ -187,35 +169,3 @@ class ProductBacklog(Column):
         self.controls[0].bgcolor = self.bg_color  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Product Backlog", self.bg_color))
-
-    def create_tag_bubble(self, tag):
-        """Creates a Chip control for the selected filter tag."""
-        chip = Chip(
-            label=Text(tag, color="black"),
-            color="#DBEBE2",  # Background color for the chip
-            border_side=BorderSide(color="white", width=1),
-            delete_icon_color="black",
-            on_delete=lambda e: self.remove_tag(tag),  # Optional: Define a method to remove the tag
-        )
-        return chip
-    
-    def update_filter_tag_row(self, tags):
-        """Updates the filter tag row with the current selected tag bubble."""
-        # Clear previous tags
-        self.filter_tag_row.controls.clear()
-        
-        # Add the new tag bubble
-        for tag in tags:
-            tag_bubble = self.create_tag_bubble(tag)
-            self.filter_tag_row.controls.append(tag_bubble)
-
-        # Refresh the page to show changes
-        self.page.update()
-
-    def remove_tag(self, tag):
-        if tag in self.selected_tags:
-            print(f"Removing filter tag: {tag}")
-            self.selected_tags.remove(tag)
-            self.update_filter_tag_row(self.selected_tags)  # Update displayed tags
-            asyncio.run(self.populate_board())
-            self.page.update()
