@@ -13,6 +13,7 @@ from views.SprintBacklogView import SprintBacklogView
 from views.SprintKanbanView import SprintKanbanView
 from views.SprintListView import SprintListView
 from views.components.ColourPopupButton import ColourPopupButton
+from views.LogInPage import LoginPage
 import asyncio
 import threading
 
@@ -192,11 +193,22 @@ def main(page):
     page.padding = 10
     page.bgcolor = "#DBEBE2"
     page.theme_mode = ThemeMode.LIGHT
+    page.fonts = {
+        "Josefin_Sans" : "fonts/Josefin_Sans/static/JosefinSans-Regular.ttf"
+    }
+    page.theme = Theme(font_family="Josefin_Sans")
+    # Create a login page and handle login logic
+    def on_login_success():
+        # Clear the page and navigate to the main app after login is successful
+        page.clean()
+        app = App(page)
+        page.on_route_change = app.route_change
+        page.go("/productbacklog")
+        page.add(app)
 
-    app = App(page)
-
-    page.on_route_change = app.route_change
-    page.go("/productbacklog")
-    page.add(app)
+    # Initialize login page with a callback to switch to the main app
+    login_page = LoginPage(page, on_login_success)
+    page.add(login_page)
 
 flet.app(target=main, assets_dir="./assets")
+
