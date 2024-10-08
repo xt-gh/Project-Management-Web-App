@@ -83,7 +83,7 @@ class Collaborators(Column):
         for item in items:
             self.board.controls.append(
                 Container(
-                    content=AccountCard(page=self.page, account_dict=item, handle_detailed_view=self.handle_detailed_view),
+                    content=AccountCard(self.refresh_page, page=self.page, account_dict=item, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                     padding=padding.only(0,0,10,0),
                 )
@@ -131,3 +131,8 @@ class Collaborators(Column):
         self.bgcolor = self.bgcolor  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Collaborators", self.bgcolor))
+
+    def refresh_page(self):
+        print("refresh page")
+        asyncio.run(self.populate_board(refetch=True))
+        self.page.update()
