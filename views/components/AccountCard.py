@@ -5,7 +5,7 @@ import asyncio
 from data.manage_user_data import UserData
 
 class AccountCard(Container):
-    def __init__(self, page, account_dict, handle_detailed_view=None):
+    def __init__(self, close_form, page, account_dict, handle_detailed_view=None):
         print("Account card initialized")
         super().__init__()
 
@@ -16,6 +16,7 @@ class AccountCard(Container):
         self.account_type = account_dict["account_type"]
         
         self.handle_detailed_view = handle_detailed_view
+        self.close_form = close_form
 
         self.bgcolor = "#BABDE2"
         self.border = border.all(1.5, "#000000")
@@ -86,7 +87,7 @@ class AccountCard(Container):
             ElevatedButton(
                 "Remove",
                 bgcolor=colors.RED_200,
-                on_click=lambda e: (asyncio.run(UserData().remove_user_account_item(self.account_dict["_id"]))),
+                on_click=lambda e: ((asyncio.run(UserData().remove_user(self.id))), self.close_form())
             )
         ],alignment=MainAxisAlignment.START)
     
