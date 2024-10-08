@@ -81,6 +81,7 @@ class LoginPage(Column):
         
         if user_info and user_info.get("password") == password:
             print("Login successful!")
+            self.page.current_user_info = user_info
             self.on_login_success()  # Call the success callback
         elif user_info == None:
             print("Login failed! User not found.")

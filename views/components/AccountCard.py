@@ -30,7 +30,8 @@ class AccountCard(Container):
         self.height = 80
 
     def handle_on_click(self):
-        self.handle_detailed_view(self.id)
+        print("Account card clicked")
+        # self.handle_detailed_view(self.id)
 
     # def card_title(self):
     #     return Row([
@@ -55,10 +56,24 @@ class AccountCard(Container):
     #     ],alignment=MainAxisAlignment.SPACE_BETWEEN)
     
     def card_details(self):
-        return Row([
-            self.username_details(),
-            self.remove_account()
-        ],
+        if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
+            body = [
+                self.username_details(),
+                self.password_details(),
+                Text(" ", color="black", size=20),
+            ]
+        elif self.page.current_user_info["account_type"] == "admin":
+            body = [
+                self.username_details(),
+                self.password_details(),
+                self.remove_account(),
+            ]
+        else:
+            body = [
+                self.username_details(),
+            ]
+
+        return Row(body,
         alignment=MainAxisAlignment.SPACE_BETWEEN,
         vertical_alignment=CrossAxisAlignment.CENTER)
     
@@ -77,7 +92,8 @@ class AccountCard(Container):
     
     def password_details(self):
         password_column = Row([
-            Text("Password: " + self.password, color="black", size=25),
+            Text("Password: ", color="black", size=25),
+            TextField(password=True, can_reveal_password=True, value=self.password, read_only=True, text_size=23, border=InputBorder.NONE, width=250),
         ],
         alignment=MainAxisAlignment.START)
         return password_column
