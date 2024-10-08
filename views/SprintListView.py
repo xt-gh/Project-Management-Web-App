@@ -135,8 +135,8 @@ class SprintListView(Column):
                 except KeyError:
                     print("Item has no sprint_id")
             
-        items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
-        items = TaskFilter().filter_tasks(items, self.filter_tag)
+        # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
+        # items = TaskFilter().filter_tasks(items, self.filter_tag)
         items = sorted(self.item_list, key=lambda x: x["task_name"])
         self.controls[0].content.controls[1].content = self.build_board(items)
         print("Board populated")

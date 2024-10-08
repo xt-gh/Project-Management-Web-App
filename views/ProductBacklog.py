@@ -86,6 +86,7 @@ class ProductBacklog(Column):
             if self.page:
                 self.controls[0].width = self.page.width - 330
                 self.controls[0].height =  self.page.height - 20
+                self.populate_board()
         
         except Exception as e:
             print(e)
