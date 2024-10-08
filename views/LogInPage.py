@@ -78,12 +78,11 @@ class LoginPage(Column):
         password =self.password.value
 
         user_info = asyncio.run(UserData().get_user(username))
-        user_document = user_info['document']
         
-        if user_document and user_document.get("password") == password:
+        if user_info and user_info.get("password") == password:
             print("Login successful!")
             self.on_login_success()  # Call the success callback
-        elif user_document == None:
+        elif user_info == None:
             print("Login failed! User not found.")
             self.login_result.value = "Login failed! User not found."  # Update login result
             self.login_result.color = "red"

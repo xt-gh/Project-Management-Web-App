@@ -46,6 +46,20 @@ class UserData():
             print(item)
         return response.json()['documents']
     
+    async def get_all_usernames(self):
+        print("\033[42mDATABASE: Getting all usernames\033[0m")
+        url = f"{self.base_url}/action/find"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print("\033[42mDATABASE: Usernames fetched\033[0m")
+        usernames = [item['username'] for item in response.json()['documents']]
+        print(usernames)
+        return usernames
+    
     # Method to get a single user by username
     async def get_user(self, username):
         print("\033[42mDATABASE: Getting user", username)
@@ -59,6 +73,40 @@ class UserData():
         response = requests.post(url, headers=self.headers, data=payload)
         print(response.json())
         print("\033[42mDATABASE: User information fetched\033[0m")
+        return response.json()['document']
+    
+        # Method to add new user
+    async def add_user(self, item):
+        print("\033[42mDATABASE: Adding new user\033[0m")
+        url = f"{self.base_url}/action/insertOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "document": item
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print("\033[42mDATABASE: New user added\033[0m")
+        return response.json()
+    
+    # Method to update a user information
+    async def update_user_info(self, account_id, updated_fields):
+        # for item in self.product_backlog_items:
+        #     if item['_id'] == item_id:
+        #         for key, value in updated_fields.items():
+        #             item[key] = value
+                # return item
+        print("\033[42mDATABASE: Updating user info\033[0m", str(updated_fields))
+        url = f"{self.base_url}/action/updateOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": account_id}},
+            "update": {"$set": updated_fields}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print(response.json())
         return response.json()
     
 if __name__ == "__main__":

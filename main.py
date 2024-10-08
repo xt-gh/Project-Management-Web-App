@@ -25,7 +25,7 @@ class App(Row):
 
         self.product_backlog = ProductBacklog(self.page, self.update_active_view)
         self.sprint_board = SprintBoard(self.page, self.update_active_view)
-        self.collaborators = Collaborators(self.page)
+        self.collaborators = Collaborators(self.page, self.update_active_view)
         self.sprint_backlog_view = SprintBacklogView(self.page)
         self.sprint_kanban_view = SprintKanbanView(self.page)
         self.sprint_list_view = SprintListView(self.page)
@@ -65,8 +65,8 @@ class App(Row):
         self.sprint_data = []
 
         # Set up a timer for regular polling
-        self.timer_interval = 5  # Check every 5 seconds
-        self.start_timer()
+        self.timer_interval = 5  # Check every 10 seconds
+        # self.start_timer()
 
     def start_timer(self):
         """Start a background timer to poll for data changes every 10 seconds."""
