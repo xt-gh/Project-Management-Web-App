@@ -1,23 +1,27 @@
+from flet import *
 import asyncio
 from datetime import datetime
-from flet import *
+
 from data.manage_data import Data
 from data.manage_sprint_data import SprintData
-from data.color_data import ColourData
 from views.components.ItemFormInSprint import ItemFormInSprint
 from views.components.ItemCard import DraggableItemCard
 from views.components.LoadingCard import LoadingCard
 from views.components.BurndownChartPopup import BurndownChartPopup
+from views.components.BurndownChartPopup import BurndownChartPopup
 
-class SprintKanbanView(Column):
-    def __init__(self, page):
-        super().__init__()
+class SprintKanbanView(Container):
+    def __init__(self, page, data="Sprint kanban here"):
         print("Sprint kanban initialized")
+        super().__init__()
+        self.data = data
         self.page = page
 
         self.bgcolor = "#CADEED"
         self.padding = padding.all(15)
         self.border_radius = border_radius.all(10)
+
+        self.content = Text("Viewing Kanban for sprint" + str(self.page.route), color="black", size=32)
         self.drag_source = None
         self.drag_target = None
 
@@ -191,6 +195,7 @@ class SprintKanbanView(Column):
                 Row([
                     Text("Sprint Kanban", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                     Row([
+                        
                         ElevatedButton("Burndown Chart", icon=icons.SSID_CHART, on_click=lambda e: self.show_burndown_chart(e)),
                         IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard")),
                     ])
@@ -230,18 +235,6 @@ class SprintKanbanView(Column):
 
             asyncio.run(self.populate_board())
             asyncio.run(self.set_item_list())
-
-    async def load_initial_background_color(self):
-        color_item = await ColourData().get_color_items()  # Get color items
-        for item in color_item:
-            if item['component'] == "Sprint KanBan View":
-                self.bgcolor = item['background_color']
-                self.controls[0].bgcolor = self.bgcolor
-                break
-
-    def did_mount(self):
-        print("\033[33mSprint KanBan mounted\033[0m")
-        asyncio.run(self.load_initial_background_color())
 
     async def set_item_list(self):
         self.item_list = await Data().get_product_backlog_items()
@@ -315,34 +308,16 @@ class SprintKanbanView(Column):
         print("Moving item")
         
         if target == "not_started":
-            source["date_completed"] = ""
             source["status"] = "Not Started"
-            source["logs"].append({
-                "user": "John Doe",
-                "date": datetime.now().strftime("%d-%m-%Y"),
-                "time": datetime.now().strftime("%I:%M %p"),
-                "action": "Moved to Not Started",
-            })
+            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
 
         elif target == "in_progress":
-            source["date_completed"] = ""
             source["status"] = "In Progress"
-            source["logs"].append({
-                "user": "John Doe",
-                "date": datetime.now().strftime("%d-%m-%Y"),
-                "time": datetime.now().strftime("%I:%M %p"),
-                "action": "Moved to In Progress",
-            })
+            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
         
         elif target == "completed":
-            source["date_completed"] = datetime.now().strftime("%d-%m-%Y")
             source["status"] = "Completed"
-            source["logs"].append({
-                "user": "John Doe",
-                "date": datetime.now().strftime("%d-%m-%Y"),
-                "time": datetime.now().strftime("%I:%M %p"),
-                "action": "Moved to Completed",
-            })
+            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
 
         id = source["_id"]
         del source["_id"]
@@ -371,15 +346,8 @@ class SprintKanbanView(Column):
         sprint_id = self.page.route.split("/")[2]
         sprint_data = asyncio.run(SprintData().get_sprint_item(sprint_id))
         
-        burndown_popup = BurndownChartPopup(sprint_id, self.page)
+        burndown_popup = BurndownChartPopup(sprint_id)
 
         # burndown_popup.open()
 
         asyncio.run(burndown_popup.display_burndown_chart(sprint_id))
-
-    def change_bg_colour(self, selected_color):
-        """Change the background color of the product backlog."""
-        self.bgcolor = selected_color
-        self.controls[0].bgcolor = self.bgcolor  # Update the container's background
-        self.page.update()
-        asyncio.run(ColourData().save_background_color("Sprint KanBan View", self.bgcolor))

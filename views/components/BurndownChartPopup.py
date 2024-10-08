@@ -1,9 +1,7 @@
 import asyncio
 import json
 from datetime import datetime
-from flet.matplotlib_chart import MatplotlibChart
 import matplotlib.pyplot as plt
-import matplotlib
 from io import BytesIO
 from flet import *
 from data.manage_sprint_data import SprintData
@@ -11,12 +9,10 @@ from data.manage_data import Data
 
 
 class BurndownChartPopup:
-    def __init__(self, sprint_id, page):
-        self.page = page
+    def __init__(self, sprint_id):
         self.sprint_id = sprint_id
         self.data_api = Data()
         self.sprint_data_api = SprintData()
-        matplotlib.use("svg")
 
     async def get_completed_tasks_for_sprint(self, sprint_id):
         # items = asyncio.run(SprintData().get_sprint_items())
@@ -70,7 +66,7 @@ class BurndownChartPopup:
         burndown_data = []
 
         for task in completed_tasks:
-            completed_date = datetime.strptime(task['date_completed'], '%d-%m-%Y').date()
+            completed_date = datetime.strptime(task['date_completed'], '%Y-%m-%dT%H:%M:%S.%f').date()
             story_points = int(task.get('story_points', 0))
 
             if completed_date:
@@ -98,21 +94,22 @@ class BurndownChartPopup:
         return burndown_data, ideal_burndown_data
 
     def generate_burndown_chart(self, burndown_data, ideal_burndown_data):
-        # Plot the burndown chart
-        plt.figure(figsize=(10, 6))
 
-        if burndown_data:
-            # Extract dates and remaining points for plotting
-            dates = [entry[0] for entry in burndown_data]
-            remaining_points = [entry[1] for entry in burndown_data]
-
-            plt.plot(dates, remaining_points, marker='o', linestyle='-', color='b', label='Remaining Points')
-            plt.fill_between(dates, remaining_points, color='blue', alpha=0.1)
+        if not burndown_data:
+            print("No burndown data available to plot.")
+            return
+        # Extract dates and remaining points for plotting
+        dates = [entry[0] for entry in burndown_data]
+        remaining_points = [entry[1] for entry in burndown_data]
 
         ideal_dates = [entry[0] for entry in ideal_burndown_data]
         ideal_remaining_points = [entry[1] for entry in ideal_burndown_data]
 
+        # Plot the burndown chart
+        plt.figure(figsize=(10, 6))
+        plt.plot(dates, remaining_points, marker='o', linestyle='-', color='b', label='Remaining Points')
         plt.plot(ideal_dates, ideal_remaining_points, marker='o', linestyle='--', color='g', label='Ideal Line')
+        plt.fill_between(dates, remaining_points, color='blue', alpha=0.1)
 
         # Formatting the chart
         plt.title('Burndown Chart')
@@ -123,15 +120,14 @@ class BurndownChartPopup:
         plt.gcf().autofmt_xdate()
         plt.tight_layout()
         plt.legend()
-        # plt.show()
+        plt.show()
 
-        # img_path = 'burndown_chart.png'  # Path where the image will be saved
-        # plt.savefig(img_path, format='png')
-        # plt.close()  # Close the plot to free memory
+        img = BytesIO()
+        plt.savefig(img, format='png')
+        plt.close()
+        img.seek(0)  # Rewind the BytesIO object to the beginning
 
-        # return img_path 
-        return MatplotlibChart(figure=plt.gcf())
-        
+        return img 
         
 
     async def display_burndown_chart(self, sprint_id):
@@ -142,21 +138,7 @@ class BurndownChartPopup:
         burndown_data, ideal_burndown_data = await self.aggregate_story_points_by_date(completed_tasks)
 
         # Generate and show the burndown chart
-        img_path = self.generate_burndown_chart(burndown_data, ideal_burndown_data)
-
-        if img_path:
-            # Create an Image component using the saved file path
-            img_component = Image(src=img_path, width=600, height=400)
-            dialog = AlertDialog(
-                title = Text("Burndown Chart"),
-                # content= img_component,
-                content=self.generate_burndown_chart(burndown_data, ideal_burndown_data),
-                actions= [
-                TextButton("Close", on_click=lambda e: self.page.close(dialog))
-            ],
-            )
-
-            self.page.open(dialog)
+        self.generate_burndown_chart(burndown_data, ideal_burndown_data)
 
 # async def main():
     

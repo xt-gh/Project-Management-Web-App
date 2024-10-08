@@ -53,7 +53,7 @@ class TextFieldInput(TextField):
     def handle_blur(self, e):
         print("on_blur fired")
         if self.is_required:
-            if self.value.strip() is "":
+            if self.value.strip() == "":
                 self.error_text = "This field is required"
             else:
                 self.error_text = None
@@ -62,7 +62,7 @@ class TextFieldInput(TextField):
     def handle_change(self, e):
         print("on_change fired")
         if self.is_required:
-            if self.value.strip() is "":
+            if self.value.strip() == "":
                 self.error_text = "This field is required"
             else:
                 self.error_text = None
