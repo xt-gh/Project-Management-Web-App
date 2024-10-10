@@ -61,7 +61,7 @@ class Collaborators(Column):
         for item in color_item:
             if item['component'] == "Collaborators":
                 self.bg_color = item['background_color']
-                self.bgcolor = self.bg_color
+                self.controls[0].bgcolor = self.bg_color
                 break
         
     def did_mount(self):
@@ -83,20 +83,12 @@ class Collaborators(Column):
         for item in items:
             self.board.controls.append(
                 Container(
-                    content=AccountCard(page=self.page, account_dict=item, handle_detailed_view=self.handle_detailed_view),
+                    content=AccountCard(self.refresh_page, page=self.page, account_dict=item, handle_detailed_view=self.handle_detailed_view),
                     alignment=alignment.center,
                     padding=padding.only(0,0,10,0),
                 )
             )
         print("Board populated")
-
-    # def did_mount(self):
-    #     print("\033[33mSprint board mounted\033[0m")
-    #     asyncio.run(UserData().get_user_account_items())
-    #     asyncio.run(self.load_initial_background_color())
-    #     asyncio.run(self.populate_board(refetch=True))
-    #     self.controls[0].content.controls[1].content = self.board
-    #     self.page.update()
 
     def handle_add_user_account(self, e):
         print("Add account clicked")
@@ -128,6 +120,11 @@ class Collaborators(Column):
     def change_bg_colour(self, selected_color):
         """Change the background color of the product backlog."""
         self.bgcolor = selected_color
-        self.bgcolor = self.bgcolor  # Update the container's background
+        self.controls[0].bgcolor = self.bgcolor  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Collaborators", self.bgcolor))
+
+    def refresh_page(self):
+        print("refresh page")
+        asyncio.run(self.populate_board(refetch=True))
+        self.page.update()

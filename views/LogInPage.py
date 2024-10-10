@@ -8,9 +8,12 @@ class LoginPage(Column):
         super().__init__()
         self.page = page
         self.on_login_success = on_login_success
+        self.bgcolor = "#DBEBE2"
+
+        self.page.on_resized = lambda e: (print("Window resized"), self.page.update())
 
         self.username = TextField(label='Username', text_align = ft.TextAlign.CENTER, width = 400)
-        self.password = TextField(label='Password', text_align = ft.TextAlign.CENTER, width = 400, password=True)
+        self.password = TextField(label='Password', text_align = ft.TextAlign.CENTER, width = 400, password=True,can_reveal_password=True)
         self.login_button = ElevatedButton(
             text='Log In',
             width = 400,
@@ -41,7 +44,7 @@ class LoginPage(Column):
                     Text("Please enter your username and password to log in.",size=16,text_align=ft.TextAlign.CENTER),
                     self.username,
                     self.password,
-                    Container(height=25),
+                    Container(height=20),
                     self.login_button,
                     self.login_result
                 ],
@@ -53,24 +56,23 @@ class LoginPage(Column):
             border_radius=15,
             bgcolor="#CADEED",
             width=500,
-            height=390,
+            height=420,
             alignment=ft.alignment.center,
         )
 
         self.controls = [
-            Row(
-                alignment=ft.MainAxisAlignment.CENTER,  # Center horizontally
-                controls=[
-                    Column(
+            Container(
+                content=Column(
                         controls=[
                             Text("Welcome back! 🥳",size=40,weight="bold",text_align=ft.TextAlign.CENTER),
                             self.container],
                         alignment=ft.MainAxisAlignment.CENTER,  # Center vertically
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Center horizontally
-                    )
-                ],
-                height=self.page.window.height,  
-            )
+                    ),
+                width=self.page.width,
+                height=self.page.height,
+                # alignment=ft.MainAxisAlignment.CENTER,  # Cente·r horizontally
+            ),
         ]
 
     def login(self, e):
@@ -78,9 +80,11 @@ class LoginPage(Column):
         password =self.password.value
 
         user_info = asyncio.run(UserData().get_user(username))
+        # user_document = user_info['document']
         
         if user_info and user_info.get("password") == password:
             print("Login successful!")
+            self.page.current_user_info = user_info
             self.on_login_success()  # Call the success callback
         elif user_info == None:
             print("Login failed! User not found.")
@@ -93,4 +97,13 @@ class LoginPage(Column):
 
         self.page.update()
 
+ 
+    def before_update(self):
+        try:
+            if self.page:
+                self.controls[0].width = self.page.width
+                self.controls[0].height =  self.page.height
+                        
+        except Exception as e:
+            print(e)
 

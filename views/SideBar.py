@@ -20,10 +20,11 @@ class SideBar(Column):
                             padding=10,
                             border_radius=border_radius.all(10),
                             width=300,
-                            # height=self.page.height - 230,
-                            # expand=True,
+                            height=self.page.height - 230,
+                            expand=True,
                         )
-
+    
+    
     def build(self):
         print("Building sidebar")
         return (
@@ -35,6 +36,8 @@ class SideBar(Column):
                 ], alignment=MainAxisAlignment.START),
                 padding=padding.all(15),
                 margin=margin.all(0),
+                border_radius=10,
+                height=900,
                 width=300,
             )
         )
