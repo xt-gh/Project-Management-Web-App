@@ -109,13 +109,35 @@ class UserData():
         print(response.json())
         return response.json()
     
+    # Method to remove a user by its _id
+    async def remove_user(self, user_id):
+        print("\033[42mDATABASE: Removing user\033[0m", user_id)
+        url = f"{self.base_url}/action/deleteOne"
+        payload = json.dumps({
+            "dataSource": "helium",
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": user_id}}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        return response.json()
+    
 if __name__ == "__main__":
     data_api = UserData()
 
-    async def main():
-        # Get all sprints
-        items = await data_api.get_all_users() 
+    def create_admin(name):
+
+        admin = {
+            "username": "name",
+            "password": "password",
+            "account_type": "admin"
+        }
+        asyncio.run(data_api.add_user(admin))
+
+    def print_all_users():
+        items = asyncio.run(data_api.get_all_users())
         for item in items:
             print(json.dumps(item, indent=4))
 
-    asyncio.run(main())
+    # create_admin("admin")
+    print_all_users()

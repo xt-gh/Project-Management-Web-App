@@ -169,7 +169,7 @@ class SprintBacklogView(Column):
     async def load_initial_background_color(self):
         color_item = await ColourData().get_color_items()  # Get color items
         for item in color_item:
-            if item['component'] == "Sprint Board":
+            if item['component'] == "Sprint Backlog View":
                 self.bg_color = item['background_color']
                 self.controls[0].bgcolor = self.bg_color
                 break
@@ -275,7 +275,7 @@ class SprintBacklogView(Column):
 
     def change_bg_colour(self, selected_color):
         """Change the background color of the product backlog."""
-        self.bg_color = selected_color
-        self.controls[0].bgcolor = self.bg_color  # Update the container's background
+        self.bgcolor = selected_color
+        self.controls[0].bgcolor = self.bgcolor  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Sprint Backlog View", self.bgcolor))
