@@ -31,29 +31,7 @@ class AccountCard(Container):
 
     def handle_on_click(self):
         print("Account card clicked")
-        # self.handle_detailed_view(self.id)
 
-    # def card_title(self):
-    #     return Row([
-    #         Text(
-    #             f"{self.username}",
-    #             color="black", 
-    #             size=15,
-    #             weight=FontWeight.BOLD,
-    #             max_lines=2,
-    #             expand=1,
-    #             overflow=TextOverflow.ELLIPSIS
-    #         ),
-    #         # IconButton(
-    #         #     icon=icons.REMOVE,
-    #         #     icon_color="black",
-    #         #     icon_size=30,
-    #         #     on_click=lambda e: self.handle_detailed_view(self.id),
-    #         #     hover_color="#F1F1F1",
-    #         #     # disabled=self.status != "Not Started",
-    #         #     # mouse_cursor=MouseCursor.CLICK if self.status == "Not Started" else MouseCursor.FORBIDDEN,
-    #         # )
-    #     ],alignment=MainAxisAlignment.SPACE_BETWEEN)
     
     def card_details(self):
         if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
@@ -106,4 +84,3 @@ class AccountCard(Container):
                 on_click=lambda e: ((asyncio.run(UserData().remove_user(self.id))), self.close_form())
             )
         ],alignment=MainAxisAlignment.START)
-    

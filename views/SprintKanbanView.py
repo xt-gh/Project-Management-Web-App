@@ -365,3 +365,15 @@ class SprintKanbanView(Column):
         self.controls[0].bgcolor = self.bgcolor  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Sprint KanBan View", self.bgcolor))
+
+    def did_mount(self):
+        print("\033[33mSprint backlog mounted\033[0m")
+        asyncio.run(self.load_initial_background_color())
+        
+    async def load_initial_background_color(self):
+        color_item = await ColourData().get_color_items()  # Get color items
+        for item in color_item:
+            if item['component'] == "Sprint KanBan View":
+                self.bgcolor = item['background_color']
+                self.controls[0].bgcolor = self.bgcolor
+                break

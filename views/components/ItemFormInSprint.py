@@ -211,12 +211,11 @@ class ItemFormInSprint(AlertDialog):
         self.tags = MultipleSelectInput(self.tag_options)
 
         
-        self.chart = Container(Text("Chart Placeholder"), padding=padding.all(10), bgcolor="#FFFFFF", border_radius=border_radius.all(10))
+        self.chart = Container(Text("Chart goes here"), padding=padding.all(10), bgcolor="#FFFFFF", border_radius=border_radius.all(10))
 
-        self.actions = [
-            ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.close_form()),
-            ElevatedButton("Save", bgcolor=colors.GREEN_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
-        ]
+        self.task_logs = Row([Text(" ", color="black", size=15),])
+        ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.close_form()),
+
 
         self.header = [
             Text("Editing Item", color="black", size=24),

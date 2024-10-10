@@ -80,6 +80,11 @@ class SprintForm(AlertDialog):
                     Text("Scrum team:", color="black", size=15),
                     Row([self.scrum_team]),
 
+                    # self.product_owner,
+                    # self.scrum_master,
+                    # Text("Scrum team:", color="black", size=15),
+                    # Row([self.scrum_team]),
+
                     self.start_date,
                     self.end_date,
 
