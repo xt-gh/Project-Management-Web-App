@@ -26,14 +26,32 @@ class Collaborators(Column):
             scroll=ScrollMode.AUTO,
             on_scroll=lambda e: print("Scrolled"),
         )
-
-        return Container(
+        if self.page.current_user_info["account_type"] == "admin":
+            return Container(
+                content=Column([
+                    Row([
+                        Text("Collaborators", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
+                        Row([
+                            ElevatedButton("Create Account", icon="account", on_click=lambda e: self.handle_add_user_account(e)),
+                        ], alignment=MainAxisAlignment.END),
+                    ], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                    Container(
+                        content=LoadingCard(),
+                        alignment=alignment.top_center,
+                        expand=1,
+                    )
+                ]),
+                padding=padding.all(20),
+                border_radius=border_radius.all(10),
+                bgcolor="#CADEED",
+                width=self.page.width - 330,
+                height=self.page.height - 20,
+            )
+        else:
+            return Container(
             content=Column([
                 Row([
                     Text("Collaborators", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
-                    Row([
-                        ElevatedButton("Create Account", icon="account", on_click=lambda e: self.handle_add_user_account(e)),
-                    ], alignment=MainAxisAlignment.END),
                 ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                 Container(
                     content=LoadingCard(),

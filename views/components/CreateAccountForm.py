@@ -24,7 +24,7 @@ class CreateAccountForm(AlertDialog):
 
     
     def build_create_account_form(self):
-        self.username = TextFieldInput(label="User Email", is_required=True)
+        self.username = TextFieldInput(label="User Email/Username", is_required=True)
         self.password = TextFieldInput(label="Password", is_required=True)
         self.actions = [
             ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100,color="black",on_click= lambda e: self.close_form()),
