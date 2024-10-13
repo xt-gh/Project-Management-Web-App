@@ -309,15 +309,39 @@ class SprintKanbanView(Column):
         
         if target == "not_started":
             source["status"] = "Not Started"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
+            source["date_completed"] = ""
+            source["logs"].append(
+                {
+                    "user": source["assignee"],
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "time": datetime.now().strftime("%I:%M %p"),
+                    "action": "Moved task to " + target + " column"
+                }
+            )
 
         elif target == "in_progress":
             source["status"] = "In Progress"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
-        
+            source["date_completed"] = ""
+            source["logs"].append(
+                {
+                    "user": source["assignee"],
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "time": datetime.now().strftime("%I:%M %p"),
+                    "action": "Moved task to " + target + " column"
+                }
+            )
+                    
         elif target == "completed":
             source["status"] = "Completed"
-            source["logs"].append("Item updated on " + datetime.utcnow().isoformat() + " - status changed to " + target)
+            source["date_completed"] = datetime.now().strftime("%d-%m-%Y")
+            source["logs"].append(
+                {
+                    "user": source["assignee"],
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "time": datetime.now().strftime("%I:%M %p"),
+                    "action": "Moved task to " + target + " column"
+                }
+            )
 
         id = source["_id"]
         del source["_id"]

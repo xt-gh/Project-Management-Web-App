@@ -158,6 +158,8 @@
 
 from flet import *
 
+from data.manage_user_data import UserData
+
 from .TimeLogTable import TimeLogTable
 from .TaskLogTable import TaskLogTable
 from .FormComponents import DropdownInput, TextFieldInput, MultipleSelectInput
@@ -185,6 +187,7 @@ class ItemFormInSprint(AlertDialog):
         self.task_status_options = ["Not Started", "In Progress", "Completed"]
         self.task_type_options = ["User Story", "Bug"]
         self.tag_options = ["Front-end", "Back-end", "API", "Database", "UI", "UX", "Testing", "Framework"]
+        self.usernames = asyncio.run(UserData().get_all_usernames())
         self.logs = []
         self.track_time = self.item_dict.get("track_time", [])
         self.time_accumulation = self.item_dict.get("time_accumulation", [0, 0])
@@ -207,15 +210,18 @@ class ItemFormInSprint(AlertDialog):
         self.task_status = DropdownInput(self.task_status_options, label="Status")
         self.task_status.disabled = True
         self.task_type = DropdownInput(self.task_type_options, label="Type")
-        self.assignee = TextFieldInput(label="Assignee", expand=False)
+        self.assignee = DropdownInput(self.usernames, label="Assignee", expand=False)
         self.tags = MultipleSelectInput(self.tag_options)
 
         
         self.chart = Container(Text("Chart goes here"), padding=padding.all(10), bgcolor="#FFFFFF", border_radius=border_radius.all(10))
 
         self.task_logs = Row([Text(" ", color="black", size=15),])
-        ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.close_form()),
-
+        
+        self.actions = [
+            ElevatedButton("Cancel", bgcolor=colors.RED_300, width=100, color="black", on_click=lambda e: self.close_form()),
+            ElevatedButton("Save", bgcolor=colors.GREEN_300, width=100, color="black", on_click=lambda e: self.handle_submit()),
+        ]
 
         self.header = [
             Text("Editing Item", color="black", size=24),
@@ -353,7 +359,7 @@ class ItemFormInSprint(AlertDialog):
                 hours, minutes = self.parse_time_input(time_record)
                 
                 log_entry = {
-                    "user": "John Doe",
+                    "user": self.page.current_user_info["username"],
                     "date": datetime.now().strftime("%d-%m-%Y"),
                     "time": datetime.now().strftime("%I:%M %p"),
                     "time_spent": f"{hours} hours {minutes} minutes",
@@ -422,7 +428,7 @@ class ItemFormInSprint(AlertDialog):
 
             item["logs"] = self.logs
             item["logs"].append({
-                "user": "John Doe",
+                "user": self.page.current_user_info["username"],
                 "date": datetime.now().strftime("%d-%m-%Y"),
                 "time": datetime.now().strftime("%I:%M %p"),
                 "action": "Updated this item"

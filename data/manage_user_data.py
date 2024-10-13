@@ -122,6 +122,20 @@ class UserData():
         response = requests.post(url, headers=self.headers, data=payload)
         return response.json()
     
+    async def get_user_by_id(self, user_id):
+        print("\033[42mDATABASE: Getting user", user_id)
+        url = f"{self.base_url}/action/findOne"
+        payload = json.dumps({
+            "dataSource": "helium", 
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"_id": {"$oid": user_id}}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print(response.json())
+        print("\033[42mDATABASE: User information fetched\033[0m")
+        return response.json()['document']
+    
 if __name__ == "__main__":
     data_api = UserData()
 

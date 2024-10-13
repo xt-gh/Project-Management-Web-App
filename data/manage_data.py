@@ -25,7 +25,7 @@ class Data():
             "status": "Not Started",
             "type": "User Story",
             "assignee": "John Doe",
-            "admin_add_date": datetime.utcnow().isoformat(),
+            "admin_add_date": datetime.now().strftime("%d-%m-%Y"),
             "logs": ["John Doe added this item on 2022-01-01 10:00 AM", "John Doe edited this item on 2022-01-02 11:00 AM"]
         },
         {
@@ -39,7 +39,7 @@ class Data():
             "status": "Not Started",
             "type": "User Story",
             "assignee": "Jane Doe",
-            "admin_add_date": datetime.utcnow().isoformat(),
+            "admin_add_date": datetime.now().strftime("%d-%m-%Y"),
             "logs": ["Jane Doe added this item on 2022-01-02 11:00 AM", "Jane Doe edited this item on 2022-01-03 12:00 PM"]
         },
         {
@@ -53,7 +53,7 @@ class Data():
             "status": "Not Started",
             "type": "User Story",
             "assignee": "John Smith",
-            "admin_add_date": datetime.utcnow().isoformat(),
+            "admin_add_date": datetime.now().strftime("%d-%m-%Y"),
             "logs": ["John Smith added this item on 2022-01-03 12:00 PM", "John Smith edited this item on 2022-01-04 01:00 PM"]
         },
         {
@@ -67,7 +67,7 @@ class Data():
             "status": "Not Started",
             "type": "User Story",
             "assignee": "Jane Smith",
-            "admin_add_date": datetime.utcnow().isoformat(),
+            "admin_add_date": datetime.now().strftime("%d-%m-%Y"),
             "logs": ["Jane Smith added this item on 2022-01-04 01:00 PM", "Jane Smith edited this item on 2022-01-05 02:00 PM"]
         }
     ]
@@ -182,6 +182,19 @@ class Data():
         response = requests.post(url, headers=self.headers, data=payload)
         print("\033[42mDATABASE: Sprint task items fetched\033[0m")
         return response.json()['documents']
+    
+    async def get_tasks_with_username(self, username):
+        print("\033[42mDATABASE: Getting tasks with username", username, "\033[0m")
+        url = f"{self.base_url}/action/find"
+        payload = json.dumps({
+            "dataSource": "helium",  # Replace with your data source name
+            "database": self.database_name,
+            "collection": self.collection_name,
+            "filter": {"assignee": username}
+        })
+        response = requests.post(url, headers=self.headers, data=payload)
+        print("\033[42mDATABASE: Tasks with username fetched\033[0m")
+        return response.json()['documents']
 
 if __name__ == "__main__":
     def print_all_items():
@@ -215,4 +228,4 @@ if __name__ == "__main__":
         for task in tasks:
             print(json.dumps(task, indent=4))
 
-    print_all_items()
+    delete_all_items()

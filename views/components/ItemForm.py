@@ -170,7 +170,7 @@ class ItemForm(AlertDialog):
             if self.mode == "add":
                 item["admin_add_date"] = datetime.utcnow().isoformat()
                 item["logs"] = [{
-                    "user": "John Doe",
+                    "user": self.page.current_user_info["username"],
                     "date": datetime.now().strftime("%d-%m-%Y"),
                     "time": datetime.now().strftime("%I:%M %p"),
                     "action": "Added this item"
@@ -181,7 +181,7 @@ class ItemForm(AlertDialog):
             if self.mode == "view":
                 item["logs"] = self.logs
                 item["logs"].append({
-                    "user": "John Doe",
+                    "user": self.page.current_user_info["username"],
                     "date": datetime.now().strftime("%d-%m-%Y"),
                     "time": datetime.now().strftime("%I:%M %p"),
                     "action": "Updated this item"
