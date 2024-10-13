@@ -4,6 +4,10 @@ from data.manage_user_data import UserData
 from views.components.LoadingCard import LoadingCard
 from .components.CreateAccountForm import CreateAccountForm
 from .components.AccountCard import AccountCard
+from .components.TableFormPopUp import TableFormPopUp
+from .components.TableFormPopUp import TableForm
+
+
 
 import asyncio
 
@@ -39,7 +43,12 @@ class Collaborators(Column):
                         content=LoadingCard(),
                         alignment=alignment.top_center,
                         expand=1,
-                    )
+                    ),
+                    Container(
+                    ElevatedButton("Average log time spent", icon=icons.ACCESS_TIME, on_click=lambda e: self.handle_view_table(e)),
+                    alignment=alignment.bottom_right,  # Positioning button at the bottom right
+                    padding=padding.only(right=10, bottom=10),  # Adding some padding for spacing
+                    ),   
                 ]),
                 padding=padding.all(20),
                 border_radius=border_radius.all(10),
@@ -131,6 +140,18 @@ class Collaborators(Column):
     def close_detailed_view(self):
         print("Closing detailed view")
         self.page.close(self.detailed_view)
+        asyncio.run(self.populate_board(refetch=True))
+        self.page.update()
+
+    def handle_view_table(self, e):
+        print("Display table form")
+        self.table_form = TableFormPopUp(self.page, self.close_table_form)
+        print("Opening table form")
+        self.page.open(self.table_form)
+
+    def close_table_form(self):
+        print("Closing table form")
+        self.page.close(self.table_form)
         asyncio.run(self.populate_board(refetch=True))
         self.page.update()
     

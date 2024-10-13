@@ -178,5 +178,3 @@ if __name__ == "__main__":
         # print("DATABASE: Updated Item:", response)
 
         # print("DATABASE: Fetched Item:", await data_api.get_sprint_item(first_item_id))
-
-    asyncio.run(main())

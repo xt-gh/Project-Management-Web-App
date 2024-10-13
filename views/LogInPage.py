@@ -46,7 +46,13 @@ class LoginPage(Column):
                     self.password,
                     Container(height=20),
                     self.login_button,
-                    self.login_result
+                    self.login_result,
+                    Image(
+                        src=f"acousm120.png",
+                        width=100,
+                        height=100,
+                        fit=ft.ImageFit.CONTAIN,
+                    )
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,

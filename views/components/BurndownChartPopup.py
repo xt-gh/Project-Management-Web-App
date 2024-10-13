@@ -14,12 +14,16 @@ class BurndownChartPopup(AlertDialog):
 
         self.title = Text("Burndown Chart")
         # self.content = Text("here")
-        self.content = self.build_chart()
         self.actions = [
             TextButton("Close", on_click=handle_close)
         ]
         self.actions_alignment=MainAxisAlignment.END
         self.sprint_tasks = asyncio.run(Data().get_tasks_from_sprint_id(sprint_id))
+        self.sprint = asyncio.run(SprintData().get_sprint_item(sprint_id))
+        
+        sprint_start_date, sprint_end_date = self.get_sprint_dates()
+        self.date_range = self.get_date_range(sprint_start_date, sprint_end_date)
+        self.content = self.build_chart()
 
     def did_mount(self):
         print("MOUNTED BURN DOWN CHART")
@@ -27,359 +31,196 @@ class BurndownChartPopup(AlertDialog):
     def before_update(self):
         print("BEFORE UPDATE OF BURN DOWN CHART")
 
-    def build_chart(self):
+    def date_to_value(self, date):
+        return self.date_range.index(date.strftime('%d-%m-%Y')) + 1
 
-        completed_tasks = asyncio.run(self.get_completed_tasks_for_sprint(self.sprint_id))
-        sprint_start_date, sprint_end_date = asyncio.run(self.get_sprint_dates(self.sprint_id))
-        diff = sprint_end_date - sprint_start_date
-        burndown_data, ideal_burndown_data = asyncio.run(self.aggregate_story_points_by_date(completed_tasks))
-
-        print("Building burndown chart")
-        print(burndown_data)
-        print(ideal_burndown_data)
-
-
-        range_of_dates = []
-        for day in range(diff.days):
-            range_of_dates.append((sprint_start_date + timedelta(days=day)).strftime('%d-%m-%Y'))
-        print(range_of_dates)
-
-
-        
-        # data_1 = [
-        #     LineChartData(
-        #         data_points=[
-        #             LineChartDataPoint(1, 1),
-        #             LineChartDataPoint(3, 1.5),
-        #             LineChartDataPoint(5, 1.4),
-        #             LineChartDataPoint(7, 3.4),
-        #             LineChartDataPoint(10, 2),
-        #             LineChartDataPoint(12, 2.2),
-        #             LineChartDataPoint(13, 1.8),
-        #         ],
-        #         stroke_width=8,
-        #         color=colors.LIGHT_GREEN,
-                
-        #         stroke_cap_round=True,
-        #     ),
-        #     LineChartData(
-        #         data_points=[
-        #             LineChartDataPoint(1, 1),
-        #             LineChartDataPoint(3, 2.8),
-        #             LineChartDataPoint(7, 1.2),
-        #             LineChartDataPoint(10, 2.8),
-        #             LineChartDataPoint(12, 2.6),
-        #             LineChartDataPoint(13, 3.9),
-        #         ],
-        #         color=colors.PINK,
-        #         below_line_bgcolor=colors.with_opacity(0, colors.PINK),
-        #         stroke_width=8,
-                
-        #         stroke_cap_round=True,
-        #     ),
-        #     LineChartData(
-        #         data_points=[
-        #             LineChartDataPoint(1, 2.8),
-        #             LineChartDataPoint(3, 1.9),
-        #             LineChartDataPoint(6, 3),
-        #             LineChartDataPoint(10, 1.3),
-        #             LineChartDataPoint(13, 2.5),
-        #         ],
-        #         color=colors.CYAN,
-        #         stroke_width=8,
-                
-        #         stroke_cap_round=True,
-        #     ),
-        # ]
-
-        # chart = LineChart(
-        #     data_series=data_1,
-        #     border=Border(
-        #         bottom=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE))
-        #     ),
-        #     left_axis=ChartAxis(
-        #         labels=[
-        #             ChartAxisLabel(
-        #                 value=1,
-        #                 label=Text("1m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=2,
-        #                 label=Text("2m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=3,
-        #                 label=Text("3m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=4,
-        #                 label=Text("4m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=5,
-        #                 label=Text("5m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=6,
-        #                 label=Text("6m", size=14, weight=FontWeight.BOLD),
-        #             ),
-        #         ],
-        #         labels_size=40,
-        #     ),
-        #     bottom_axis=ChartAxis(
-        #         labels=[
-        #             ChartAxisLabel(
-        #                 value=2,
-        #                 label=Container(
-        #                     Text(
-        #                         "SEP",
-        #                         size=16,
-        #                         weight=FontWeight.BOLD,
-        #                         color=colors.with_opacity(0.5, colors.ON_SURFACE),
-        #                     ),
-        #                     margin=margin.only(top=10),
-        #                 ),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=7,
-        #                 label=Container(
-        #                     Text(
-        #                         "OCT",
-        #                         size=16,
-        #                         weight=FontWeight.BOLD,
-        #                         color=colors.with_opacity(0.5, colors.ON_SURFACE),
-        #                     ),
-        #                     margin=margin.only(top=10),
-        #                 ),
-        #             ),
-        #             ChartAxisLabel(
-        #                 value=12,
-        #                 label=Container(
-        #                     Text(
-        #                         "DEC",
-        #                         size=16,
-        #                         weight=FontWeight.BOLD,
-        #                         color=colors.with_opacity(0.5, colors.ON_SURFACE),
-        #                     ),
-        #                     margin=margin.only(top=10),
-        #                 ),
-        #             ),
-        #         ],
-        #         labels_size=32,
-        #     ),
-        #     tooltip_bgcolor=colors.with_opacity(0.5, colors.WHITE),
-        #     min_y=0,
-        #     max_y=4,
-        #     min_x=0,
-        #     max_x=14,
-        #     # animate=5000,
-        # )
-
-
-
-        chart = LineChart(
-            data_series=[
-                LineChartDataPoint(1, 1),
-                LineChartDataPoint(3, 1.5),
-                LineChartDataPoint(5, 1.4),
-                LineChartDataPoint(7, 3.4),
-                LineChartDataPoint(10, 2),
-                LineChartDataPoint(12, 2.2),
-                LineChartDataPoint(13, 1.8),
-            ],
-            border=Border(
-                bottom=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE))
-            ),
-            left_axis=ChartAxis(
-                labels=[
-                    ChartAxisLabel(
-                        value=i+1,
-                        label=Text(str(i+1), size=14, weight=FontWeight.BOLD),
-                    ) 
-                    for i in range(ideal_burndown_data[0][1])
-                ],
-                labels_size=40,
-            ),
-            bottom_axis=ChartAxis(
-                labels=[
-                    ChartAxisLabel(
-                        value=i+1,
-                        label=Text(range_of_dates[i], size=14)
+    def get_date_range(self, start_date, end_date):
+        date_range = []
+        diff = end_date - start_date
+        for day in range(diff.days + 1):
+            date_range.append((start_date + timedelta(days=day)).strftime('%d-%m-%Y'))
+        return date_range
+    
+    def get_left_axis(self, total_story_points):
+        return ChartAxis(
+            title=Text("Story Points", size=32, weight=FontWeight.BOLD),
+            title_size=32,
+            labels=[
+                ChartAxisLabel(
+                    value=i+1,
+                    label=Container(
+                        content=Text(str(i+1), size=14, weight=FontWeight.BOLD),
+                        padding=padding.all(10),
+                        alignment=alignment.center,
                     )
-                    for i in range(len(burndown_data))
-                ],
-                labels_size=32,
+                ) 
+                for i in range(total_story_points)
+            ],
+            labels_size=40,
+        )
+    
+    def get_bottom_axis(self, range_of_dates):
+        return ChartAxis(
+            title=Text("Day", size=32, weight=FontWeight.BOLD),
+            title_size=100,
+            labels=[
+                ChartAxisLabel(
+                    value=i+1,
+                    label=Container(
+                        content=Column([
+                            Text(f"Day {i+1}", size=15),
+                            Text(f"({str(range_of_dates[i])})", size=12),
+                        ], horizontal_alignment=CrossAxisAlignment.CENTER),
+                        padding=padding.all(10),
+                        alignment=alignment.center,
+                    )
+                )
+                for i in range(len(range_of_dates))
+            ],
+            labels_size=32,
+        )
+    
+    def get_total_story_points(self, tasks):
+        total_story_points = 0
+        for task in tasks:
+            total_story_points += int(task.get('story_points', 0))
+        return total_story_points
+    
+    def get_chart_data(self):
+        burndown_data, ideal_burndown_data = self.aggregate_story_points_by_date()        
+        print("Date range", self.date_range)
+        print("Building burndown chart")
+        print("Ideal burndown data", ideal_burndown_data)
+        print("Burndown data", burndown_data)
+
+        ideal_data = LineChartData(
+            data_points=[
+                # ideal_burndown_data is in the format [(points, date), ...]
+                LineChartDataPoint(
+                    ideal_burndown_data[0][0],
+                    ideal_burndown_data[0][1],
+                    tooltip=f"Ideal burndown: {self.date_range[ideal_burndown_data[0][1]]}",
+                    tooltip_style=TextStyle(
+                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                    ),
+                ),
+                LineChartDataPoint(
+                    ideal_burndown_data[1][0],
+                    ideal_burndown_data[1][1],
+                    tooltip=f"Ideal burndown{self.date_range[ideal_burndown_data[1][1]]}",
+                    tooltip_style=TextStyle(
+                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                    ),
+                ),
+            ],
+            stroke_width=4,
+            color=colors.with_opacity(0.5, colors.RED),
+            stroke_cap_round=True,
+        )
+
+        actual_data = LineChartData(
+            data_points=[
+                # burndown_data is in the format [(points, date), ...]
+                LineChartDataPoint(
+                    burndown_data[i][0],
+                    burndown_data[i][1],
+                    tooltip=f"Actual burndown: {self.date_range[burndown_data[i][1]]}",
+                    tooltip_style=TextStyle(
+                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                    ),
+                )
+                for i in range(len(burndown_data))
+            ],
+            stroke_width=4,
+            color=colors.with_opacity(0.5, colors.LIGHT_BLUE),
+            stroke_cap_round=True,
+        )
+
+        return [ideal_data, actual_data]
+
+
+    def build_chart(self):
+        chart = LineChart(
+            data_series=self.get_chart_data(),
+            border=Border(
+                bottom=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE)),
+                left=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE)),
+                top=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE)),
+                right=BorderSide(4, colors.with_opacity(0.5, colors.ON_SURFACE)),
             ),
-            tooltip_bgcolor=colors.with_opacity(0.5, colors.WHITE),
+            left_axis=self.get_left_axis(self.get_total_story_points(self.sprint_tasks)),
+            bottom_axis=self.get_bottom_axis(self.date_range),
+            tooltip_bgcolor=colors.with_opacity(0.5, colors.GREY),
+            tooltip_rounded_radius=10,
+            horizontal_grid_lines=ChartGridLines(width=1, color=colors.with_opacity(0.5, colors.ON_SURFACE), interval=1),
+            vertical_grid_lines=ChartGridLines(width=1, color=colors.with_opacity(0.5, colors.ON_SURFACE), interval=1),
             min_y=0,
-            min_x=0,
+            min_x=1,
         )
         
         return Container(
             content=chart,
-            width=self.page.width * 0.4,
+            width=self.page.width * 0.7,
             height=self.page.height * 0.7,
+            padding=padding.only(20, 20, 50, 20),
         )
 
-    async def get_completed_tasks_for_sprint(self, sprint_id):
-        # items = asyncio.run(SprintData().get_sprint_items())
-        items = await Data().get_product_backlog_items()  # Await the coroutine
-
-
+    def get_completed_tasks_for_sprint(self):
+        items = self.sprint_tasks
         # Filter out completed tasks
-        # completed_tasks = [item for item in items if item['status'] == 'Completed']
-        # return completed_tasks
-    
-        # sprint_id = 
-        completed_tasks = [
-            item for item in items 
-            if item['sprint_id'] == sprint_id and item['status'] == 'Completed'
-        ]
+        completed_tasks = [item for item in items if item['status'] == 'Completed']
         return completed_tasks
     
-    async def get_sprint_dates(self, sprint_id):
-        sprint_item = await SprintData().get_sprint_item(sprint_id)
-
-        if sprint_item is None:
-            print(f"No sprint item found for sprint_id: {sprint_id}")
-            return None, None
-
+    def get_sprint_dates(self):
         start_date = None
         end_date = None
 
-        if 'start_date' in sprint_item:
-            start_date = datetime.strptime(sprint_item['start_date'], '%d-%m-%Y').date()
+        if 'start_date' in self.sprint:
+            start_date = datetime.strptime(self.sprint['start_date'], '%d-%m-%Y').date()
         else:
-            print(f"Start date not found for sprint_id: {sprint_id}")
+            print(f"Start date not found for sprint_id: {self.sprint_id}")
 
-        if 'end_date' in sprint_item:
-            end_date = datetime.strptime(sprint_item['end_date'], '%d-%m-%Y').date()
+        if 'end_date' in self.sprint:
+            end_date = datetime.strptime(self.sprint['end_date'], '%d-%m-%Y').date()
         else:
-            print(f"End date not found for sprint_id: {sprint_id}")
+            print(f"End date not found for sprint_id: {self.sprint_id}")
 
         return start_date, end_date
 
-    async def aggregate_story_points_by_date(self, completed_tasks):
+    def aggregate_story_points_by_date(self):
         # Initialize a dictionary to store the total story points completed on each date
-        date_points = {}
-        start_date, end_date = await self.get_sprint_dates(self.sprint_id)
+        start_date, end_date = self.get_sprint_dates()
         if not start_date or not end_date:
             return [],[]
         
-        all_tasks = await Data().get_product_backlog_items()
-
-        all_tasks = [task for task in all_tasks if task['sprint_id'] == self.sprint_id]
+        all_tasks = self.sprint_tasks
 
         total_story_points = 0
         for task in all_tasks:
             total_story_points += int(task.get('story_points', 0))
 
-        burndown_data = []
+        task_data = []
 
+        completed_tasks = self.get_completed_tasks_for_sprint()
         for task in completed_tasks:
-            completed_date = datetime.strptime(task['date_completed'], '%Y-%m-%dT%H:%M:%S.%f').date()
+            date_value = self.date_to_value(datetime.strptime(task['date_completed'], '%d-%m-%Y').date())
             story_points = int(task.get('story_points', 0))
-
-            if completed_date:
-                if completed_date in date_points:
-                    date_points[completed_date] += story_points
-                else:
-                    date_points[completed_date] = story_points
+            task_data.append((date_value, story_points))
         
         # Sort the dates and calculate remaining points
-        sorted_dates = sorted(date_points.keys())
+        task_data.sort()
         remaining_points = total_story_points
 
-        if sorted_dates:  # Check if there are any sorted dates
-            burndown_data.insert(0, (start_date, total_story_points))
+        burndown_data = [(self.date_to_value(start_date), total_story_points)]
 
-        for date in sorted_dates:
-            remaining_points -= date_points[date]
-            burndown_data.append((date, remaining_points))
+        for task in task_data:
+            remaining_points -= task[1]
+            burndown_data.append((task[0], remaining_points))
 
         ideal_burndown_data = [
-        (start_date, total_story_points),
-        (end_date, 0)
+            (self.date_to_value(start_date), total_story_points),
+            (self.date_to_value(end_date), 0)
         ]   
 
         return burndown_data, ideal_burndown_data
 
-# class BurndownChartPopup:
-#     def __init__(self, sprint_id, page):
-#         self.page = page
-#         self.sprint_id = sprint_id
-#         self.data_api = Data()
-#         self.sprint_data_api = SprintData()
-#         matplotlib.use("svg")
-
-#     def generate_burndown_chart(self, burndown_data, ideal_burndown_data):
-#         # Plot the burndown chart
-#         plt.figure(figsize=(10, 6))
-
-#         if burndown_data:
-#             # Extract dates and remaining points for plotting
-#             dates = [entry[0] for entry in burndown_data]
-#             remaining_points = [entry[1] for entry in burndown_data]
-
-#             plt.plot(dates, remaining_points, marker='o', linestyle='-', color='b', label='Remaining Points')
-#             plt.fill_between(dates, remaining_points, color='blue', alpha=0.1)
-
-#         ideal_dates = [entry[0] for entry in ideal_burndown_data]
-#         ideal_remaining_points = [entry[1] for entry in ideal_burndown_data]
-
-#         plt.plot(ideal_dates, ideal_remaining_points, marker='o', linestyle='--', color='g', label='Ideal Line')
-
-#         # Formatting the chart
-#         plt.title('Burndown Chart')
-#         plt.xlabel('Date')
-#         plt.ylabel('Remaining Story Points')
-#         plt.grid(True)
-#         plt.xticks(rotation=45)
-#         plt.gcf().autofmt_xdate()
-#         plt.tight_layout()
-#         plt.legend()
-#         # plt.show()
-
-#         # img_path = 'burndown_chart.png'  # Path where the image will be saved
-#         # plt.savefig(img_path, format='png')
-#         # plt.close()  # Close the plot to free memory
-
-#         # return img_path 
-#         return MatplotlibChart(figure=plt.gcf())
-        
-        
-
-#     async def display_burndown_chart(self, sprint_id):
-#         # Get completed tasks for the sprint
-#         completed_tasks = await self.get_completed_tasks_for_sprint(sprint_id)
-
-#         # Aggregate the story points by date
-#         burndown_data, ideal_burndown_data = await self.aggregate_story_points_by_date(completed_tasks)
-
-#         # Generate and show the burndown chart
-#         img_path = self.generate_burndown_chart(burndown_data, ideal_burndown_data)
-
-#         if img_path:
-#             # Create an Image component using the saved file path
-#             img_component = Image(src=img_path, width=600, height=400)
-#             dialog = AlertDialog(
-#                 title = Text("Burndown Chart"),
-#                 # content= img_component,
-#                 content=self.generate_burndown_chart(burndown_data, ideal_burndown_data),
-#                 actions= [
-#                 TextButton("Close", on_click=lambda e: self.page.close(dialog))
-#             ],
-#             )
-
-#             self.page.open(dialog)
-
-# # async def main():
-    
-# #     # Create an instance of BurndownChartPopup
-# #     burndown_chart_popup = BurndownChartPopup()
-
-# #     sprint_id = "sprint_id"
-
-# #     await burndown_chart_popup.display_burndown_chart(sprint_id)
-
-# # asyncio.run(main())

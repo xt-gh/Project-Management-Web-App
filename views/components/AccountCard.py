@@ -34,32 +34,82 @@ class AccountCard(Container):
         print("Account card clicked")
 
     
-    def card_details(self):
-        if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
-            body = [
-                self.username_details(),
-                self.password_details(),
-                Text(" ", color="black", size=20),
-            ]
-            return Row(body,
-            alignment=MainAxisAlignment.START, 
-            spacing=90)
+    # def card_details(self):
+    #     if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
+    #         body = [
+    #             self.username_details(),
+    #             self.password_details(),
+    #             Text(" ", color="black", size=20),
+    #         ]
+    #         return Row(body,
+    #         alignment=MainAxisAlignment.START, 
+    #         spacing=90)
         
+    #     elif self.page.current_user_info["account_type"] == "admin":
+    #         body = [
+    #             self.username_details(),
+    #             self.password_details(),
+    #             self.user_effort_bar_chart(),
+    #             self.remove_account(),
+    #         ]
+    #     else:
+    #         body = [
+    #             self.username_details(),
+    #         ]
+# 
+        # return Row(body,
+        # alignment=MainAxisAlignment.SPACE_BETWEEN,
+        # vertical_alignment=CrossAxisAlignment.CENTER)
+
+    def card_details(self):
+        body = []
+
+        username_container = Container(
+            self.username_details(),
+            width=380
+        )
+
+        password_container = Container(
+            self.password_details(),
+            width=380
+        )
+
+        credentials_container = Container(
+            Row([
+                username_container,
+                password_container,
+            ],
+            alignment=MainAxisAlignment.SPACE_BETWEEN),
+        )
+
+        if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
+            body.append(credentials_container)
+            body.append(
+                Row([
+                    self.user_effort_bar_chart(),  
+                ],
+                alignment=MainAxisAlignment.END,
+                )
+            )
+
         elif self.page.current_user_info["account_type"] == "admin":
-            body = [
-                self.username_details(),
-                self.password_details(),
-                self.user_effort_bar_chart(),
-                self.remove_account(),
-            ]
+            body.append(credentials_container)
+            body.append(
+                Row([
+                    self.user_effort_bar_chart(),  
+                    self.remove_account(),  
+                ],
+                alignment=MainAxisAlignment.END,
+                )
+            )
+
         else:
-            body = [
-                self.username_details(),
-            ]
+            body.append(username_container)
 
         return Row(body,
-        alignment=MainAxisAlignment.SPACE_BETWEEN,
-        vertical_alignment=CrossAxisAlignment.CENTER)
+                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                    spacing=20)
+
     
     def username_details(self):
         
