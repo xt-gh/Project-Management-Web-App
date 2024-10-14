@@ -12,8 +12,7 @@ class BurndownChartPopup(AlertDialog):
         self.page = page
         self.handle_close = handle_close
 
-        self.title = Text("Burndown Chart")
-        # self.content = Text("here")
+        self.title = Text("Burndown Chart", size=40, weight=FontWeight.BOLD)
         self.actions = [
             TextButton("Close", on_click=handle_close)
         ]
@@ -44,7 +43,7 @@ class BurndownChartPopup(AlertDialog):
     def get_left_axis(self, total_story_points):
         return ChartAxis(
             title=Text("Story Points", size=32, weight=FontWeight.BOLD),
-            title_size=32,
+            title_size=40,
             labels=[
                 ChartAxisLabel(
                     value=i+1,
@@ -62,7 +61,7 @@ class BurndownChartPopup(AlertDialog):
     def get_bottom_axis(self, range_of_dates):
         return ChartAxis(
             title=Text("Day", size=32, weight=FontWeight.BOLD),
-            title_size=100,
+            title_size=80,
             labels=[
                 ChartAxisLabel(
                     value=i+1,
@@ -99,7 +98,7 @@ class BurndownChartPopup(AlertDialog):
                 LineChartDataPoint(
                     ideal_burndown_data[0][0],
                     ideal_burndown_data[0][1],
-                    tooltip=f"Ideal burndown: {self.date_range[ideal_burndown_data[0][1]]}",
+                    tooltip="Ideal burndown: " + self.date_range[ideal_burndown_data[0][0]-1],
                     tooltip_style=TextStyle(
                         color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
                     ),
@@ -107,7 +106,7 @@ class BurndownChartPopup(AlertDialog):
                 LineChartDataPoint(
                     ideal_burndown_data[1][0],
                     ideal_burndown_data[1][1],
-                    tooltip=f"Ideal burndown{self.date_range[ideal_burndown_data[1][1]]}",
+                    tooltip="Ideal burndown " + self.date_range[ideal_burndown_data[1][0]-1],
                     tooltip_style=TextStyle(
                         color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
                     ),
@@ -124,7 +123,7 @@ class BurndownChartPopup(AlertDialog):
                 LineChartDataPoint(
                     burndown_data[i][0],
                     burndown_data[i][1],
-                    tooltip=f"Actual burndown: {self.date_range[burndown_data[i][1]]}",
+                    tooltip="Actual burndown: " + self.date_range[burndown_data[i][0]-1],
                     tooltip_style=TextStyle(
                         color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
                     ),
