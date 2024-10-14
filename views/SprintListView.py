@@ -21,6 +21,8 @@ class SprintListView(Column):
         self.item_list = []
         self.page = page
 
+        self.selected_tags = []
+
         self.filter_tag = "All Tasks"
         self.sort_label = "Oldest to Newest"
 
@@ -68,13 +70,15 @@ class SprintListView(Column):
     def build(self):
         print("Building Sprint List View")
         
+        self.filter_tag_row = Row(controls=[], alignment=MainAxisAlignment.START)
         return Container(
             content=Column([
                         Row([
                             Text("Sprint Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
+                            self.filter_tag_row,
                             Row([
                                 # SortPopupButton(self.handle_sort_option),
-                                # FilterPopupButton(self.filter_selected_tag),
+                                FilterPopupButton(self.filter_selected_tag),
                                 IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard")),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
@@ -136,8 +140,7 @@ class SprintListView(Column):
                     print("Item has no sprint_id")
             
         # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
-        # items = TaskFilter().filter_tasks(items, self.filter_tag)
-        items = sorted(self.item_list, key=lambda x: x["task_name"])
+        items = TaskFilter().filter_task(self.item_list, self.selected_tags)
         self.controls[0].content.controls[1].content = self.build_board(items)
         print("Board populated")
     
@@ -163,8 +166,20 @@ class SprintListView(Column):
 
     def filter_selected_tag(self, tag):
         print("Filter selected:", tag)
-        self.filter_tag = tag
+        
+        if tag == "All Tasks":
+            self.selected_tags = ["All Tasks"]
+        else:
+            if "All Tasks" in self.selected_tags:
+                self.selected_tags.remove("All Tasks")
+                
+            if tag in self.selected_tags:
+                self.selected_tags.remove(tag)
+            else:
+                self.selected_tags.append(tag)
+
         asyncio.run(self.populate_board())
+        self.update_filter_tag_row(self.selected_tags)
         self.update()
 
     def change_bg_colour(self, selected_color):
@@ -173,3 +188,35 @@ class SprintListView(Column):
         self.controls[0].bgcolor = self.bg_color  # Update the container's background
         self.page.update()
         asyncio.run(ColourData().save_background_color("Product Backlog", self.bg_color))
+
+    def create_tag_bubble(self, tag):
+        """Creates a Chip control for the selected filter tag."""
+        chip = Chip(
+            label=Text(tag, color="black"),
+            color="#DBEBE2",  # Background color for the chip
+            border_side=BorderSide(color="white", width=1),
+            delete_icon_color="black",
+            on_delete=lambda e: self.remove_tag(tag),  
+        )
+        return chip
+    
+    def update_filter_tag_row(self, tags):
+        """Updates the filter tag row with the current selected tag bubble."""
+        # Clear previous tags
+        self.filter_tag_row.controls.clear()
+        
+        # Add the new tag bubble
+        for tag in tags:
+            tag_bubble = self.create_tag_bubble(tag)
+            self.filter_tag_row.controls.append(tag_bubble)
+
+        # Refresh the page to show changes
+        self.page.update()
+
+    def remove_tag(self, tag):
+        if tag in self.selected_tags:
+            print(f"Removing filter tag: {tag}")
+            self.selected_tags.remove(tag)
+            self.update_filter_tag_row(self.selected_tags)  # Update displayed tags
+            asyncio.run(self.populate_board())
+            self.page.update()
