@@ -38,26 +38,45 @@ class SprintBoard(Column):
 
         self.body = self.loading_screen
 
-        return Container(
-            content=Column([
-                        Row([
-                            Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
+        if self.page.current_user_info["account_type"] == "admin":
+            return Container(
+                content=Column([
                             Row([
-                                ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
-                            ], alignment=MainAxisAlignment.END),
-                        ], alignment=MainAxisAlignment.SPACE_BETWEEN),
-                        Container(
-                            content=self.body,
-                            alignment=alignment.top_center,
-                            expand=1,
-                        )
-                    ]),
-            padding=padding.all(20),
-            border_radius=border_radius.all(10),
-            bgcolor="#CADEED",
-            width=self.page.width - 330,
-            height=self.page.height - 20,
-        )
+                                Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
+                                Row([
+                                    ElevatedButton("Add Sprint", icon="add", on_click=lambda e: self.handle_add_sprint(e)),
+                                ], alignment=MainAxisAlignment.END),
+                            ], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                            Container(
+                                content=self.body,
+                                alignment=alignment.top_center,
+                                expand=1,
+                            )
+                        ]),
+                padding=padding.all(20),
+                border_radius=border_radius.all(10),
+                bgcolor="#CADEED",
+                width=self.page.width - 330,
+                height=self.page.height - 20,
+            )
+        else:
+            return Container(
+                content=Column([
+                            Row([
+                                Text("Sprintboard", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
+                            ], alignment=MainAxisAlignment.SPACE_BETWEEN),
+                            Container(
+                                content=self.body,
+                                alignment=alignment.top_center,
+                                expand=1,
+                            )
+                        ]),
+                padding=padding.all(20),
+                border_radius=border_radius.all(10),
+                bgcolor="#CADEED",
+                width=self.page.width - 330,
+                height=self.page.height - 20,
+            )
 
     def before_update(self):
         print("\033[33mSprint board updated\033[0m")
