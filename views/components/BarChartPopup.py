@@ -83,7 +83,6 @@ class BarChartPopup(AlertDialog):
 
     def get_barchart_data(self):
         bar_width = 40
-        date_range = self.get_date_range()
         return [
             BarChartGroup(
                 x=item[0],
@@ -93,7 +92,7 @@ class BarChartPopup(AlertDialog):
                         to_y=item[1],
                         width = bar_width,
                         color=colors.BLUE,
-                        tooltip=date_range[item[0]-1],
+                        tooltip=item[1],
                         border_radius=0,
                     )
                 ]

@@ -70,6 +70,7 @@ class LoginPage(Column):
             Container(
                 content=Column(
                         controls=[
+                            Text("Agile Master",size=30,weight="bold",text_align=ft.TextAlign.CENTER),
                             Text("Welcome back! 🥳",size=40,weight="bold",text_align=ft.TextAlign.CENTER),
                             self.container],
                         alignment=ft.MainAxisAlignment.CENTER,  # Center vertically
