@@ -52,28 +52,44 @@ class SprintCard(Container):
         # self.page.go("/sprintkanban/" + self.id)
 
     def card_title(self):
-        return Row([
-            Text(
-                f"{self.sprint_name} ({self.status})",
-                color="black", 
-                size=30,
-                weight=FontWeight.BOLD,
-                max_lines=2,
-                expand=1,
-                overflow=TextOverflow.ELLIPSIS
-            ),
-            IconButton(
-                icon=icons.EDIT_DOCUMENT,
-                icon_color="black",
-                icon_size=30,
-                on_click=lambda e: self.handle_detailed_view(self.id),
-                hover_color="#F1F1F1",
-                disabled=self.status != "Not Started",
-                mouse_cursor=MouseCursor.CLICK if self.status == "Not Started" else MouseCursor.FORBIDDEN,
+        if self.page.current_user_info["account_type"] == "admin":
+            return Row([
+                Text(
+                    f"{self.sprint_name} ({self.status})",
+                    color="black", 
+                    size=30,
+                    weight=FontWeight.BOLD,
+                    max_lines=2,
+                    expand=1,
+                    overflow=TextOverflow.ELLIPSIS
+                ),
+                IconButton(
+                    icon=icons.EDIT_DOCUMENT,
+                    icon_color="black",
+                    icon_size=30,
+                    on_click=lambda e: self.handle_detailed_view(self.id),
+                    hover_color="#F1F1F1",
+                    disabled=self.status == "Completed",
+                    mouse_cursor=MouseCursor.CLICK if self.status != "Completed" else MouseCursor.FORBIDDEN,
+                )
+            ],
+            alignment=MainAxisAlignment.SPACE_BETWEEN
             )
-        ],
-        alignment=MainAxisAlignment.SPACE_BETWEEN
-        )
+        else:
+            return Row([
+                Text(
+                    f"{self.sprint_name} ({self.status})",
+                    color="black", 
+                    size=30,
+                    weight=FontWeight.BOLD,
+                    max_lines=2,
+                    expand=1,
+                    overflow=TextOverflow.ELLIPSIS
+                )
+            ],
+            alignment=MainAxisAlignment.SPACE_BETWEEN
+            )
+
 
     def card_details(self):
         return Row([
