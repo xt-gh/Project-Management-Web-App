@@ -16,3 +16,4 @@ class FilterPopupButton(PopupMenuButton):
             PopupMenuItem(text="UI", on_click=lambda _: filter_selected_tag("UI")),
             PopupMenuItem(text="UX", on_click=lambda _: filter_selected_tag("UX"))   
         ]
+        self.tooltip="Filter"

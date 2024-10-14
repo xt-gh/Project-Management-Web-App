@@ -77,9 +77,9 @@ class SprintListView(Column):
                             Text("Sprint Backlog", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                             self.filter_tag_row,
                             Row([
-                                # SortPopupButton(self.handle_sort_option),
+                                SortPopupButton(self.handle_sort_option),
                                 FilterPopupButton(self.filter_selected_tag),
-                                IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard")),
+                                IconButton(icon=icons.CLOSE, on_click=lambda e: self.page.go("/sprintboard"),tooltip="Close"),
                             ], alignment=MainAxisAlignment.END),
                         ], alignment=MainAxisAlignment.SPACE_BETWEEN),
                         Container(
@@ -94,7 +94,7 @@ class SprintListView(Column):
             width=self.page.width - 330,
             height=self.page.height - 20,
         )
-
+    
     def before_update(self):
         if self.page.route.startswith("/sprintlist/"):
 
@@ -139,7 +139,7 @@ class SprintListView(Column):
                 except KeyError:
                     print("Item has no sprint_id")
             
-        # items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
+        items = TaskSorter().sort_tasks(self.item_list, self.sort_label)
         items = TaskFilter().filter_task(self.item_list, self.selected_tags)
         self.controls[0].content.controls[1].content = self.build_board(items)
         print("Board populated")
@@ -220,3 +220,4 @@ class SprintListView(Column):
             self.update_filter_tag_row(self.selected_tags)  # Update displayed tags
             asyncio.run(self.populate_board())
             self.page.update()
+

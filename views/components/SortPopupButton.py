@@ -11,3 +11,4 @@ class SortPopupButton(PopupMenuButton):
             PopupMenuItem(text="Oldest to Newest", on_click=lambda e: handle_sort_option("Oldest to Newest")),
             PopupMenuItem(text="Newest to Oldest", on_click=lambda e: handle_sort_option("Newest to Oldest")),
         ]
+        self.tooltip="Sort"
