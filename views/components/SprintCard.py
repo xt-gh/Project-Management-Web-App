@@ -30,7 +30,7 @@ class SprintCard(Container):
             self.status = "Completed"
 
         else:
-            self.status = "In Progress"
+            self.status = "Active"
 
         self.handle_detailed_view = handle_detailed_view
 
@@ -67,6 +67,7 @@ class SprintCard(Container):
                     icon=icons.EDIT_DOCUMENT,
                     icon_color="black",
                     icon_size=30,
+                    tooltip = "Edit",
                     on_click=lambda e: self.handle_detailed_view(self.id),
                     hover_color="#F1F1F1",
                     disabled=self.status == "Completed",
@@ -148,7 +149,7 @@ class SprintCard(Container):
             ],
             alignment=MainAxisAlignment.START)
         
-        if self.status == "In Progress":
+        if self.status == "Active":
             return Column([
                 ElevatedButton(
                     "Manage Sprint Backlog", 

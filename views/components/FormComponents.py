@@ -15,6 +15,12 @@ class DropdownInput(Dropdown):
         self.on_blur = self.handle_blur
         self.on_change = self.handle_change
         self.is_required = is_required
+        self.priority_colors = {
+            "Low": colors.GREEN_300,
+            "Medium": colors.YELLOW_300,
+            "Important": colors.ORANGE_300,
+            "Urgent": colors.RED_300,
+        }
 
     def handle_blur(self, e):
         print("on_blur fired", self.value, "is the value")
@@ -27,6 +33,9 @@ class DropdownInput(Dropdown):
         
     def handle_change(self, e):
         print("on_change fired")
+        if self.value in self.priority_colors.keys():
+            self.fill_color = self.priority_colors[self.value]
+            self.update()
         if self.is_required:
             if self.value is None:
                 self.error_text = "This field is required"
@@ -81,6 +90,16 @@ class MultipleSelectInput(Row):
         self.tight = True
         
         self.expand = expand
+        self.tag_colors = {
+            "Front-end": "#FA9189",
+            "Back-end": "#FCAE7C",
+            "API": "#FFE699",
+            "Database": "#F9FFB5",
+            "UI": "#B3F5BC",
+            "UX": "#D6F6FF",
+            "Testing": "#E2CBF7",
+            "Framework": "#D1BDFF",
+        }
     
     def handle_add_tag(self, tag):
         # print("Add tag clicked for item", tag)
@@ -94,8 +113,12 @@ class MultipleSelectInput(Row):
             self.controls[-1] = self.build_popup_menu()
     
     def add_chip(self, tag):
+        chip_color = "#DBEBE2"
+        if tag in self.tag_colors.keys():
+            chip_color = self.tag_colors[tag]
+
         chip = Chip(label=Text(tag, color="black"),
-                    color="#DBEBE2",
+                    color=chip_color,
                     border_side=BorderSide(color="white", width=1),
                     )
         if not self.disabled:

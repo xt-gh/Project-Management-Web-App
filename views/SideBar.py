@@ -11,9 +11,36 @@ class SideBar(Column):
                             content=Column(
                                 controls=[
                                     Text("View", color="white", size=35),
-                                    ElevatedButton("Product Backlog", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/productbacklog")),
-                                    ElevatedButton("Sprintboard", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/sprintboard")),
-                                    ElevatedButton("Collaborators", bgcolor="#DAE9FE", color="374375", on_click=lambda e: self.page.go("/collaborators")),
+                                    ElevatedButton(
+                                        content=Container(
+                                            Text("Product Backlog", color="black", size=20),
+                                            width=250,
+                                            padding=padding.only(0, 3, 0, 0)
+                                        ),
+                                        bgcolor="#DAE9FE",
+                                        color="374375",
+                                        on_click=lambda e: self.page.go("/productbacklog")
+                                    ),
+                                    ElevatedButton(
+                                        content=Container(
+                                            Text("Sprint Board", color="black", size=20), 
+                                            width=250,
+                                            padding=padding.only(0, 3, 0, 0)
+                                        ),
+                                        bgcolor="#DAE9FE",
+                                        color="374375",
+                                        on_click=lambda e: self.page.go("/sprintboard")
+                                    ),
+                                    ElevatedButton(
+                                        content=Container(
+                                            Text("Collaborators", color="black", size=20),
+                                            width=250,
+                                            padding=padding.only(0, 3, 0, 0)
+                                        ),
+                                        bgcolor="#DAE9FE",
+                                        color="374375",
+                                        on_click=lambda e: self.page.go("/collaborators")
+                                    ),
                                 ],
                             ),
                             bgcolor="#6686BD",
@@ -30,8 +57,7 @@ class SideBar(Column):
         return (
             Container(
                 content=Column([
-                    Text("Project Title", color="black", size=54),
-                    Text("Project Description/Details", color="black", size=16),
+                    Container(Text("Agile Master", color="black", size=54), padding=padding.only(0, 20, 0, 0)),
                     self.navigator,
                 ], alignment=MainAxisAlignment.START),
                 padding=padding.all(15),

@@ -33,6 +33,17 @@ class ItemCard(Container):
         ])
 
     def build_tags(self):
+        tag_colors = {
+            "Front-end": "#FA9189",
+            "Back-end": "#FCAE7C",
+            "API": "#FFE699",
+            "Database": "#F9FFB5",
+            "UI": "#B3F5BC",
+            "UX": "#D6F6FF",
+            "Testing": "#E2CBF7",
+            "Framework": "#D1BDFF",
+        }
+
         tags = Container(
             content=Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN, 
@@ -43,7 +54,7 @@ class ItemCard(Container):
             tags.content.controls.append(
                 Container(
                     content=Text(self.tags[i], color="black", size=12),
-                    bgcolor="#FFFFFF",
+                    bgcolor=tag_colors[self.tags[i]],
                     border_radius=border_radius.all(5),
                     padding=padding.only(3, 1, 3, 1),
                     margin=margin.only(0, 0, 6, 0),
