@@ -22,7 +22,6 @@ class SprintData():
             "team_members": ["John Doe", "John Smith"],
             "start_date": "2022-01-03",
             "end_date": "2022-02-03",
-            "status": "In Progress"
         },
         {
             "sprint_name": "Sprint2",
@@ -31,7 +30,6 @@ class SprintData():
             "team_members": ["Harry Smith", "John Smith"],
             "start_date": "2022-04-02",
             "end_date": "2022-05-03",
-            "status": "Not Started"
         }]
     
     async def ping(self):

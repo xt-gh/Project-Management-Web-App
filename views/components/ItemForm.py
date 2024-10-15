@@ -81,6 +81,7 @@ class ItemForm(AlertDialog):
             self.task_name.value = item["task_name"]
             self.task_description.value = item["description"]
             self.priority.value = item["priority"]
+            self.priority.fill_color = self.priority.priority_colors[item["priority"]]
             self.story_points.value = item["story_points"]
             self.task_stage.value = item["stage"]
             self.task_status.value = item["status"]

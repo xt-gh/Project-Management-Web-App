@@ -52,6 +52,7 @@ class SprintForm(AlertDialog):
                 IconButton(
                     icon=icons.DELETE_FOREVER,
                     icon_color="black",
+                    tooltip = "Delete Sprint",
                     on_click=lambda e: (asyncio.run(SprintData().remove_sprint_item(self.sprint_dict["_id"])), self.close_form()),
                 )
             ]
