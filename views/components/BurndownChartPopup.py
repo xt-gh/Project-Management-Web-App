@@ -100,7 +100,7 @@ class BurndownChartPopup(AlertDialog):
                     ideal_burndown_data[0][1],
                     tooltip="Ideal burndown: " + self.date_range[ideal_burndown_data[0][0]-1],
                     tooltip_style=TextStyle(
-                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                        color=colors.BLACK
                     ),
                 ),
                 LineChartDataPoint(
@@ -108,7 +108,7 @@ class BurndownChartPopup(AlertDialog):
                     ideal_burndown_data[1][1],
                     tooltip="Ideal burndown " + self.date_range[ideal_burndown_data[1][0]-1],
                     tooltip_style=TextStyle(
-                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                        color=colors.BLACK
                     ),
                 ),
             ],
@@ -125,7 +125,7 @@ class BurndownChartPopup(AlertDialog):
                     burndown_data[i][1],
                     tooltip="Actual burndown: " + self.date_range[burndown_data[i][0]-1],
                     tooltip_style=TextStyle(
-                        color=colors.WHITE, bgcolor=colors.with_opacity(0.5, colors.RED)
+                        color=colors.BLACK
                     ),
                 )
                 for i in range(len(burndown_data))
