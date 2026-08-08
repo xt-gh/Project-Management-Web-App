@@ -56,8 +56,7 @@ class SprintBoard(Column):
                 padding=padding.all(20),
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
-                width=self.page.width - 330,
-                height=self.page.height - 60,
+                expand=True,
             )
         else:
             return Container(
@@ -74,16 +73,14 @@ class SprintBoard(Column):
                 padding=padding.all(20),
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
-                width=self.page.width - 330,
-                height=self.page.height - 60,
+                expand=True,
             )
 
     def before_update(self):
         print("\033[33mSprint board updated\033[0m")
         try: 
             if self.page:
-                self.controls[0].width = self.page.width - 330
-                self.controls[0].height =  self.page.height - 60
+                pass
         except Exception as e:
             print(e)
 

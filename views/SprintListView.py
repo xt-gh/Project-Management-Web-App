@@ -91,8 +91,7 @@ class SprintListView(Column):
             padding=padding.all(20),
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",
-            width=self.page.width - 330,
-            height=self.page.height - 60,
+            expand=True,
         )
     
     def before_update(self):
@@ -104,9 +103,6 @@ class SprintListView(Column):
             print("Sprint name:", sprint_name)
                 
             self.controls[0].content.controls[0].controls[0].value = "Sprint Backlog Of " +  sprint_name
-
-            self.controls[0].width = self.page.width - 330
-            self.controls[0].height =  self.page.height - 60
             
             asyncio.run(self.populate_board(refetch=True))
 

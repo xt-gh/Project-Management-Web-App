@@ -58,7 +58,8 @@ class App(Row):
             self.sprint_list_view,
         ]
 
-        # self.vertical_alignment = CrossAxisAlignment.START
+        self.expand = True
+        self.vertical_alignment = CrossAxisAlignment.START
         self.page.on_resized = self.on_page_resize
 
         self.product_backlog_data = []
@@ -70,28 +71,6 @@ class App(Row):
 
     def on_page_resize(self, e):
         print("Window resized")
-        # Update the width and height of the currently visible active view.
-        # Skip index 0 (self.controls[0]) because that is the Sidebar Stack.
-        for control in self.controls[1:]:
-            if hasattr(control, "visible") and control.visible:
-                if hasattr(control, "controls") and len(control.controls) > 0:
-                    outer = control.controls[0]
-                    # If it's a Stack-based view (like SprintKanbanView), its controls[0] is a Stack
-                    if isinstance(outer, Stack) and len(outer.controls) > 0:
-                        outer = outer.controls[0]
-                    
-                    outer.width = self.page.width - 330
-                    outer.height = self.page.height - 60
-                    
-                    # Special resizing logic for SprintKanbanView columns
-                    if isinstance(control, SprintKanbanView):
-                        try:
-                            # Update Column heights inside Kanban board
-                            outer.controls[0].content.controls[1].content.controls[0].height = self.page.height - 120
-                            outer.controls[0].content.controls[1].content.controls[1].height = self.page.height - 120
-                            outer.controls[0].content.controls[1].content.controls[2].height = self.page.height - 120
-                        except Exception as ex:
-                            print("Error resizing Kanban columns:", ex)
         self.page.update()
 
     def start_timer(self):

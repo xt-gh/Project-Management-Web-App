@@ -23,6 +23,7 @@ class SprintKanbanView(Stack):
 
         self.width = self.page.width - 330
         self.height = self.page.height - 60
+        self.expand = True
 
         self.drag_source = None
         self.drag_target = None
@@ -212,12 +213,10 @@ class SprintKanbanView(Stack):
                     padding=padding.all(20),
                     border_radius=border_radius.all(10),
                     bgcolor="#CADEED",
-                    width=self.page.width - 330,
-                    height=self.page.height - 60,
+                    expand=True,
                 )
             ],
-            width=self.page.width - 330,
-            height=self.page.height - 60,
+            expand=True,
         )
     
     
@@ -230,9 +229,6 @@ class SprintKanbanView(Stack):
 
             if self.page:
                 self.controls[0].controls[0].content.controls[0].controls[0].value = sprint_name
-
-                self.controls[0].controls[0].width = self.page.width - 330
-                self.controls[0].controls[0].height =  self.page.height - 60
 
             asyncio.run(self.populate_board())
             asyncio.run(self.set_item_list())

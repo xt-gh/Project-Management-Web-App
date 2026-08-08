@@ -63,7 +63,7 @@ class SideBar(Column):
                 padding=padding.all(15),
                 margin=margin.all(0),
                 border_radius=10,
-                height=900,
+                expand=True,
                 width=300,
             )
         )
