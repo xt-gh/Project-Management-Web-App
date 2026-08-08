@@ -28,6 +28,7 @@ class SprintListView(Column):
 
         # self.width = self.page.width - 330
         # self.height =  self.page.height - 20
+        self.expand = True
         # self.bgcolor = "#CADEED"
         # self.border_radius = border_radius.all(10)
         # self.padding = padding.all(20)

@@ -18,6 +18,7 @@ class SprintBoard(Column):
         self.bgcolor = "#CADEED"
         self.padding = padding.all(15)
         self.border_radius = border_radius.all(10)
+        self.expand = True
 
     def build(self):
         print("Building Sprintboard")

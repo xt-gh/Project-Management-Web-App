@@ -28,6 +28,7 @@ class ProductBacklog(Column):
         # self.bgcolor = "#CADEED"
         # self.border_radius = border_radius.all(10)
         # self.padding = padding.all(20)
+        self.expand = True
 
     def build(self):
         print("Building product backlog")

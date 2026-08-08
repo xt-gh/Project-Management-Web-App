@@ -21,8 +21,6 @@ class SprintKanbanView(Stack):
         self.padding = padding.all(15)
         self.border_radius = border_radius.all(10)
 
-        self.width = self.page.width - 330
-        self.height = self.page.height - 60
         self.expand = True
 
         self.drag_source = None
