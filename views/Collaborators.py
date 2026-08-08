@@ -54,7 +54,7 @@ class Collaborators(Column):
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
                 width=self.page.width - 330,
-                height=self.page.height - 20,
+                height=self.page.height - 60,
             )
         else:
             return Container(
@@ -72,14 +72,14 @@ class Collaborators(Column):
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",
             width=self.page.width - 330,
-            height=self.page.height - 20,
+            height=self.page.height - 60,
         )
     
     def before_update(self):
         print("\033[33mCollaborators board updated\033[0m")
         if self.page.route.startswith("/collaborators"):
             self.controls[0].width = self.page.width - 330
-            self.controls[0].height =  self.page.height - 20
+            self.controls[0].height =  self.page.height - 60
 
             asyncio.run(self.populate_board())
 

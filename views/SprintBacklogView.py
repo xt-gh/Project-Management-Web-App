@@ -145,7 +145,7 @@ class SprintBacklogView(Column):
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",
             width=self.page.width - 330,
-            height=self.page.height - 20,
+            height=self.page.height - 60,
         )
     
     def before_update(self):
@@ -157,7 +157,7 @@ class SprintBacklogView(Column):
                 self.controls[0].content.controls[0].controls[0].value = sprint_name
 
                 self.controls[0].width = self.page.width - 330
-                self.controls[0].height =  self.page.height - 20
+                self.controls[0].height =  self.page.height - 60
 
             asyncio.run(self.populate_product_backlog())
             asyncio.run(self.populate_sprint_backlog())

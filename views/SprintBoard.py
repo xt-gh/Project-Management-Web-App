@@ -57,7 +57,7 @@ class SprintBoard(Column):
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
                 width=self.page.width - 330,
-                height=self.page.height - 20,
+                height=self.page.height - 60,
             )
         else:
             return Container(
@@ -75,7 +75,7 @@ class SprintBoard(Column):
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
                 width=self.page.width - 330,
-                height=self.page.height - 20,
+                height=self.page.height - 60,
             )
 
     def before_update(self):
@@ -83,7 +83,7 @@ class SprintBoard(Column):
         try: 
             if self.page:
                 self.controls[0].width = self.page.width - 330
-                self.controls[0].height =  self.page.height - 20
+                self.controls[0].height =  self.page.height - 60
         except Exception as e:
             print(e)
 

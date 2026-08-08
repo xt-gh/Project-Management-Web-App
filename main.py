@@ -81,7 +81,7 @@ class App(Row):
                         outer = outer.controls[0]
                     
                     outer.width = self.page.width - 330
-                    outer.height = self.page.height - 20
+                    outer.height = self.page.height - 60
                     
                     # Special resizing logic for SprintKanbanView columns
                     if isinstance(control, SprintKanbanView):
