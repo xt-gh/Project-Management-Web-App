@@ -70,8 +70,9 @@ class App(Row):
 
     def on_page_resize(self, e):
         print("Window resized")
-        # Update the width and height of the currently visible active view
-        for control in self.controls:
+        # Update the width and height of the currently visible active view.
+        # Skip index 0 (self.controls[0]) because that is the Sidebar Stack.
+        for control in self.controls[1:]:
             if hasattr(control, "visible") and control.visible:
                 if hasattr(control, "controls") and len(control.controls) > 0:
                     outer = control.controls[0]
