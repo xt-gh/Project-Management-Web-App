@@ -78,7 +78,6 @@ class SprintKanbanView(Stack):
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             expand=True,
-            height=self.page.height - 120,
         )
     
     def build_in_progress_column(self, in_progress_items=None):
@@ -132,7 +131,6 @@ class SprintKanbanView(Stack):
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             expand=True,
-            height=self.page.height - 120,
         )
     
     def build_completed_column(self, completed_items=None):
@@ -186,7 +184,6 @@ class SprintKanbanView(Stack):
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             expand=True,
-            height=self.page.height - 120,
         )
 
     def build(self):
@@ -236,10 +233,6 @@ class SprintKanbanView(Stack):
 
                 self.controls[0].controls[0].width = self.page.width - 330
                 self.controls[0].controls[0].height =  self.page.height - 20
-
-                self.controls[0].controls[0].content.controls[1].content.controls[0].height = self.page.height - 120
-                self.controls[0].controls[0].content.controls[1].content.controls[1].height = self.page.height - 120
-                self.controls[0].controls[0].content.controls[1].content.controls[2].height = self.page.height - 120
 
             asyncio.run(self.populate_board())
             asyncio.run(self.set_item_list())

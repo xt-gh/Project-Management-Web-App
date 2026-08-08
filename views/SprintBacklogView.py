@@ -70,7 +70,6 @@ class SprintBacklogView(Column):
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             expand=True,
-            height=self.page.height - 120,
         )
     
     def build_sprint_backlog_column(self, sprint_backlog_items=None):
@@ -123,7 +122,6 @@ class SprintBacklogView(Column):
             border_radius=border_radius.all(10),
             padding=padding.all(10),
             expand=True,
-            height=self.page.height - 120,
         )
     
     def build(self):
@@ -139,9 +137,10 @@ class SprintBacklogView(Column):
                     content=Row([
                         self.build_product_backlog_column(),
                         self.build_sprint_backlog_column(),
-                    ])
+                    ], expand=True),
+                    expand=True,
                 )
-            ]),
+            ], expand=True),
             padding=padding.all(20),
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",
@@ -159,9 +158,6 @@ class SprintBacklogView(Column):
 
                 self.controls[0].width = self.page.width - 330
                 self.controls[0].height =  self.page.height - 20
-
-                self.controls[0].content.controls[1].content.controls[0].height = self.page.height - 120
-                self.controls[0].content.controls[1].content.controls[1].height = self.page.height - 120
 
             asyncio.run(self.populate_product_backlog())
             asyncio.run(self.populate_sprint_backlog())

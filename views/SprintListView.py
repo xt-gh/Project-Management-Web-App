@@ -87,7 +87,7 @@ class SprintListView(Column):
                             alignment=alignment.center,
                             expand=1,
                         )
-                    ]),
+                    ], expand=True),
             padding=padding.all(20),
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",

@@ -32,7 +32,7 @@ class Collaborators(Column):
         )
         if self.page.current_user_info["account_type"] == "admin":
             return Container(
-                content=Column([
+                 content=Column([
                     Row([
                         Text("Collaborators", color=colors.BLACK, size=40, weight=FontWeight.BOLD),
                         Row([
@@ -49,7 +49,7 @@ class Collaborators(Column):
                     alignment=alignment.bottom_right,  # Positioning button at the bottom right
                     padding=padding.only(right=10, bottom=10),  # Adding some padding for spacing
                     ),   
-                ]),
+                ], expand=True),
                 padding=padding.all(20),
                 border_radius=border_radius.all(10),
                 bgcolor="#CADEED",
@@ -67,7 +67,7 @@ class Collaborators(Column):
                     alignment=alignment.top_center,
                     expand=1,
                 )
-            ]),
+            ], expand=True),
             padding=padding.all(20),
             border_radius=border_radius.all(10),
             bgcolor="#CADEED",
