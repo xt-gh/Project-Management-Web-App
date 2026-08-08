@@ -266,7 +266,7 @@ class SprintBacklogView(Column):
         asyncio.run(self.populate_sprint_backlog())
         self.page.update()
 
-    def drag_will_accept(self, e: DragTargetAcceptEvent):
+    def drag_will_accept(self, e):
         print(f"Will accept dragged item: {e.data}")
         
         # Change the background of the drop target to show it can accept the drop
