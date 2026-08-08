@@ -235,5 +235,13 @@ def main(page):
     login_page = LoginPage(page, on_login_success)
     page.add(login_page)
 
-flet.app(target=main, assets_dir="./assets")
+if __name__ == "__main__":
+    import os
+    port = int(os.getenv("PORT", 8000))
+    # If PORT is specified (like in Render or Docker), start as a web app.
+    # Otherwise, start as a standard desktop app.
+    if os.getenv("PORT"):
+        flet.app(target=main, assets_dir="./assets", view=flet.AppView.WEB_BROWSER, port=port, host="0.0.0.0")
+    else:
+        flet.app(target=main, assets_dir="./assets")
 
