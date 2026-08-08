@@ -44,11 +44,9 @@ class Collaborators(Column):
                         alignment=alignment.top_center,
                         expand=1,
                     ),
-                    Container(
-                    ElevatedButton("Average log time spent", icon=icons.ACCESS_TIME, on_click=lambda e: self.handle_view_table(e)),
-                    alignment=alignment.bottom_right,  # Positioning button at the bottom right
-                    padding=padding.only(right=10, bottom=10),  # Adding some padding for spacing
-                    ),   
+                    Row([
+                        ElevatedButton("Average log time spent", icon=icons.ACCESS_TIME, on_click=lambda e: self.handle_view_table(e)),
+                    ], alignment=MainAxisAlignment.END),   
                 ], expand=True),
                 padding=padding.all(20),
                 border_radius=border_radius.all(10),
