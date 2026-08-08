@@ -18,16 +18,25 @@ client = None
 db = None
 
 try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000, tlsCAFile=certifi.where())
+    # Use 5 seconds timeout for cloud database connection
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, tlsCAFile=certifi.where())
     db = client["projectDatabase"]
     # Quick connectivity check
     client.server_info()
+    print("\033[32m[INFO] Successfully connected to MongoDB Atlas Cloud!\033[0m")
 except Exception as e:
-    print(f"\033[31m[ERROR] Failed to connect to MongoDB: {e}\033[0m")
-    # If connection/DNS resolution failed, fallback to a local MongoDB client
-    # so that the imports do not crash on start-up.
-    try:
-        client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=2000, tlsCAFile=certifi.where())
-        db = client["projectDatabase"]
-    except Exception:
+    print(f"\033[31m[ERROR] Failed to connect to MongoDB Atlas: {e}\033[0m")
+    
+    # Only fall back to local MongoDB if we are NOT running in the cloud (Render/Docker)
+    if not os.getenv("PORT"):
+        print("[INFO] Falling back to local MongoDB at localhost:27017")
+        try:
+            client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=2000, tlsCAFile=certifi.where())
+            db = client["projectDatabase"]
+            client.server_info()
+        except Exception as local_err:
+            print(f"[ERROR] Local MongoDB fallback failed: {local_err}")
+            db = None
+    else:
+        # In cloud environments, do not fall back to localhost
         db = None
