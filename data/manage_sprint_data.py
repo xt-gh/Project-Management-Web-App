@@ -1,18 +1,12 @@
 from datetime import datetime
 import time
-import requests
-import json
 import asyncio
+from bson.objectid import ObjectId
+from data.db import db
 
 class SprintData():
-    base_url = 'https://ap-southeast-1.aws.data.mongodb-api.com/app/data-vevzgeu/endpoint/data/v1'
-    api_key = 'oFUhaqY07FnEp8S3hU4Bw8bxTMHM4plR3kWxT1856Wt3Hc0iiUjcn3vrhzDzLoyK'  
-    headers = {
-        "Content-Type": "application/json",
-        "api-key": api_key,
-    }
-    database_name = "projectDatabase"
     collection_name = "sprint"
+    collection = db[collection_name]
 
     sprint_board_items = [
         {
@@ -34,97 +28,66 @@ class SprintData():
     
     async def ping(self):
         try:
-            url = f"{self.base_url}/action/findOne"
-            payload = json.dumps({
-                "dataSource": "helium",
-                "database": self.database_name,
-                "collection": self.collection_name,
-                "filter": {}
-            })
-            response = requests.post(url, headers=self.headers, data=payload)
-            if response.status_code == 200:
-                print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
-            else:
-                print(f"\031[42mFailed to connect to MongoDB: {response.status_code}\033[0m")
+            db.client.admin.command('ping')
+            print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
         except Exception as e:
             print(f"\031[42mAn error occurred: {e}\033[0m")
     
     # Method to get all sprint items
     async def get_sprint_items(self):
         print("\033[42mDATABASE: Getting sprint items\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({}))
+        for doc in documents:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
         print("\033[42mDATABASE: Sprint items fetched\033[0m")
-        for item in response.json()['documents']:
+        for item in documents:
             print(item)
-        return response.json()['documents']
+        return documents
 
      # Method to add a new sprint
     async def add_sprint_item(self, item):
         print("\033[42mDATABASE: Adding new sprint\033[0m")
-        url = f"{self.base_url}/action/insertOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "document": item
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        if '_id' in item:
+            if isinstance(item['_id'], str) and ObjectId.is_valid(item['_id']):
+                item['_id'] = ObjectId(item['_id'])
+        result = self.collection.insert_one(item)
         print("\033[42mDATABASE: New sprint added\033[0m")
-        return response.json()
+        return {"insertedId": str(result.inserted_id)}
     
     # Method to update a sprint
     async def update_sprint_item(self, sprint_id, updated_fields):
         print("\033[42mDATABASE: Updating sprint\033[0m")
         print(sprint_id)
         print(updated_fields)
-        url = f"{self.base_url}/action/updateOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": sprint_id}},
-            "update": {"$set": updated_fields}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        # print(response.json())
+        if '_id' in updated_fields:
+            del updated_fields['_id']
+        result = self.collection.update_one(
+            {"_id": ObjectId(sprint_id)},
+            {"$set": updated_fields}
+        )
         print("\033[42mDATABASE: Sprints fetched\033[0m")
-        return response.json()
+        return {
+            "matchedCount": result.matched_count,
+            "modifiedCount": result.modified_count
+        }
 
     # Method to delete a sprint
     async def remove_sprint_item(self, sprint_id):
         print("\033[42mDATABASE: Removing sprint\033[0m")
-        url = f"{self.base_url}/action/deleteOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": sprint_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
+        result = self.collection.delete_one({"_id": ObjectId(sprint_id)})
         print("\033[42mDATABASE: Sprint deleted\033[0m")
-        return response.json()
+        return {"deletedCount": result.deleted_count}
     
     # Method to get a single sprint by its _id
     async def get_sprint_item(self, item_id):
         print("\033[42mDATABASE: Getting sprint", item_id)
-        url = f"{self.base_url}/action/findOne"
-        payload = json.dumps({
-            "dataSource": "helium",  # Replace with your data source name
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": item_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json()['document'])
+        document = self.collection.find_one({"_id": ObjectId(item_id)})
+        if document:
+            document['_id'] = str(document['_id'])
+        print(document)
         print("\033[42mDATABASE: Sprint fetched\033[0m")
-        return response.json()['document']
+        return document
 
 # SPRINTS =  asyncio.run(SprintData().get_sprint_items())
 # for sprint in SPRINTS:

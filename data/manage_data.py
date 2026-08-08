@@ -1,17 +1,11 @@
 import asyncio
 from datetime import datetime
-import requests
-import json
+from bson.objectid import ObjectId
+from data.db import db
 
 class Data():
-    base_url = 'https://ap-southeast-1.aws.data.mongodb-api.com/app/data-vevzgeu/endpoint/data/v1'
-    api_key = 'oFUhaqY07FnEp8S3hU4Bw8bxTMHM4plR3kWxT1856Wt3Hc0iiUjcn3vrhzDzLoyK'  # Replace with your API key
-    headers = {
-        "Content-Type": "application/json",
-        "api-key": api_key,
-    }
-    database_name = "projectDatabase"
     collection_name = "task"
+    collection = db[collection_name]
     
     product_backlog_items = [
         {
@@ -74,127 +68,79 @@ class Data():
     
     async def ping(self):
         try:
-            url = f"{self.base_url}/action/findOne"
-            payload = json.dumps({
-                "dataSource": "helium",  # Replace with your data source name
-                "database": self.database_name,
-                "collection": self.collection_name,
-                "filter": {}
-            })
-            response = requests.post(url, headers=self.headers, data=payload)
-            if response.status_code == 200:
-                print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
-            else:
-                print(f"\031[42mFailed to connect to MongoDB: {response.status_code}\033[0m")
+            db.client.admin.command('ping')
+            print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
         except Exception as e:
             print(f"\031[42mAn error occurred: {e}\033[0m")
     
     # Method to get all product backlog items
     async def get_product_backlog_items(self):
         print("\033[42mDATABASE: Getting product backlog items\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",  # Replace with your data source name
-            "database": self.database_name,
-            "collection": self.collection_name,
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({}))
+        for doc in documents:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
         print("\033[42mDATABASE: Product backlog items fetched\033[0m")
-        return response.json()['documents']
+        return documents
 
     # Method to get a single product backlog item by its _id
     async def get_product_backlog_item(self, item_id):
-        
         print("\033[42mDATABASE: Getting product backlog item", item_id)
-        url = f"{self.base_url}/action/findOne"
-        payload = json.dumps({
-            "dataSource": "helium",  # Replace with your data source name
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": item_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
+        document = self.collection.find_one({"_id": ObjectId(item_id)})
+        if document:
+            document['_id'] = str(document['_id'])
+        print(document)
         print("\033[42mDATABASE: Product backlog item fetched\033[0m")
-        return response.json()['document']
+        return document
 
     # Method to add a new product backlog item
     async def add_product_backlog_item(self, item):
         print("\033[42mDATABASE: Adding new product backlog item\033[0m")
-        url = f"{self.base_url}/action/insertOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "document": item
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        if '_id' in item:
+            if isinstance(item['_id'], str) and ObjectId.is_valid(item['_id']):
+                item['_id'] = ObjectId(item['_id'])
+        result = self.collection.insert_one(item)
         print("\033[42mDATABASE: New product backlog item added\033[0m")
-        return response.json()
+        return {"insertedId": str(result.inserted_id)}
 
     # Method to update a product backlog item
     async def update_product_backlog_item(self, item_id, updated_fields):
-        # for item in self.product_backlog_items:
-        #     if item['_id'] == item_id:
-        #         for key, value in updated_fields.items():
-        #             item[key] = value
-                # return item
         print("\033[42mDATABASE: Updating product backlog item\033[0m", str(updated_fields))
-        url = f"{self.base_url}/action/updateOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": item_id}},
-            "update": {"$set": updated_fields}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
-        return response.json()
+        if '_id' in updated_fields:
+            del updated_fields['_id']
+        result = self.collection.update_one(
+            {"_id": ObjectId(item_id)},
+            {"$set": updated_fields}
+        )
+        return {
+            "matchedCount": result.matched_count,
+            "modifiedCount": result.modified_count
+        }
 
     # Method to remove a product backlog item by its _id
     async def remove_product_backlog_item(self, item_id):
-        # for i, item in enumerate(self.product_backlog_items):
-        #     if item['_id'] == item_id:
-        #         self.product_backlog_items.pop(i)
-                # return item
         print("\033[42mDATABASE: Removing product backlog item\033[0m", item_id)
-        url = f"{self.base_url}/action/deleteOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": item_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        return response.json()
+        result = self.collection.delete_one({"_id": ObjectId(item_id)})
+        return {"deletedCount": result.deleted_count}
     
     # Method to get all items from a sprint
     async def get_tasks_from_sprint_id(self, sprint_id):
         print("\033[42mDATABASE: Getting tasks from sprint ID", sprint_id, "\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",  # Replace with your data source name
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"sprint_id": sprint_id}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({"sprint_id": sprint_id}))
+        for doc in documents:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
         print("\033[42mDATABASE: Sprint task items fetched\033[0m")
-        return response.json()['documents']
+        return documents
     
     async def get_tasks_with_username(self, username):
         print("\033[42mDATABASE: Getting tasks with username", username, "\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",  # Replace with your data source name
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"assignee": username}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({"assignee": username}))
+        for doc in documents:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
         print("\033[42mDATABASE: Tasks with username fetched\033[0m")
-        return response.json()['documents']
+        return documents
 
 if __name__ == "__main__":
     def print_all_items():

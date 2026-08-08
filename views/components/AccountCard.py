@@ -64,22 +64,13 @@ class AccountCard(Container):
     def card_details(self):
         body = []
 
-        username_container = Container(
-            self.username_details(),
-            width=380
-        )
-
-        password_container = Container(
-            self.password_details(),
-            width=380
-        )
-
         credentials_container = Container(
             Row([
-                username_container,
-                password_container,
+                self.username_details(),
+                self.password_details(),
             ],
-            alignment=MainAxisAlignment.SPACE_BETWEEN),
+            alignment=MainAxisAlignment.START,
+            spacing=45),
         )
 
         if self.page.current_user_info["account_type"] == "admin" and self.username == self.page.current_user_info["username"]:
@@ -104,7 +95,7 @@ class AccountCard(Container):
             )
 
         else:
-            body.append(username_container)
+            body.append(self.username_details())
 
         return Row(body,
                     alignment=MainAxisAlignment.SPACE_BETWEEN,

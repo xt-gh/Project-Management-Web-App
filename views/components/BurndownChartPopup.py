@@ -79,10 +79,19 @@ class BurndownChartPopup(AlertDialog):
             labels_size=32,
         )
     
+    def _parse_story_points(self, task):
+        val = task.get('story_points')
+        if val is None or val == "":
+            return 0
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            return 0
+
     def get_total_story_points(self, tasks):
         total_story_points = 0
         for task in tasks:
-            total_story_points += int(task.get('story_points', 0))
+            total_story_points += self._parse_story_points(task)
         return total_story_points
     
     def get_chart_data(self):
@@ -196,14 +205,14 @@ class BurndownChartPopup(AlertDialog):
 
         total_story_points = 0
         for task in all_tasks:
-            total_story_points += int(task.get('story_points', 0))
+            total_story_points += self._parse_story_points(task)
 
         task_data = []
 
         completed_tasks = self.get_completed_tasks_for_sprint()
         for task in completed_tasks:
             date_value = self.date_to_value(datetime.strptime(task['date_completed'], '%d-%m-%Y').date())
-            story_points = int(task.get('story_points', 0))
+            story_points = self._parse_story_points(task)
             task_data.append((date_value, story_points))
         
         # Sort the dates and calculate remaining points

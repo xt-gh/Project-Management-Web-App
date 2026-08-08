@@ -208,9 +208,10 @@ class SprintKanbanView(Stack):
                                 self.build_not_started_column(),
                                 self.build_in_progress_column(),
                                 self.build_completed_column(),
-                            ]),
-                            )
-                    ]),
+                            ], expand=True),
+                            expand=True,
+                        )
+                    ], expand=True),
                     padding=padding.all(20),
                     border_radius=border_radius.all(10),
                     bgcolor="#CADEED",

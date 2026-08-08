@@ -1,140 +1,92 @@
 from datetime import datetime
 import time
-import requests
-import json
 import asyncio
+from bson.objectid import ObjectId
+from data.db import db
 
 class UserData():
-    base_url = 'https://ap-southeast-1.aws.data.mongodb-api.com/app/data-vevzgeu/endpoint/data/v1'
-    api_key = 'oFUhaqY07FnEp8S3hU4Bw8bxTMHM4plR3kWxT1856Wt3Hc0iiUjcn3vrhzDzLoyK'  
-    headers = {
-        "Content-Type": "application/json",
-        "api-key": api_key,
-    }
-    database_name = "projectDatabase"
     collection_name = "user"
+    collection = db[collection_name]
 
     async def ping(self):
         try:
-            url = f"{self.base_url}/action/findOne"
-            payload = json.dumps({
-                "dataSource": "helium",
-                "database": self.database_name,
-                "collection": self.collection_name,
-                "filter": {}
-            })
-            response = requests.post(url, headers=self.headers, data=payload)
-            if response.status_code == 200:
-                print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
-            else:
-                print(f"\031[42mFailed to connect to MongoDB: {response.status_code}\033[0m")
+            db.client.admin.command('ping')
+            print("\033[42mDATABASE: Successfully connected to MongoDB\033[0m")
         except Exception as e:
             print(f"\031[42mAn error occurred: {e}\033[0m")
 
     # Method to get all users
     async def get_all_users(self):
         print("\033[42mDATABASE: Getting all users informations\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({}))
+        for doc in documents:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
         print("\033[42mDATABASE: User information fetched\033[0m")
-        for item in response.json()['documents']:
+        for item in documents:
             print(item)
-        return response.json()['documents']
+        return documents
     
     async def get_all_usernames(self):
         print("\033[42mDATABASE: Getting all usernames\033[0m")
-        url = f"{self.base_url}/action/find"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        documents = list(self.collection.find({}, {"username": 1}))
+        usernames = []
+        for item in documents:
+            if 'username' in item:
+                usernames.append(item['username'])
         print("\033[42mDATABASE: Usernames fetched\033[0m")
-        usernames = [item['username'] for item in response.json()['documents']]
         print(usernames)
         return usernames
     
     # Method to get a single user by username
     async def get_user(self, username):
         print("\033[42mDATABASE: Getting user", username)
-        url = f"{self.base_url}/action/findOne"
-        payload = json.dumps({
-            "dataSource": "helium", 
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"username": username}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
+        document = self.collection.find_one({"username": username})
+        if document:
+            document['_id'] = str(document['_id'])
+        print(document)
         print("\033[42mDATABASE: User information fetched\033[0m")
-        return response.json()['document']
+        return document
     
-        # Method to add new user
+    # Method to add new user
     async def add_user(self, item):
         print("\033[42mDATABASE: Adding new user\033[0m")
-        url = f"{self.base_url}/action/insertOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "document": item
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
+        if '_id' in item:
+            if isinstance(item['_id'], str) and ObjectId.is_valid(item['_id']):
+                item['_id'] = ObjectId(item['_id'])
+        result = self.collection.insert_one(item)
         print("\033[42mDATABASE: New user added\033[0m")
-        return response.json()
+        return {"insertedId": str(result.inserted_id)}
     
     # Method to update a user information
     async def update_user_info(self, account_id, updated_fields):
-        # for item in self.product_backlog_items:
-        #     if item['_id'] == item_id:
-        #         for key, value in updated_fields.items():
-        #             item[key] = value
-                # return item
         print("\033[42mDATABASE: Updating user info\033[0m", str(updated_fields))
-        url = f"{self.base_url}/action/updateOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": account_id}},
-            "update": {"$set": updated_fields}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
-        return response.json()
+        if '_id' in updated_fields:
+            del updated_fields['_id']
+        result = self.collection.update_one(
+            {"_id": ObjectId(account_id)},
+            {"$set": updated_fields}
+        )
+        return {
+            "matchedCount": result.matched_count,
+            "modifiedCount": result.modified_count
+        }
     
     # Method to remove a user by its _id
     async def remove_user(self, user_id):
         print("\033[42mDATABASE: Removing user\033[0m", user_id)
-        url = f"{self.base_url}/action/deleteOne"
-        payload = json.dumps({
-            "dataSource": "helium",
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": user_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        return response.json()
+        result = self.collection.delete_one({"_id": ObjectId(user_id)})
+        return {"deletedCount": result.deleted_count}
     
     async def get_user_by_id(self, user_id):
         print("\033[42mDATABASE: Getting user", user_id)
-        url = f"{self.base_url}/action/findOne"
-        payload = json.dumps({
-            "dataSource": "helium", 
-            "database": self.database_name,
-            "collection": self.collection_name,
-            "filter": {"_id": {"$oid": user_id}}
-        })
-        response = requests.post(url, headers=self.headers, data=payload)
-        print(response.json())
+        document = self.collection.find_one({"_id": ObjectId(user_id)})
+        if document:
+            document['_id'] = str(document['_id'])
+        print(document)
         print("\033[42mDATABASE: User information fetched\033[0m")
-        return response.json()['document']
+        return document
+
     
 if __name__ == "__main__":
     data_api = UserData()
